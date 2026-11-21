@@ -17,7 +17,7 @@ A brief is build-ready when someone who was not in the conversation can
 implement it without a second interview. Technical approach is not part of
 the brief — that belongs to a later technical-approach pass.
 
-, in this order
+## Required sections, in this order
 
 1. **Problem** — who is blocked, and what fails today. One to three sentences.
 2. **Outcome** — what done looks like for that person.
