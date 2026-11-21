@@ -1,0 +1,71 @@
+---
+description: >-
+  Kotlin style — null safety, coroutines, modules, and tests. Use when editing
+  Kotlin for Android or multiplatform.
+globs: "**/*.{kt,kts}"
+alwaysApply: false
+---
+
+# Kotlin
+
+## Format and tooling
+
+- Match the project's Kotlin language version and Gradle / Android settings.
+  Do not raise the toolchain for one file.
+- Format with the repo's Kotlin formatter (`ktlint`, Spotless, or IDE
+  defaults). Do not hand-align beyond what the formatter keeps.
+- Fix new compiler and lint findings on code you change. Do not
+  `@Suppress` a lint to land the change unless the module already
+  suppresses that lint for the same reason.
+- Prefer the standard library and the project's existing AndroidX /
+  Jetpack libraries. Do not add a dependency for a helper already on the
+  classpath.
+
+## Null safety and types
+
+- Prefer non-null types. Use `?` only when absence is a real domain state.
+- Prefer `?.` / `?:` / early `return` over `!!` on a path a caller can
+  handle. `!!` is allowed only when the invariant is locally obvious.
+- Prefer `data class`, `sealed class` / `sealed interface`, and value
+  classes for domain models. Do not encode variants as a pile of nullable
+  fields.
+- Prefer `val` unless reassignment is required. Prefer immutable
+  collections at public boundaries.
+- Keep Java interop nullability honest (`@Nullable` / `@NonNull` on the
+  Java side, or platform-type handling at the boundary).
+
+## Coroutines and UI
+
+- Prefer structured concurrency (`coroutineScope`, `supervisorScope`,
+  viewModelScope / lifecycleScope the project already uses) over global
+  `GlobalScope`.
+- Cancel work when the owner is cleared. Do not launch a fire-and-forget
+  coroutine that outlives its screen without an explicit owner.
+- Switch dispatchers at the boundary (`withContext`) — do not hardcode
+  `Dispatchers.IO` deep inside pure domain code when the project injects
+  dispatchers.
+- Prefer the project's existing UI stack (Jetpack Compose or Views). Do
+  not introduce a second UI toolkit for one screen.
+- Do not update UI state off the main thread. Use the project's main
+  dispatcher / Compose snapshot rules.
+
+## Modules and packaging
+
+- Keep packages named for what they provide, not `util` or `common`.
+- Prefer `internal` for module-local API. Expose only what another module
+  needs.
+- One primary type per file when the file would otherwise mix networking,
+  persistence, and presentation.
+- Match the project's Gradle module boundaries. Do not create a new
+  module for a single helper.
+
+## Tests
+
+- Prefer the project's test stack (JUnit, Kotest, instrumentation). Ship a
+  unit test for a new exported behavior in the same change
+  (`code-unit-testing`).
+- Cover the failure path and one success path. Prefer fakes or the
+  project's existing test doubles over a heavyweight mock framework for a
+  single call.
+- Do not `Thread.sleep` to wait for a coroutine. Use `runTest`, Turbine,
+  or the project's existing async test helper.

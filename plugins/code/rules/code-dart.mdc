@@ -1,0 +1,68 @@
+---
+description: >-
+  Dart and Flutter style — null safety, async, widgets, and tests. Use when
+  editing Dart for Flutter or Dart-only packages.
+globs: "**/*.dart"
+alwaysApply: false
+---
+
+# Dart / Flutter
+
+## Format and tooling
+
+- Match the project's Dart / Flutter SDK constraint in `pubspec.yaml`. Do
+  not raise the SDK floor for one file.
+- Format with `dart format`. Fix new `dart analyze` issues on code you
+  change. Do not ignore a lint in `analysis_options.yaml` to land one
+  edit unless the package already ignores that lint for the same reason.
+- Prefer the Dart SDK and the project's existing pub dependencies. Do not
+  add a package for a helper `dart:core` / `dart:async` already provides.
+- Use the project's package manager workflow (`flutter pub` / `dart pub`).
+  Do not mix in a second lockfile tool.
+
+## Null safety and types
+
+- Prefer non-nullable types. Use `?` only when absence is a real domain
+  state.
+- Prefer early returns and null-aware operators over `!` on a path a
+  caller can handle. `!` is allowed only when the invariant is locally
+  obvious.
+- Prefer `final` fields and locals unless reassignment is required.
+- Prefer enums, sealed classes (when the SDK allows), and small immutable
+  model classes over maps of dynamic values at a public boundary.
+- Type every public function's parameters and return value. Avoid `dynamic`
+  except at a validated serialization boundary.
+
+## Async and Flutter UI
+
+- Prefer `async`/`await` and cancelable subscriptions over nested
+  callbacks. Dispose `StreamSubscription`, controllers, and listeners in
+  `dispose` / `close`.
+- Prefer the project's existing state approach (setState, Provider, Riverpod,
+  Bloc, or similar). Do not introduce a second state library for one
+  screen.
+- Keep `build` pure: no network, random, or persistence writes during
+  build. Trigger side effects from init/dispose, listeners, or explicit
+  handlers.
+- Prefer composition of small widgets over one massive `build`. Extract a
+  widget when it owns state or is reused.
+- Respect platform differences with the project's existing pattern
+  (`Platform.isX`, federated plugins) — do not sprinkle ad-hoc OS checks
+  through domain code.
+
+## Packages and libraries
+
+- Keep library visibility honest: `public` API in the package's intended
+  export; prefer private top-levels (`_name`) for helpers.
+- One primary type per library file when the file would otherwise mix
+  networking, persistence, and presentation.
+- Do not create a catch-all `utils.dart` dumping ground.
+
+## Tests
+
+- Prefer the project's test stack (`package:test`, `flutter_test`). Ship a
+  unit or widget test for a new exported behavior in the same change
+  (`code-unit-testing`).
+- Cover the failure path and one success path. Use `pump` /
+  `pumpAndSettle` (or the project's helper) instead of real sleeps.
+- Prefer fakes at the boundary over mocking every Flutter framework type.

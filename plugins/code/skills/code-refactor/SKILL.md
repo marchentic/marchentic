@@ -2,8 +2,9 @@
 name: code-refactor
 description: >-
   Audit and apply behavior-preserving structural refactoring across Python,
-  JavaScript, TypeScript, Go, and Rust. Use for refactor audit, ownership/decomposition
-  cleanup, or when asked to restructure live code without behavior change.
+  JavaScript, TypeScript, Go, Rust, Swift, Kotlin, Dart, and Java. Use for
+  refactor audit, ownership/decomposition cleanup, or when asked to
+  restructure live code without behavior change.
 ---
 
 # Refactor
@@ -45,8 +46,9 @@ Refactor:
 
 ### 1. Scope
 
-State paths and languages (Python, JS/TS/JSX, or both). Prefer the smallest
-set that contains the ownership problem.
+State paths and languages (Python, JS/TS/JSX, Go, Rust, Swift, Kotlin,
+Dart, Java, or the mix in scope). Prefer the smallest set that contains
+the ownership problem.
 
 ### 2. Behavior contract
 
@@ -130,6 +132,20 @@ gate. Do not claim success from linting or import checks alone.
 - Avoid broad `utils` / `helpers` / `common` modules and circular imports.
 - Do not use regex replacement for syntax-aware changes; AST codemod only when
   mechanical and tested.
+
+
+## Swift / Kotlin / Dart / Java mechanics
+
+- Refactor around responsibility and ownership (actors, ViewModels,
+  widgets, presenters), not arbitrary line counts.
+- Preserve nullability / optionality, error and cancellation semantics,
+  main-thread UI rules, and serialization identities.
+- Keep platform or native-bridge code at a clear boundary; do not drag
+  UIKit / Compose / Flutter widgets into domain modules.
+- Prefer the language rule for the files in scope (`code-swift`,
+  `code-kotlin`, `code-dart`, `code-java`) for format and safety defaults.
+- Move one responsibility at a time; keep intermediate states testable.
+- Avoid catch-all `util` / `common` / `helpers` dumping grounds.
 
 ## Close-out
 

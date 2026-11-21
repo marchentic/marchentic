@@ -1,0 +1,66 @@
+---
+description: >-
+  Java style — nullability, exceptions, modules, and tests. Use when editing
+  Java for Android or general JVM apps.
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Java
+
+## Format and tooling
+
+- Match the project's Java language level and build settings (Maven /
+  Gradle / Android). Do not raise the bytecode target for one file.
+- Format with the repo's Java formatter (google-java-format, Spotless, or
+  IDE defaults). Do not hand-align beyond what the formatter keeps.
+- Fix new compiler and lint findings on code you change. Do not
+  `@SuppressWarnings` a finding to land the change unless the module
+  already suppresses that warning for the same reason.
+- Prefer the standard library and the project's existing dependencies. Do
+  not add a library for a helper already on the classpath.
+
+## Nullability and types
+
+- Annotate nullability at public boundaries (`@Nullable` / `@NonNull`, or
+  the project's chosen annotations). Prefer non-null return types.
+- Prefer `Optional` only when the project already uses it for that kind of
+  API — do not wrap every nullable field.
+- Prefer immutable value types and enums over boolean pairs that encode
+  variants.
+- Prefer `final` locals and fields unless reassignment is required.
+- Keep generics honest. Do not use raw types.
+
+## Exceptions and APIs
+
+- Prefer checked exceptions only when the project already uses them for
+  that boundary; otherwise prefer unchecked domain exceptions the caller
+  can handle.
+- Do not swallow an exception with an empty `catch`. Log or wrap with
+  context, or document why it is safe to ignore.
+- Close resources with try-with-resources. Do not leave streams or cursors
+  open across an early return.
+- Prefer the project's existing DI / Android component patterns. Do not
+  introduce a second injection framework for one class.
+
+## Android and packaging
+
+- Prefer the project's existing UI stack (Views or the shared Compose
+  interop path). Do not introduce a second UI toolkit for one screen.
+- Do main-thread UI updates only on the main thread. Prefer the project's
+  existing executor / coroutine / WorkManager path for background work —
+  do not spawn unmanaged threads for one call.
+- Keep packages named for what they provide, not `util` or `common`.
+- One primary type per file when the file would otherwise mix networking,
+  persistence, and presentation.
+
+## Tests
+
+- Prefer the project's test stack (JUnit, instrumentation). Ship a unit
+  test for a new exported behavior in the same change
+  (`code-unit-testing`).
+- Cover the failure path and one success path. Prefer fakes or the
+  project's existing test doubles over a heavyweight mock for a single
+  call.
+- Do not `Thread.sleep` to wait for async work. Use the project's
+  existing IdlingResource, coroutine test, or latch helper.

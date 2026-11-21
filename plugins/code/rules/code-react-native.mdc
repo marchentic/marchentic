@@ -1,0 +1,56 @@
+---
+description: >-
+  React Native craft — platform files, native modules, navigation, and tests.
+  Pair with code-javascript / code-typescript / code-react. Use for RN apps.
+globs: "**/*.{js,jsx,ts,tsx}"
+alwaysApply: false
+---
+
+# React Native
+
+Builds on `code-javascript`, `code-typescript` (for `.ts` / `.tsx`), and
+`code-react`. Apply this rule when the package is a React Native app or
+library (Metro, `react-native` dependency, or `*.ios.*` / `*.android.*`
+platform files).
+
+## Platform and modules
+
+- Prefer the project's existing RN major, navigation, and native-module
+  pattern. Do not introduce a second navigation or state library for one
+  screen.
+- Put platform-specific code in `*.ios.*` / `*.android.*` (or the
+  project's platform extension scheme). Keep shared logic platform-free.
+- Prefer JavaScript / TypeScript APIs the RN and community modules already
+  expose. Touch native Swift / Kotlin / Java / Objective-C only when the
+  JS bridge cannot do the job — then follow the matching language rule.
+- Do not add a bare `Linking`, permissions, or filesystem call deep in a
+  presentational component; keep device APIs at a clear boundary.
+
+## UI and performance
+
+- Prefer the project's existing component and design-system primitives
+  over one-off `View` / `Text` trees copied from web.
+- Do not use web-only DOM APIs (`document`, `window` layout hacks) in RN
+  code. Use RN primitives and the project's layout library.
+- List performance: stable `key`s, avoid inline unstable callbacks in hot
+  lists when the project already memoizes list rows, and keep row
+  components light.
+- Images and heavy assets follow the project's bundler and caching path —
+  do not embed large base64 payloads in source.
+
+## Native changes
+
+- A JS-only change must not require a native rebuild unless you also ship
+  the native edit. Say when a pod / Gradle change is required.
+- Keep bridge contracts typed (or JSDoc'd) on the JS side. Do not pass
+  unvalidated free-form maps into native modules.
+- Match existing autolinking / config-plugin patterns. Do not add a manual
+  native link the project abandoned.
+
+## Tests
+
+- Prefer the project's RN test stack (Jest + Testing Library, Detox, or
+  Maestro). Ship a unit or component test for a new exported behavior in
+  the same change (`code-unit-testing`).
+- Mock native modules at the boundary the project already uses. Do not
+  invent a second mock layer for one call.

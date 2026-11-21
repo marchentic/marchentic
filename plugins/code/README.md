@@ -18,7 +18,12 @@ trust-boundary list.
 | `code-typescript` | TypeScript and TSX types, narrowing, and module boundaries |
 | `code-go` | Go formatting, errors, context, and tests |
 | `code-rust` | Rust ownership, errors, and tests |
+| `code-swift` | Swift optionals, concurrency, modules, and tests (Apple) |
+| `code-kotlin` | Kotlin null safety, coroutines, modules, and tests (Android) |
+| `code-dart` | Dart / Flutter null safety, widgets, async, and tests |
+| `code-java` | Java nullability, exceptions, modules, and tests (Android/JVM) |
 | `code-react` | React components, hooks, effects, lists, tests |
+| `code-react-native` | React Native platform files, native modules, and tests |
 | `code-nextjs` | Next.js App Router / Server vs Client Components |
 | `code-flask` | Flask app factory, blueprints, sessions, extensions |
 | `code-fastapi` | FastAPI routers, Pydantic, Depends, async |

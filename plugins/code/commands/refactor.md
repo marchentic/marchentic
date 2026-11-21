@@ -13,7 +13,8 @@ or the current change set if the user did not bound it).
 ## Do this
 
 1. Load and follow `code-refactor` end to end.
-2. Bound scope to named paths / languages (Python and/or JS/TS/JSX).
+2. Bound scope to named paths / languages (Python, JS/TS/JSX, Go, Rust,
+   Swift, Kotlin, Dart, Java, or the mix in scope).
 3. Establish the behavior contract before moving code (callers, tests,
    identities, side effects).
 4. Inventory structural candidates; skip taste-only or out-of-scope platform

@@ -1,0 +1,67 @@
+---
+description: >-
+  Swift style — optionals, errors, concurrency, modules, and tests. Use when
+  editing Swift for iOS, macOS, or other Apple platforms.
+globs: "**/*.{swift,swiftinterface}"
+alwaysApply: false
+---
+
+# Swift
+
+## Format and tooling
+
+- Match the project's Swift tools version and package / Xcode settings. Do
+  not raise the language mode for one file.
+- Format with the repo's Swift formatter (`swift-format`, SwiftFormat, or
+  Xcode). Do not hand-align beyond what the formatter keeps.
+- Fix new compiler and analyzer warnings on code you change. Do not silence
+  a warning with `@available` misuse or a broad `#if` unless the project
+  already does that for the same reason.
+- Prefer the standard library and the project's existing Apple frameworks.
+  Do not add a third-party package for a helper Foundation already provides.
+
+## Types and optionals
+
+- Prefer `let` unless reassignment is required.
+- Make invalid states unrepresentable: an `enum` or struct, not a pair of
+  optional flags.
+- Prefer `Optional` and early `guard` / `if let` over force-unwrap (`!`)
+  on a path a caller can handle. Force-unwrap only when the invariant is
+  locally obvious and a crash is the correct failure.
+- Prefer `throws` / `Result` for recoverable failures. Do not use `try!`
+  outside a test or a process-stop path that states why.
+- Mark API availability honestly. Do not call a newer API without a
+  deployment check the project already uses.
+
+## Concurrency and UI
+
+- Prefer structured `async`/`await` over ad-hoc callback pyramids when the
+  module already uses concurrency.
+- Isolate UI work to the main actor (`@MainActor` or the project's
+  equivalent). Do not update UIKit / SwiftUI / AppKit state off the main
+  actor.
+- Cancel work you start when the owning task or view goes away. Do not
+  leave a detached `Task` that outlives its screen without an explicit
+  owner.
+- Prefer the project's existing UI stack (SwiftUI, UIKit, AppKit). Do not
+  introduce a second UI framework for one screen.
+
+## Modules and access
+
+- Default to `internal`. Use `public` / `open` only for API another module
+  needs. Prefer `private` / `fileprivate` for helpers.
+- One primary type per file when the file would otherwise mix networking,
+  persistence, and presentation.
+- Keep bridging to Objective-C (`@objc`, `.m` / `.mm` call sites) minimal
+  and at a clear boundary. Match the project's existing interop style.
+
+## Tests
+
+- Prefer the project's test stack (XCTest or Swift Testing). Ship a unit
+  test for a new exported behavior in the same change
+  (`code-unit-testing`).
+- Cover the failure path and one success path. Do not force-unwrap in a
+  test to hide a missing assertion — use `XCTAssert*` / `#expect` and
+  fail with a reason.
+- Do not sleep to wait for async work. Use expectations, Swift Testing
+  confirmation, or the project's existing async test helper.
