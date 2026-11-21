@@ -1,8 +1,9 @@
 # github
 
-Agnostic GitHub craft for Claude Code and Cursor — PR checks, comments, and
-Actions workflow hygiene. Install when the project uses GitHub (GitHub MCP or
-equivalent). No product-specific workflows or repo keys hard-coded.
+Agnostic GitHub craft for Claude Code, Cursor, GitHub Copilot, and OpenAI
+Codex — PR checks, comments, and Actions workflow hygiene. Install when the
+project uses GitHub (GitHub MCP or equivalent). No product-specific workflows
+or repo keys hard-coded.
 
 ## Rules (Cursor)
 

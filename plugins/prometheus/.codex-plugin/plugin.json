@@ -1,7 +1,7 @@
 {
   "name": "nodadyoushutup-prometheus",
   "description": "Agnostic Prometheus craft: discover metrics/labels, PromQL instant/range queries, and targets health via MCP. Prefer Prometheus MCP; discover before guessing.",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
@@ -18,6 +18,8 @@
     "skills",
     "commands"
   ],
+  "skills": "./skills/",
+  "commands": "./commands/",
   "interface": {
     "displayName": "Prometheus",
     "shortDescription": "Agnostic Prometheus craft: discover metrics/labels, PromQL instant/range queries, and targets health via MCP. Prefer Prometheus MCP; discove",

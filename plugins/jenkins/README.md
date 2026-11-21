@@ -1,8 +1,9 @@
 # jenkins
 
-Agnostic Jenkins craft for Claude Code and Cursor — build status, console
-triage, and pipeline hygiene. Install when the project uses Jenkins (Jenkins
-MCP or equivalent). No product-specific job names hard-coded.
+Agnostic Jenkins craft for Claude Code, Cursor, GitHub Copilot, and OpenAI
+Codex — build status, console triage, and pipeline hygiene. Install when the
+project uses Jenkins (Jenkins MCP or equivalent). No product-specific job
+names hard-coded.
 
 ## Rules (Cursor)
 

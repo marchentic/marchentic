@@ -1,6 +1,7 @@
 # code
 
-Coding standards and coding workflow for Claude Code and Cursor.
+Coding standards and coding workflow for Claude Code, Cursor, GitHub Copilot,
+and OpenAI Codex.
 
 This plugin owns file-type conventions, refactor / debug / verify skills,
 and coding agents. Tracker filing, git-host craft, product briefs, and a

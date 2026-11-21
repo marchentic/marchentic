@@ -1,8 +1,8 @@
 # atlassian
 
-Unified Atlassian craft for Claude Code and Cursor — **Jira** + **Confluence**
-in one plugin. Install when the project uses Atlassian MCP (or equivalent). No
-project- or space-specific keys hard-coded.
+Unified Atlassian craft for Claude Code, Cursor, GitHub Copilot, and OpenAI
+Codex — **Jira** + **Confluence** in one plugin. Install when the project uses
+Atlassian MCP (or equivalent). No project- or space-specific keys hard-coded.
 
 ## Rules (Cursor)
 

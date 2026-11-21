@@ -102,16 +102,34 @@ def check_plugin_folder_vs_catalog(catalog: set[str], errors: list[str]) -> None
         )
 
 
+# Host asset dirs that must be declared in every host manifest when present.
+# Rules stay Cursor-primary (Claude Code does not load plugin rules).
+_HOST_ASSET_DIRS: tuple[str, ...] = ("skills", "commands", "agents")
+
+_MANIFEST_RELS: tuple[str, ...] = (
+    ".cursor-plugin/plugin.json",
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
+)
+
+
+def _expected_asset_path(rel: str, asset: str) -> str:
+    """Codex uses trailing-slash paths; Cursor and Claude do not."""
+    if rel.startswith(".codex-plugin/"):
+        return f"./{asset}/"
+    return f"./{asset}"
+
+
 def check_manifests(short: str, errors: list[str]) -> str | None:
     """Validate host manifests. Return the shared version when consistent."""
     expected_name = f"nodadyoushutup-{short}"
     versions: dict[str, str | None] = {}
-    for rel in (
-        ".cursor-plugin/plugin.json",
-        ".claude-plugin/plugin.json",
-        ".codex-plugin/plugin.json",
-    ):
-        path = PLUGINS / short / rel
+    root = PLUGINS / short
+    required_assets = [
+        asset for asset in _HOST_ASSET_DIRS if (root / asset).is_dir()
+    ]
+    for rel in _MANIFEST_RELS:
+        path = root / rel
         if not path.is_file():
             errors.append(f"{short}: missing {rel}")
             continue
@@ -126,6 +144,13 @@ def check_manifests(short: str, errors: list[str]) -> str | None:
             versions[rel] = None
         else:
             versions[rel] = ver
+        for asset in required_assets:
+            want = _expected_asset_path(rel, asset)
+            got = data.get(asset)
+            if got != want:
+                errors.append(
+                    f"{short}: {rel} {asset}={got!r} want {want!r}"
+                )
 
     present = [v for v in versions.values() if v is not None]
     if not present:

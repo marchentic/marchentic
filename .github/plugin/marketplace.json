@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.8"
+    "version": "0.12.9"
   },
   "plugins": [
     {
@@ -37,7 +37,7 @@
     {
       "name": "nodadyoushutup-code",
       "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/C/C++/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-      "version": "0.16.0",
+      "version": "0.16.1",
       "source": "./plugins/code",
       "author": {
         "name": "nodadyoushutup",
@@ -109,7 +109,7 @@
     {
       "name": "nodadyoushutup-atlassian",
       "description": "Atlassian craft: Jira and Confluence create gates, issue and page shape, and status. No project or space ids hard-coded.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "source": "./plugins/atlassian",
       "author": {
         "name": "nodadyoushutup",
@@ -136,7 +136,7 @@
     {
       "name": "nodadyoushutup-github",
       "description": "GitHub craft: pull request checks and comments, Actions workflow YAML, and default-branch CI. No product pipelines hard-coded.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "source": "./plugins/github",
       "author": {
         "name": "nodadyoushutup",
@@ -163,7 +163,7 @@
     {
       "name": "nodadyoushutup-git",
       "description": "Host-agnostic git craft: worktrees, merge conflicts, Conventional Commits, and safe local git operations. No GitHub hard-coded.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -267,7 +267,7 @@
     {
       "name": "nodadyoushutup-jenkins",
       "description": "Agnostic Jenkins craft: build status, console triage, pipeline hygiene, and CI-from-main reminders. No product-specific jobs.",
-      "version": "0.10.0",
+      "version": "0.10.1",
       "source": "./plugins/jenkins",
       "author": {
         "name": "nodadyoushutup",
@@ -473,7 +473,7 @@
     {
       "name": "nodadyoushutup-compose",
       "description": "Agnostic Docker Compose craft: multi-file COMPOSE_FILE layout, project-directory anchors, overlays/profiles, ops, and hard gates on destructive downs/volume wipes.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "source": "./plugins/compose",
       "author": {
         "name": "nodadyoushutup",
@@ -525,161 +525,161 @@
       "name": "nodadyoushutup-proxmox",
       "source": "./plugins/proxmox",
       "description": "Agnostic Proxmox VE craft: list nodes/VMs, status, and gated power/clone/migrate via MCP. Prefer Proxmox MCP; never invent VMID or touch sacred hosts.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-argocd",
       "source": "./plugins/argocd",
       "description": "Agnostic Argo CD craft: list/get apps, sync status, and gated sync/action via MCP. Prefer Argo CD MCP; never invent app names.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-prometheus",
       "source": "./plugins/prometheus",
       "description": "Agnostic Prometheus craft: discover metrics/labels, PromQL instant/range queries, and targets health via MCP. Prefer Prometheus MCP; discover before guessing.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-graylog",
       "source": "./plugins/graylog",
       "description": "Agnostic Graylog craft: search logs, streams, and fields via MCP. Prefer Graylog MCP; never invent stream ids; keep secrets out of chat.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-minio",
       "source": "./plugins/minio",
       "description": "Agnostic MinIO / S3 craft: buckets, objects, tags, and gated delete via MCP. Prefer MinIO MCP; never invent bucket names; refuse secret dumps.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-velero",
       "source": "./plugins/velero",
       "description": "Agnostic Velero craft: list backups/schedules/restores and gated create/delete via MCP. Prefer Velero MCP; restores are irreversible without explicit ask.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-fortigate",
       "source": "./plugins/fortigate",
       "description": "Agnostic FortiGate craft: inventory policies/addresses/routes and gated firewall changes via MCP. Prefer FortiGate MCP; never invent policy ids; destructive needs explicit verb.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-yarr",
       "source": "./plugins/yarr",
       "description": "Agnostic *arr / Plex / qBittorrent / Seerr craft via the yarr MCP fleet: search, status, and gated mutations. Prefer yarr MCP; never invent instance ids.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-victoriametrics",
       "source": "./plugins/victoriametrics",
       "description": "Agnostic VictoriaMetrics craft: discover metrics/labels, MetricsQL/PromQL query and range, TSDB status, and alerts/rules via MCP. Prefer VictoriaMetrics MCP; discover before guessing.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-runpod",
       "source": "./plugins/runpod",
       "description": "Agnostic RunPod craft: list pods/endpoints/templates/GPUs and gated create/start/stop/delete via MCP. Prefer RunPod MCP; never invent pod or endpoint ids; cost-aware defaults.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-uptime-kuma",
       "source": "./plugins/uptime-kuma",
       "description": "Agnostic Uptime Kuma craft: monitors, status pages, and notification channels with gated delete/pause. Prefer MCP when connected; otherwise API/UI. Never invent monitor ids.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-nginx-proxy-manager",
       "source": "./plugins/nginx-proxy-manager",
       "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-vaultwarden",
       "source": "./plugins/vaultwarden",
       "description": "Agnostic Vaultwarden craft: admin/ops posture and Bitwarden-compatible API hygiene with hard refuse to dump vault contents or credentials into chat.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-kopia",
       "source": "./plugins/kopia",
       "description": "Agnostic Kopia craft: repository and snapshot inventory plus gated snapshot/restore/forget. Prefer MCP when connected; otherwise kopia CLI. Complements Velero for non-K8s backups.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-authentik",
       "source": "./plugins/authentik",
       "description": "Agnostic Authentik IdP craft: applications, providers, flows, and groups with gated destructive changes. Prefer MCP when connected; otherwise API/UI. Never invent object ids.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-traefik",
       "source": "./plugins/traefik",
       "description": "Agnostic Traefik craft: routers, services, middlewares, and IngressRoute shape with destructive gates. Prefer MCP when connected; otherwise API/manifests. Never invent router names.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-tailscale",
       "source": "./plugins/tailscale",
       "description": "Agnostic Tailscale craft: devices, ACLs, and network inventory with gated ACL/device changes. Prefer MCP when connected; otherwise API/CLI. Never invent device ids.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-home-assistant",
       "source": "./plugins/home-assistant",
       "description": "Agnostic Home Assistant craft: entity/state inventory, service calls, and automation hygiene with gated destructive actions. Prefer MCP when connected; otherwise API/UI.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-immich",
       "source": "./plugins/immich",
       "description": "Agnostic Immich craft: library/album/asset inventory and gated delete/share changes. Prefer MCP when connected; otherwise API/UI. Never invent asset ids; refuse credential dumps.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-obsidian",
       "source": "./plugins/obsidian",
       "description": "Agnostic Obsidian vault craft: note inventory, Markdown/wikilink/frontmatter authoring, and gated delete/move. Prefer MCP when connected; otherwise vault filesystem. Never invent note paths; refuse vault dumps.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-portainer",
       "source": "./plugins/portainer",
       "description": "Agnostic Portainer craft: endpoint/stack/container inventory and gated stack/container mutations. Prefer MCP when connected; otherwise API/UI. Never invent endpoint ids.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-zot",
       "source": "./plugins/zot",
       "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     },
     {
       "name": "nodadyoushutup-harbor",
       "source": "./plugins/harbor",
       "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot — install what you run.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "logo": "assets/avatar.png"
     }
   ]

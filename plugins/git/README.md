@@ -1,8 +1,9 @@
 # git
 
-Host-agnostic git craft for Claude Code and Cursor — worktrees, merge/rebase
-conflicts, and Conventional Commits. Install when the project uses git and
-you want those conventions. No git-host (GitHub/GitLab) hard-coded.
+Host-agnostic git craft for Claude Code, Cursor, GitHub Copilot, and OpenAI
+Codex — worktrees, merge/rebase conflicts, and Conventional Commits. Install
+when the project uses git and you want those conventions. No git-host
+(GitHub/GitLab) hard-coded.
 
 ## Rules (Cursor)
 

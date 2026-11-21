@@ -1,7 +1,7 @@
 {
   "name": "nodadyoushutup-nginx-proxy-manager",
   "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
@@ -19,6 +19,8 @@
     "skills",
     "commands"
   ],
+  "skills": "./skills/",
+  "commands": "./commands/",
   "interface": {
     "displayName": "Nginx Proxy Manager",
     "shortDescription": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; other",

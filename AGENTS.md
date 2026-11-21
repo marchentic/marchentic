@@ -11,8 +11,12 @@ Root catalogs:
 Plugins live under `plugins/<short>/` (for example `plugins/jenkins/`).
 
 Marketplace / `plugin.json` **`name`** is `nodadyoushutup-<short>` (for example
-`nodadyoushutup-jenkins`). Claude/Cursor catalog `source` stays the short folder
-name; Copilot/Codex catalogs use `./plugins/<short>`.
+`nodadyoushutup-jenkins`). Catalog `source` shapes differ by host:
+
+- **Cursor:** short folder name (`jenkins`)
+- **Claude:** `./<short>` (`./jenkins`)
+- **Copilot:** `./plugins/<short>`
+- **Codex:** `{ "source": "local", "path": "./plugins/<short>" }`
 
 ## Out of scope (permanent)
 
@@ -135,6 +139,9 @@ Enforced by `python3 scripts/validate_marketplace.py` unless noted.
 2. **≥1 skill** at `skills/*/SKILL.md`.
 3. **Manifests:** `.cursor-plugin/plugin.json`, `.claude-plugin/plugin.json`,
    `.codex-plugin/plugin.json`, and matching entries in all four root catalogs.
+   When `skills/`, `commands/`, or `agents/` exists on disk, declare that path
+   in all three host manifests (Cursor/Claude `./skills`; Codex `./skills/`).
+   Rules stay Cursor-primary — do not require `rules` on Claude/Codex.
 
 **Workflow diagram** (`docs/<short>-workflow.drawio`, or
 `<short>-*-workflow.drawio` for multi-surface plugins): required for every

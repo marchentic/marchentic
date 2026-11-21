@@ -1,7 +1,7 @@
 {
   "name": "nodadyoushutup-minio",
   "description": "Agnostic MinIO / S3 craft: buckets, objects, tags, and gated delete via MCP. Prefer MinIO MCP; never invent bucket names; refuse secret dumps.",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
@@ -18,6 +18,8 @@
     "skills",
     "commands"
   ],
+  "skills": "./skills/",
+  "commands": "./commands/",
   "interface": {
     "displayName": "MinIO",
     "shortDescription": "Agnostic MinIO / S3 craft: buckets, objects, tags, and gated delete via MCP. Prefer MinIO MCP; never invent bucket names; refuse secret dump",
