@@ -2,8 +2,9 @@
 name: business-analyst-planner
 description: >-
   Lock a product-sequence plan for vague multi-step or cross-subsystem work
-  after a brief. Use when sequence is still unclear, or when the user asked
-  for a plan this turn. Does not pick technical approach or implement.
+  after a brief. Use when sequence is still unclear after the lean or full
+  brief — even if the user never said "plan" — or when the user asked for a
+  plan this turn. Does not pick technical approach or implement.
 model: inherit
 readonly: true
 is_background: true

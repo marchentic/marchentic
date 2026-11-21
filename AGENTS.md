@@ -38,7 +38,7 @@ plus the short slash aliases listed under Allowed basenames.
 | --- | --- | --- | --- | --- |
 | `global` | `nodadyoushutup-global` | `global` or `global-*` | Standing posture, host URLs, MCP-first, writing, and policy sync | core |
 | `code` | `nodadyoushutup-code` | `code` or `code-*`; commands also `deslop`, `refactor` | Language standards, workflow, and coding agents | core |
-| `business-analyst` | `nodadyoushutup-business-analyst` | `business-analyst` or `business-analyst-*` | Briefs, plans, and external research | core |
+| `business-analyst` | `nodadyoushutup-business-analyst` | `business-analyst` or `business-analyst-*` | Ambient briefs, scope pushback, product sequence, and external research | core |
 | `security` | `nodadyoushutup-security` | `security` or `security-*` | Secrets, auth, injection, crypto, transport, supply chain, and data exposure | core |
 | `git` | `nodadyoushutup-git` | `git` or `git-*` | Worktrees, merge conflicts, Conventional Commits, and safe local git | core |
 | `github` | `nodadyoushutup-github` | `github` or `github-*` | Pull request checks, comments, titles, and Actions workflow craft | core |

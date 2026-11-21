@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.4",
+    "version": "0.12.7",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -14,7 +14,7 @@
       "name": "nodadyoushutup-global",
       "source": "global",
       "description": "Core posture and writing/policy craft: execute-first, MCP-first, host URLs, STE/writing skills. Pair with business-analyst for planning and code for coding work.",
-      "version": "0.13.1",
+      "version": "0.14.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -38,7 +38,7 @@
       "name": "nodadyoushutup-code",
       "source": "code",
       "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-      "version": "0.15.0",
+      "version": "0.15.1",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -82,7 +82,7 @@
       "name": "nodadyoushutup-business-analyst",
       "source": "business-analyst",
       "description": "Business analysis and planning: BA brief skill, planner for ambiguous multi-step work, and external researcher. Pair with global (posture) and code (implementation).",
-      "version": "0.11.1",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"

@@ -24,23 +24,23 @@
         <mxCell id="legend" value="Legend&#10;&#10;Boxes&#10;blue = BA / routing phase&#10;green = finish / handoff&#10;gray = START / END / skip&#10;purple dashed = optional parallel&#10;&#10;Lines&#10;black = next step&#10;green = skip BA / handoff&#10;purple dashed = optional researcher" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fontSize=11;fillColor=#f5f5f5;strokeColor=#bbbbbb;fontColor=#222222" parent="1" vertex="1">
           <mxGeometry x="40" y="40" width="260" height="280" as="geometry"/>
         </mxCell>
-        <mxCell id="ambient" value="AMBIENT — always-on gate&#10;&#10;business-analyst-baseline&#10;stay out → implement&#10;unclear product → brief&#10;&#10;Do not edit product code&#10;&#10;Approach / touch map&#10;→ later pass&#10;&#10;Tracker filing out of scope&#10;Paste hygiene: refuse / rotate / continue" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fontSize=11;fontStyle=1;fillColor=#eeeeee;strokeColor=#999999;strokeWidth=2;fontColor=#333333" parent="1" vertex="1">
-          <mxGeometry x="40" y="340" width="260" height="360" as="geometry"/>
+        <mxCell id="ambient" value="AMBIENT — always-on gate&#10;&#10;business-analyst-baseline&#10;stay out → implement&#10;unclear product → lean brief&#10;+ scope pushback (auto)&#10;&#10;Same-turn continue when&#10;assumptions are safe&#10;&#10;Pause only on one blocker&#10;or unclear sequence&#10;&#10;Slash cmds optional&#10;&#10;Approach / touch map&#10;→ later pass&#10;&#10;Tracker filing out of scope&#10;Paste hygiene: refuse / rotate / continue" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fontSize=11;fontStyle=1;fillColor=#eeeeee;strokeColor=#999999;strokeWidth=2;fontColor=#333333" parent="1" vertex="1">
+          <mxGeometry x="40" y="340" width="260" height="420" as="geometry"/>
         </mxCell>
 
         <mxCell id="start" value="START — user ask" style="ellipse;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
           <mxGeometry x="780" y="40" width="380" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="gate" value="gate · need BA?&#10;unclear product ask / Story shaping /&#10;“what should we build”" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+        <mxCell id="gate" value="gate · auto-engage?&#10;unclear product ask / Story shaping /&#10;“what should we build” — no slash needed" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
           <mxGeometry x="780" y="160" width="380" height="110" as="geometry"/>
         </mxCell>
         <mxCell id="skip" value="skip BA&#10;scope already obvious;&#10;trivia / single-file / labels" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
           <mxGeometry x="400" y="160" width="320" height="110" as="geometry"/>
         </mxCell>
-        <mxCell id="ba_shape" value="business-analyst&#10;problem · outcome · requirements · AC;&#10;out of scope · assumptions · defaults" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+        <mxCell id="ba_shape" value="lean brief (ambient)&#10;problem · outcome · requirements · AC;&#10;out of scope · assumptions · ≤1 question;&#10;then same-turn continue if safe" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
           <mxGeometry x="780" y="310" width="380" height="110" as="geometry"/>
         </mxCell>
-        <mxCell id="route" value="route · still ambiguous?&#10;product sequence unclear or&#10;user asked for a plan → planner;&#10;true external unknown → researcher" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+        <mxCell id="route" value="route · still ambiguous?&#10;product sequence unclear (even without&#10;“plan”) → planner;&#10;true external unknown → researcher" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
           <mxGeometry x="780" y="460" width="380" height="120" as="geometry"/>
         </mxCell>
         <mxCell id="planner" value="business-analyst-planner&#10;lock product sequence + risks;&#10;approach is a later pass" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
@@ -60,10 +60,10 @@
         <mxCell id="tech_lead" value="later technical approach&#10;approach · touch map · risks · sequencing;&#10;BA does not pick the build path" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
           <mxGeometry x="780" y="680" width="380" height="110" as="geometry"/>
         </mxCell>
-        <mxCell id="handoff" value="brief locked&#10;paste-ready Overview / Requirements / AC;&#10;implementation is a later pass" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#12401A" parent="1" vertex="1">
+        <mxCell id="handoff" value="lean brief stated&#10;assumptions visible · continue same turn;&#10;or pause on blocker / sequence lock" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#12401A" parent="1" vertex="1">
           <mxGeometry x="780" y="830" width="380" height="110" as="geometry"/>
         </mxCell>
-        <mxCell id="end" value="END — brief/plan ready" style="ellipse;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
+        <mxCell id="end" value="END — shaped; implement or paused" style="ellipse;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
           <mxGeometry x="780" y="980" width="380" height="80" as="geometry"/>
         </mxCell>
         <mxCell id="end_skip" value="END — skip BA; implement" style="ellipse;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">

@@ -1,40 +1,65 @@
 ---
 description: >-
-  Always-on business-analyst gate — stay out of already-scoped work; write a
-  brief before edits when the product ask has no testable outcome.
+  Always-on ambient business-analyst gate — stay out of scoped work; auto
+  lean-brief and scope pushback before edits when the product ask has no
+  testable outcome; continue same turn when assumptions are safe.
 alwaysApply: true
 ---
 
 # Business-analyst baseline
 
-While this plugin is installed, apply this gate before shaping or planning.
-Depth lives in `business-analyst-when`, `business-analyst-brief`, and the
-skills — do not copy those rules here.
+While this plugin is installed, apply this gate on every product ask. Do
+not wait for a slash command. Full-tier sections and planner depth live in
+`business-analyst-brief`, `business-analyst-when`, and the skills — open
+those only when this gate says you need them.
+
+## Precedence
+
+When **Engage** matches, product shaping runs before the first product-code
+edit. Execute-first and implement-now posture apply after Stay out matches,
+or after the lean brief and assumptions are stated in this turn.
 
 ## Stay out
 
-If `business-analyst-when` stay-out matches (question answered by the repo,
-label/copy tweak, single-field config, bug whose acceptance is "the failing
-check passes", or work the user already scoped), do **not** write a brief or
-lock a plan. Implement.
+Do **not** write a brief or lock a plan. Implement immediately when:
 
-## Engage the brief
+- The ask is a question answered by reading the repo
+- It is a label, copy, or comment tweak
+- It is a single-field config change with an obvious result
+- It is a bug whose acceptance is "the failing check passes"
+- The user already scoped the work (named issue, tight acceptance text, or
+  "change X to Y")
 
-When the ask is a new capability, an unclear "what should we build", or a
-story with no testable outcome yet:
+## Engage (automatic)
 
-1. Write the brief sections from `business-analyst-brief` in the parent turn
-   before implementation edits.
-2. On Full-tier or still-vague asks, you may launch agent `business-analyst`
-   instead of writing the brief inline — same section list.
-3. Ask at most one true blocker. Everything else is a marked assumption and
-   continues
+Engage in the **parent turn** — no slash command — when the ask is a new
+capability, an unclear "what should we build", or a story with no testable
+outcome yet.
 
-## After the brief
+1. **Scope pushback** — challenge missing "done", "and also" extras, and a
+   second hidden product outcome. Move extras to Out of scope or the one
+   blocker.
+2. **Lean brief** (write inline; do not require loading other rules first):
+   Problem, Outcome, numbered Requirements, matching Acceptance criteria,
+   Out of scope, Assumptions, Open questions (at most one true blocker).
+3. **Same-turn continue** — mark every non-blocker gap as an assumption and
+   continue implementation in this turn when those assumptions are safe.
+4. **Pause** only when there is one true product-outcome blocker, or when
+   more than one subsystem must change and the product sequence is still
+   unclear. Then ask that one blocker or lock sequence before more edits.
+5. **Full-tier / still-vague** — optionally launch agent `business-analyst`
+   (full brief sections from `business-analyst-brief`) instead of the lean
+   inline brief. Parent-turn lean brief is the default.
 
-- If sequence across subsystems is still unclear, or the user asked for a
-  plan this turn → `business-analyst-planner`.
-- Technical approach, touch map, and verification commands →
-  a later implementation pass. Do not invent a second design here.
+Slash commands `/business-analyst` and `/business-analyst-plan` remain
+optional force paths for a full brief or plan lock.
+
+## After the lean brief
+
+- Product sequence still unclear across subsystems (even if the user never
+  said "plan"), acceptance still missing, the user asked for a plan, or a
+  verify loop changed scope → `business-analyst-planner`.
+- Technical approach, touch map, and verification commands → a later
+  implementation pass. Do not invent a second design here.
 - External library or API contract the repo does not document →
   `business-analyst-researcher`.

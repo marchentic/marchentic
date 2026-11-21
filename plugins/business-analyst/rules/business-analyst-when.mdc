@@ -1,14 +1,14 @@
 ---
 description: >-
-  When to skip business analysis. Use before launching a planner on a clear
-  bugfix, label tweak, or single-file change.
+  When to skip business analysis vs auto-engage brief or planner. Use when
+  the always-on baseline needs planner-depth triggers after a lean brief.
 alwaysApply: false
 ---
 
 # When to analyze
 
-The always-on gate is `business-analyst-baseline`. This rule is the depth
-list that gate points at.
+The always-on gate is `business-analyst-baseline`. This rule is planner-depth
+and stay-out detail that gate already inlines in short form.
 
 ## Stay out
 
@@ -23,15 +23,21 @@ Do not write a brief or lock a plan for:
 
 Those go straight to implementation.
 
-## Engage the brief
+## Engage the brief (automatic)
 
-Launch `business-analyst` when the ask is a new capability, an unclear
-"what should we build", or a story that has no testable outcome yet.
+When the ask is a new capability, an unclear "what should we build", or a
+story that has no testable outcome yet, engage ambient lean brief in the
+parent turn per `business-analyst-baseline`. Do not wait for a slash
+command or an explicit "act as BA" ask.
+
+Use the full `business-analyst-brief` section list (or launch agent
+`business-analyst`) for Full-tier / still-vague asks, or when the user
+ran `/business-analyst`.
 
 ## Engage the planner
 
-Launch `business-analyst-planner` only when, after the brief, one of these
-is still true:
+Engage `business-analyst-planner` when, after the lean or full brief, one
+of these is still true — even if the user never said "plan":
 
 - More than one subsystem must change and the sequence is not obvious
 - Acceptance criteria are still missing

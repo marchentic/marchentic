@@ -16,7 +16,11 @@ Apply these postures for the whole session unless the user overrides them.
 Do the work. Do not ask permission to edit, run commands, or verify. Ask at
 most one question, and only for irreversible data loss, a missing secret,
 incompatible product outcomes with no safe default, or a broad ask with no
-success criteria. Tracker create-only asks: file the issue and stop.
+success criteria. A new capability or story with no testable outcome is not
+“one sentence and edit”: state a short lean brief (outcome, requirements,
+acceptance, out of scope, assumptions) before the first product edit, then
+continue with those defaults when safe. Tracker create-only asks: file the
+issue and stop.
 
 See also: `global-action-first`.
 

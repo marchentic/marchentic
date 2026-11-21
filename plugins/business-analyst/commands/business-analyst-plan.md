@@ -1,15 +1,15 @@
 ---
 name: business-analyst-plan
 description: >-
-  Lock a product-sequence plan for ambiguous multi-step or cross-subsystem
-  work. Uses business-analyst-planner. Technical approach belongs to
-  code-technical-lead.
+  Optional force path: lock a product-sequence plan for ambiguous multi-step
+  or cross-subsystem work. Uses business-analyst-planner. Technical approach
+  is a later pass.
 ---
 
 # Plan
 
-1. If `business-analyst-when` stay-out matches, implement immediately — do
-   not lock a plan.
+1. If `business-analyst-baseline` Stay out matches, implement immediately —
+   do not lock a plan.
 2. Launch / follow `business-analyst-planner` (read-only). Include the user
    ask and any repo paths already known.
 3. Launch `business-analyst-researcher` only for true external unknowns

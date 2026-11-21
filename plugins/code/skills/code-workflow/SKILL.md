@@ -81,10 +81,14 @@ Resolve only ambiguities that would materially change the implementation.
 - Read the repository instead of asking. Existing code is the default.
 - Do not stop to ask which approach to use. Pick the reversible option that
   matches nearby patterns and state the assumption in the handoff.
-- Stop only for irreversible data loss, a missing secret, two incompatible
-  user-visible outcomes with no reversible default, or a **broad** feature
-  ask with no success criteria. Ask at most one question, with a recommended
-  default, then act.
+- Stop only for irreversible data loss, a missing secret, or two incompatible
+  user-visible outcomes with no reversible default.
+- **Unscoped product carve-out:** a new capability or story with no testable
+  outcome is not “assume one sentence and edit.” Before the first product-code
+  edit, state a short lean brief (outcome, numbered requirements, matching
+  acceptance criteria, out of scope, assumptions) and at most one
+  product-outcome question; then continue this turn with those defaults when
+  safe. Pause only on that blocker or an unclear multi-subsystem sequence.
 - Never call `AskQuestion` or `SwitchMode` for approach selection, missing
   polish details, or "requirements unclear" when a reversible default exists.
 

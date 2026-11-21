@@ -1,17 +1,23 @@
 ---
 description: >-
-  Business-analyst brief shape — problem, outcome, numbered requirements,
-  matching acceptance criteria. Use when shaping an unclear product ask.
+  Full business-analyst brief shape — problem, outcome, numbered
+  requirements, matching acceptance criteria. Use for Full-tier,
+  /business-analyst, or still-vague asks. Lean seven-section floor lives in
+  business-analyst-baseline.
 alwaysApply: false
 ---
 
 # Brief shape
 
+This is the **full** eleven-section brief. The always-on lean floor
+(Problem through Open questions) lives in `business-analyst-baseline` and
+runs automatically without opening this file.
+
 A brief is build-ready when someone who was not in the conversation can
 implement it without a second interview. Technical approach is not part of
 the brief — that belongs to a later technical-approach pass.
 
-## Required sections, in this order
+, in this order
 
 1. **Problem** — who is blocked, and what fails today. One to three sentences.
 2. **Outcome** — what done looks like for that person.

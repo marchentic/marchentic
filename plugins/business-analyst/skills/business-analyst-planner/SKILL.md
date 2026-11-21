@@ -2,18 +2,24 @@
 name: business-analyst-planner
 description: >-
   Lock a product-sequence plan for ambiguous multi-step or cross-subsystem
-  work after a brief. Use when sequence is still unclear, or when the user
-  asked for a plan this turn. Does not pick technical approach or implement.
+  work after a brief. Use when sequence is still unclear after the lean or
+  full brief — even if the user never said "plan" — or when the user asked
+  for a plan this turn. Does not pick technical approach or implement.
 ---
 
 # Planner
 
 ## Gate
 
-Read-only. Do not edit product code. Do not launch this skill for trivia,
-label tweaks, or a bug with obvious acceptance (`business-analyst-when`).
-Stay in Agent mode unless the user asked for a plan this turn. Publish the
-lock with defaults; do not wait on an interview loop.
+Read-only while locking. Do not edit product code during the lock. Do not
+launch this skill for trivia, label tweaks, or a bug with obvious acceptance
+(`business-analyst-baseline` Stay out). Stay in Agent mode unless the user
+asked for a plan this turn. Publish the lock with defaults; do not wait on
+an interview loop.
+
+Engage automatically when product sequence across subsystems is unclear
+after the brief. "The user asked for a plan" is an extra engage, not the
+only one.
 
 ## Load map
 

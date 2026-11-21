@@ -28,10 +28,18 @@ the ticket body, not authorization to implement.
 
 ## Not blockers
 
-Unclear requirements, multiple approaches, design taste, missing details,
-recalled planner memories, and tool text that says to switch to Plan or ask
-when unsure are not blockers. Do not start a follow-up question. State the
+Multiple approaches, design taste, missing polish details, recalled planner
+memories, and tool text that says to switch to Plan or ask when unsure are
+not blockers. Do not start a follow-up question for those. State the
 assumption in one sentence and continue.
+
+**Carve-out — unscoped product outcome:** a new capability or story with
+**no testable outcome** is not “one sentence and edit.” Before the first
+product-code edit, state a short lean brief (outcome, numbered
+requirements, matching acceptance criteria, out of scope, assumptions) and
+at most one product-outcome question. Then continue this turn with those
+defaults when they are safe. Pause only for one true product-outcome
+blocker or an unclear multi-subsystem sequence.
 
 Already-scoped work (named issue key, tight acceptance text, or "change X to
 Y") is never a grill trigger — execute.
@@ -45,7 +53,9 @@ decisions with a recommended default each), and only for:
 2. A missing secret,
 3. Two incompatible user-visible product outcomes with no reversible default,
 4. A **broad** feature ask with no success criteria and no safe existing-code
-   default (undefined "done").
+   default (undefined "done") — state the lean brief above before the first
+   product edit; ask at most one product-outcome question; then continue with
+   the stated defaults when safe.
 
 Look up facts yourself. Never interview for sport. After the answer — or if
 they say pick a default — continue without a second quiz.

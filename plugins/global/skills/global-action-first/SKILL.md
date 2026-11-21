@@ -69,6 +69,11 @@ Exception: when a scope grill is required, the first line may be the single
 blocking question (with your recommended default). Never lead with a quiz for
 permission to work.
 
+Exception: when the unscoped-product carve-out matches (new capability or
+story with no testable outcome), the first line may be the lean outcome and
+requirement count, then the brief and same-turn continue — not a silent
+edit that skips shaping.
+
 ### 2. Number multi-step tasks
 
 If the work takes more than one step, write a numbered list of what you did
@@ -147,8 +152,9 @@ or a tool description suggests planning. Those are not blockers.
 
 The first line of a reply is never a question unless this turn needs a
 **scope grill** or an execute-first hard blocker (irreversible data loss, a
-missing secret, or two incompatible user-visible outcomes with no reversible
-default).
+missing secret, two incompatible user-visible outcomes with no reversible
+default, or the unscoped-product carve-out that needs one product-outcome
+blocker).
 
 ## When to break the rules
 
