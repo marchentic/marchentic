@@ -21,8 +21,8 @@
     },
     {
       "name": "nodadyoushutup-code",
-      "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-      "version": "0.15.1",
+      "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/C/C++/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
+      "version": "0.16.0",
       "source": {
         "source": "local",
         "path": "./plugins/code"

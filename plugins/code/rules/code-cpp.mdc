@@ -1,0 +1,85 @@
+---
+description: >-
+  C++ style — RAII, types, headers, errors, and tests. Use when editing C++
+  sources or C++ headers.
+globs: "**/*.{cpp,cc,cxx,hpp,hh,hxx,ipp,tpp}"
+alwaysApply: false
+---
+
+# C++
+
+Apply for C++ translation units and C++ headers. Plain C sources follow
+`code-c`. Shared `.h` files that are C-compatible stay on `code-c` unless
+they are clearly C++-only.
+
+## Format and build
+
+- Match the project's C++ standard (`-std=c++17` / `c++20` / …), ABI, and
+  warning set. Do not raise the language mode for one file.
+- Format with the repo's formatter (`clang-format` or the project's
+  equivalent). Do not hand-align beyond what the formatter keeps.
+- Fix new compiler and clang-tidy (or project linter) findings on code you
+  change. Do not `NOLINT` a finding to land the change unless the module
+  already suppresses that check for the same reason.
+- Prefer the standard library and the project's existing dependencies. Do
+  not add a library for a helper `std::` already provides.
+
+## Types, RAII, and ownership
+
+- Prefer RAII: `std::unique_ptr` / `std::shared_ptr` / containers / lock
+  guards over bare `new` / `delete`. Every resource owner has a destructor
+  or is a standard owning type.
+- Prefer `std::unique_ptr` for exclusive ownership. Use `std::shared_ptr`
+  only when shared lifetime is required and documented.
+- Prefer value semantics and `const` by default. Pass large objects by
+  `const&` or by value when moves are cheap and the project prefers it.
+- Make invalid states unrepresentable: an `enum class`, not a pile of
+  bools; a strong typedef / wrapper for ids that must not mix.
+- Prefer `nullptr` over `NULL` or `0`. Prefer `enum class` over plain
+  enums.
+- Avoid raw owning pointers in new APIs. A raw non-owning observer pointer
+  or reference is fine when lifetime is clearly borrowed.
+
+## Headers and modules
+
+- Headers are include-guarded (`#pragma once` or include guards — match the
+  project).
+- Keep public headers minimal. Prefer forward declarations over including
+  heavy headers in `.hpp` / `.hh`.
+- Implementation stays in `.cpp` / `.cc` unless a template or inline
+  function must live in the header.
+- Prefer `namespace` scopes the project already uses. Do not add anonymous
+  using-directives (`using namespace std`) in headers.
+- Do not put `using` directives in a public header that pollute includers.
+
+## Errors and APIs
+
+- Prefer the project's existing error model (`exceptions`, `std::expected`,
+  error codes, `absl::Status`, …). Do not introduce a second error style
+  for one call.
+- Exceptions: throw only for genuinely exceptional paths the project
+  already treats that way. Mark non-throwing APIs `noexcept` when the
+  project does.
+- Check every fallible call the caller can handle. Do not ignore
+  `[[nodiscard]]` results.
+- Bound string and buffer operations. Prefer `std::string` /
+  `std::string_view` / `std::span` over unsafe C string APIs when the
+  module already uses them.
+
+## Concurrency
+
+- Prefer standard mutexes, atomics, and the project's existing executor /
+  thread-pool. Do not spawn unmanaged `std::thread`s without a join /
+  shutdown path.
+- Do not share mutable state across threads without synchronization the
+  project already uses.
+
+## Tests
+
+- Prefer the project's C++ test stack (GoogleTest, Catch2, doctest, CTest).
+  Ship a unit test for a new exported behavior in the same change
+  (`code-unit-testing`).
+- Cover the failure path and one success path. Prefer the project's test
+  fixtures over ad-hoc global state.
+- Do not sleep to wait for a condition. Use the project's existing
+  synchronization or timeout helper.

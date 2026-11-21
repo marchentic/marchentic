@@ -49,7 +49,13 @@ MANIFEST_NAMES = {
 
 LANGUAGES = {
     ".c": "C",
+    ".cc": "C++",
     ".cpp": "C++",
+    ".cxx": "C++",
+    ".h": "C/C++ Header",
+    ".hh": "C++ Header",
+    ".hpp": "C++ Header",
+    ".hxx": "C++ Header",
     ".css": "CSS",
     ".dart": "Dart",
     ".go": "Go",

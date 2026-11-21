@@ -1,0 +1,71 @@
+---
+description: >-
+  C style — types, ownership, headers, errors, and tests. Use when editing C
+  sources or C headers.
+globs: "**/*.{c,h}"
+alwaysApply: false
+---
+
+# C
+
+Apply for C translation units and C headers. C++ sources follow `code-cpp`.
+When a `.h` is clearly a C++ header (templates, namespaces, `.hpp` peers),
+prefer `code-cpp`.
+
+## Format and build
+
+- Match the project's C standard (`-std=c11` / `c17` / …) and warning set.
+  Do not raise the language mode for one file.
+- Format with the repo's formatter (`clang-format` or the project's
+  equivalent). Do not hand-align beyond what the formatter keeps.
+- Fix new compiler warnings on code you change. Do not cast away a warning
+  without fixing the cause unless the project already suppresses that
+  warning for the same reason.
+- Prefer the C standard library and the project's existing dependencies.
+  Do not add a library for a helper already available.
+
+## Types and memory
+
+- Prefer fixed-width types from `<stdint.h>` for wire formats and sizes that
+  must not change across platforms.
+- Every `malloc` / `calloc` / `realloc` / `strdup` path has a matching
+  free on every exit. Prefer a single cleanup label (`goto cleanup`) over
+  duplicated frees when the function has several early returns.
+- Check every allocation and I/O result. Do not ignore `NULL` or negative
+  return codes on a path a caller can handle.
+- Do not use VLAs when the project forbids them. Prefer a bounded heap
+  buffer or a fixed stack array with an explicit limit.
+- Prefer `size_t` for object counts and sizes. Do not mix signed lengths
+  with `size_t` without an explicit bounds check.
+
+## Headers and APIs
+
+- Headers are include-guarded (`#ifndef` / `#define` / `#endif` or
+  `#pragma once` when the project already uses it).
+- Keep public headers minimal. Do not pull heavy implementation headers into
+  a public `.h` when a forward declaration would do.
+- Prefer opaque structs at API boundaries when the project already hides
+  implementation that way.
+- Document ownership in the API: who allocates, who frees, and whether a
+  returned pointer may be `NULL`.
+
+## Safety
+
+- Bound every copy and format into a buffer (`snprintf`, `strlcpy` /
+  project helpers). Do not use unbounded `strcpy` / `sprintf` /
+  `gets`.
+- Validate lengths before `memcpy` / `memmove`. Treat untrusted input as
+  hostile.
+- Do not cast away `const` to mutate shared data. Prefer a mutable copy or
+  an API that takes non-const.
+- Threaded code follows the project's locking rules. Do not invent a second
+  synchronization style for one call.
+
+## Tests
+
+- Prefer the project's C test stack (CTest, Check, Unity, or custom). Ship
+  a unit test for a new exported behavior in the same change
+  (`code-unit-testing`).
+- Cover the failure path (allocation / I/O error) and one success path.
+- Do not sleep to wait for a condition. Use the project's existing timeout
+  or polling helper.

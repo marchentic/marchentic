@@ -37,8 +37,8 @@
     {
       "name": "nodadyoushutup-code",
       "source": "code",
-      "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-      "version": "0.15.1",
+      "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/C/C++/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
+      "version": "0.16.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -70,7 +70,10 @@
         "flutter",
         "typescript",
         "go",
-        "rust"
+        "rust",
+        "c",
+        "c++",
+        "cpp"
       ],
       "category": "productivity",
       "tags": [

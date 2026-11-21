@@ -18,6 +18,8 @@ trust-boundary list.
 | `code-typescript` | TypeScript and TSX types, narrowing, and module boundaries |
 | `code-go` | Go formatting, errors, context, and tests |
 | `code-rust` | Rust ownership, errors, and tests |
+| `code-c` | C types, ownership, headers, and tests |
+| `code-cpp` | C++ RAII, types, headers, and tests |
 | `code-swift` | Swift optionals, concurrency, modules, and tests (Apple) |
 | `code-kotlin` | Kotlin null safety, coroutines, modules, and tests (Android) |
 | `code-dart` | Dart / Flutter null safety, widgets, async, and tests |

@@ -2,8 +2,8 @@
 name: code-refactor
 description: >-
   Audit and apply behavior-preserving structural refactoring across Python,
-  JavaScript, TypeScript, Go, Rust, Swift, Kotlin, Dart, and Java. Use for
-  refactor audit, ownership/decomposition cleanup, or when asked to
+  JavaScript, TypeScript, Go, Rust, C, C++, Swift, Kotlin, Dart, and Java.
+  Use for refactor audit, ownership/decomposition cleanup, or when asked to
   restructure live code without behavior change.
 ---
 
@@ -46,9 +46,9 @@ Refactor:
 
 ### 1. Scope
 
-State paths and languages (Python, JS/TS/JSX, Go, Rust, Swift, Kotlin,
-Dart, Java, or the mix in scope). Prefer the smallest set that contains
-the ownership problem.
+State paths and languages (Python, JS/TS/JSX, Go, Rust, C, C++, Swift,
+Kotlin, Dart, Java, or the mix in scope). Prefer the smallest set that
+contains the ownership problem.
 
 ### 2. Behavior contract
 
@@ -134,16 +134,19 @@ gate. Do not claim success from linting or import checks alone.
   mechanical and tested.
 
 
-## Swift / Kotlin / Dart / Java mechanics
+## C / C++ / Swift / Kotlin / Dart / Java mechanics
 
-- Refactor around responsibility and ownership (actors, ViewModels,
-  widgets, presenters), not arbitrary line counts.
+- Refactor around responsibility and ownership (translation units,
+  actors, ViewModels, widgets, presenters), not arbitrary line counts.
 - Preserve nullability / optionality, error and cancellation semantics,
   main-thread UI rules, and serialization identities.
 - Keep platform or native-bridge code at a clear boundary; do not drag
   UIKit / Compose / Flutter widgets into domain modules.
-- Prefer the language rule for the files in scope (`code-swift`,
-  `code-kotlin`, `code-dart`, `code-java`) for format and safety defaults.
+- Prefer the language rule for the files in scope (`code-c`,
+  `code-cpp`, `code-swift`, `code-kotlin`, `code-dart`, `code-java`)
+  for format and safety defaults.
+- In C/C++, preserve ABI and header include graphs; prefer RAII /
+  single-cleanup ownership moves over scattered frees.
 - Move one responsibility at a time; keep intermediate states testable.
 - Avoid catch-all `util` / `common` / `helpers` dumping grounds.
 

@@ -1,7 +1,7 @@
 {
   "name": "nodadyoushutup-code",
-  "description": "Coding workflow skills and coding agents, including framework rules (React/React Native/Next/Flask/FastAPI) and mobile languages (Swift/Kotlin/Dart/Java). Pair with git for worktrees and Conventional Commits (Cursor also ships language/YAML/K8s/Terraform rules).",
-  "version": "0.15.1",
+  "description": "Coding workflow skills and coding agents, including framework rules (React/React Native/Next/Flask/FastAPI), compiled languages (C/C++), and mobile languages (Swift/Kotlin/Dart/Java). Pair with git for worktrees and Conventional Commits (Cursor also ships language/YAML/K8s/Terraform rules).",
+  "version": "0.16.0",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
@@ -33,7 +33,10 @@
     "dart",
     "java",
     "react-native",
-    "flutter"
+    "flutter",
+    "c",
+    "c++",
+    "cpp"
   ],
   "skills": "./skills",
   "agents": "./agents",

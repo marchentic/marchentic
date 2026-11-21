@@ -1,7 +1,7 @@
 {
   "name": "nodadyoushutup-code",
-  "description": "Coding standards and workflow: language rules (Python, JavaScript, TypeScript, Go, Rust, Swift, Kotlin, Dart, Java) (incl. YAML/Kubernetes); React/React Native/Next.js/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-  "version": "0.15.1",
+  "description": "Coding standards and workflow: language rules (Python, JavaScript, TypeScript, Go, Rust, C, C++, Swift, Kotlin, Dart, Java) (incl. YAML/Kubernetes); React/React Native/Next.js/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
+  "version": "0.16.0",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
@@ -34,7 +34,10 @@
     "dart",
     "java",
     "react-native",
-    "flutter"
+    "flutter",
+    "c",
+    "c++",
+    "cpp"
   ],
   "rules": "./rules",
   "skills": "./skills",
