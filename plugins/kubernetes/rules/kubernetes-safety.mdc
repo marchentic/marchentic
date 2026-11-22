@@ -1,7 +1,7 @@
 ---
 description: >-
-  Destructive Kubernetes gates — delete, scale, exec, and apply need explicit
-  verbs. Read-only is the default.
+  Destructive Kubernetes gates — delete, scale, exec, apply, and privileged
+  changes need explicit verbs. Read-only is the default.
 alwaysApply: false
 ---
 
@@ -9,17 +9,47 @@ alwaysApply: false
 
 ## Read-only default
 
-List/get/log/events/top are fine when triage is authorized. Do **not**:
+When triage or manifest review is authorized, these are fine without a mutate
+verb: list/get/log/events/top/stats/`configuration_view`.
 
-- delete pods/namespaces/workloads
-- scale replicas
-- exec into containers
-- apply manifests that change cluster state
+Do **not** do any of the following unless the user gave an explicit verb this
+turn naming the object (or clearly scoped set):
 
-…unless the user gave an explicit verb this turn naming the object.
+- delete pods, namespaces, workloads, PVCs, or CRDs
+- scale replicas (including scale-to-zero)
+- exec / attach / port-forward into containers
+- apply or patch live cluster state
+- create privileged Pods, hostNetwork, or hostPath for "convenience"
+- edit RBAC that widens cluster-admin or bind wildcards
 
-## Irreversible
+This MCP surface is **read-heavy** (list/get/log/events). If a mutate must
+happen, use the project's normal apply path (kubectl/GitOps) only after the
+user authorized it — do not invent write tools that are not connected.
 
-Namespace deletes, PVC deletes, and production scale-to-zero: state the risk
-and only proceed when clearly authorized (execute-first posture scope grill
-for irreversible loss).
+## Irreversible — confirm blast radius
+
+Before proceeding when clearly authorized:
+
+| Action | State risk |
+| --- | --- |
+| Namespace delete | All namespaced objects in that ns |
+| PVC / PV delete | Persistent data loss |
+| Production scale-to-zero | Immediate outage |
+| Delete Deployment/StatefulSet | Workload + possible volume claims |
+
+State the object, namespace, and consequence in one sentence, then act only if
+authorization already covers that irreversible loss.
+
+## Manifest apply risk
+
+Editing YAML in-repo is craft (`kubernetes-manifests`). Applying it to a live
+cluster is a separate mutate — requires an explicit apply/deploy verb and
+follows this rule. Prefer dry-run / server-side diff when the toolchain
+supports it.
+
+## Defaults
+
+1. Prefer the smallest mutate that satisfies the ask.
+2. Never "fix prod" by deleting random Pending pods without naming them.
+3. Do not paste kubeconfig credentials or tokens into the reply.
+4. Site production cluster names stay unresolved until listed from context.

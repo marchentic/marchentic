@@ -1,15 +1,61 @@
 ---
 description: >-
-  Kubernetes pod/workload triage via MCP — namespaces, status, events, nodes.
+  Kubernetes pod/workload triage via MCP — namespaces, status, events, nodes,
+  symptom trees. Prefer read-only list/get/events/top before logs.
 alwaysApply: false
 ---
 
 # Kubernetes triage
 
+## Gate
+
+Load when the user asks about pod/workload health, Pending/CrashLoop, events,
+or "what's wrong in the cluster." Skip bare "Kubernetes" with no object or
+symptom. Prefer a connected Kubernetes MCP.
+
+## MCP tool map
+
+| Need | Tool |
+| --- | --- |
+| List namespaces | `namespaces_list` |
+| Pods (all ns) | `pods_list` |
+| Pods in one ns | `pods_list_in_namespace` |
+| One pod | `pods_get` |
+| Events | `events_list` (optional `namespace` / `fieldSelector`) |
+| Workload / Service / Ingress | `resources_list` / `resources_get` |
+| Node CPU/mem | `nodes_top` |
+| Node detail | `nodes_stats_summary` |
+| Pod CPU/mem | `pods_top` |
+| Current kubeconfig context | `configuration_view` (minified; no secrets in reply) |
+
+Never invent namespace, pod, node, or Deployment names — resolve with list/get.
+
+## Procedure
+
+1. Resolve namespace from the user or list namespaces. Do not guess prod.
+2. List or get the named workload/pods. Note phase, ready replicas, restarts.
+3. Pull Warning events for that object (`fieldSelector` on
+   `involvedObject.name` when known).
+4. Map symptom → next check (below). Fetch logs only when status/events are
+   insufficient — follow `kubernetes-logs`.
+5. Report: object, phase/reason, one next action. Keep it short.
+
+## Symptom tree
+
+| Symptom | Likely cause checks |
+| --- | --- |
+| Pending | Events (FailedScheduling); `nodes_top` / pressure; PVC unbound |
+| CrashLoopBackOff | Current + previous logs; exit code; probe failures |
+| ImagePullBackOff | Image name/tag; pull secret; registry auth events |
+| OOMKilled | `pods_top` / limits; raise memory or fix leak |
+| Evicted | Node disk/memory pressure via `nodes_stats_summary` |
+| Not Ready | Readiness probe; Service endpoints; `resources_get` on Deployment |
+
 ## Defaults
 
-1. Resolve namespace from the user or current context — do not guess prod.
-2. Order: workload status → events → logs (when needed).
-3. Distinguish Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled.
-4. Node pressure: use node summary/top tools when pods are Pending/evicted.
-5. Keep reports short: object name, phase/reason, one next check.
+1. Read-only triage is the default. Mutate only under `kubernetes-safety`.
+2. Distinguish container state (CrashLoopBackOff) from pod phase (Running).
+3. Prefer namespace-scoped lists once the ns is known.
+4. OpenShift: `projects_list` only when the cluster exposes projects.
+5. Site GitOps paths and overlays stay out of scope — portable object names
+   only.

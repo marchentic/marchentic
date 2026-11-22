@@ -8,7 +8,8 @@ description: >-
 
 1. If the user did not authorize cluster work and named no workload, say so
    and stop.
-2. Load `kubernetes` and follow `kubernetes-triage` / `kubernetes-logs` /
-   `kubernetes-safety`.
+2. Load `kubernetes` and prefer skill `kubernetes-incident-triage` with rules
+   `kubernetes-triage` / `kubernetes-logs` / `kubernetes-safety`.
 3. Prefer Kubernetes MCP. Never invent namespaces or pod names.
-4. Return status + short log/event evidence.
+4. Return status + short log/event evidence. Do not mutate unless explicitly
+   asked.

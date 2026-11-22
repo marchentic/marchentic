@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.11",
+    "version": "0.12.12",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -475,7 +475,7 @@
       "name": "nodadyoushutup-kubernetes",
       "source": "kubernetes",
       "description": "Agnostic Kubernetes craft: portable manifest authoring plus pods, events, logs, and node signals via MCP. Prefer Kubernetes MCP; no destructive cluster changes without an explicit ask.",
-      "version": "0.11.1",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"

@@ -1,16 +1,37 @@
 ---
 description: >-
   Kubernetes pod log reads via MCP — short excerpts, previous container on
-  crash loops.
+  crash loops, multi-container naming, redaction.
 alwaysApply: false
 ---
 
 # Kubernetes logs
 
+## Gate
+
+Load when the user asks for logs, crash output, or previous-container history.
+Prefer status/events first (`kubernetes-triage`) unless logs were explicit.
+
+## MCP tool map
+
+| Need | Tool |
+| --- | --- |
+| Pod logs | `pods_log` (`name`, optional `namespace`, `container`, `tail`, `previous`) |
+| Node/system logs | `nodes_log` (`name`, `query`, optional `tailLines`) — only when node-level |
+
+## Procedure
+
+1. Resolve pod name + namespace (list/get). Never invent.
+2. If the pod has multiple containers, name the container before fetching.
+3. Call `pods_log` with a small `tail` (default 100; raise only when needed).
+4. On CrashLoopBackOff or "it died," also call with `previous: true`.
+5. Quote a short excerpt. Redact tokens, passwords, connection strings, and
+   bearer headers. Prefer error lines over startup noise.
+
 ## Defaults
 
 1. Prefer tail/limited lines over full history dumps.
-2. On CrashLoopBackOff, also fetch **previous** container logs when MCP
-   supports it.
-3. Redact secrets and tokens from excerpts.
-4. Name the container when a pod has more than one.
+2. Do not dump every replica — pick the failing pod from status/events.
+3. Init-container failures: set `container` to the init name from `pods_get`.
+4. Node logs (`nodes_log`) only for kubelet/node-level asks — not app triage.
+5. Log aggregation / dashboards are out of scope — API/MCP excerpts only.
