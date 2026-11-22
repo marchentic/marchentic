@@ -1,7 +1,7 @@
 ---
 description: >-
-  FortiGate mutate gates — policy/address/route create/update/delete need an
-  explicit verb. Read-only is the default.
+  FortiGate destructive gates — policy/object/route/VIP/device registry
+  mutates need an explicit verb. Read-only is the default.
 alwaysApply: false
 ---
 
@@ -9,17 +9,69 @@ alwaysApply: false
 
 ## Read-only default
 
-List devices, policies, addresses, routes, interfaces, and health checks are
-fine when FortiGate work is authorized. Do **not**:
+When FortiGate craft is authorized, these are fine without a mutate verb:
 
-- create/update/delete firewall policies
-- change NAT / VIP / static routes
-- remove address or service objects still referenced by policy
+| Surface | Tools |
+| --- | --- |
+| Devices / health | `list_devices`, `get_device_status`, `test_device_connection`, `health`, `test_connection`, `discover_vdoms`, `get_schema_info` |
+| Interfaces | `list_interfaces`, `get_interface_status` |
+| Policies (read) | `list_firewall_policies`, `get_firewall_policy_detail` |
+| Objects (read) | `list_address_objects`, `list_service_objects`, `list_virtual_ips`, `get_virtual_ip_detail` |
+| Routes (read) | `get_routing_table`, `list_static_routes`, `get_static_route_detail` |
 
-…unless the user gave an explicit verb this turn naming the object (and VDOM
-when required).
+Do **not** call any of the following unless the user gave an explicit verb
+this turn naming the target (device_id, policy_id, object/VIP name,
+route_id, or clear create intent):
 
-## Blast radius
+| Mutate | Tools |
+| --- | --- |
+| Register / remove MCP device | `add_device`, `remove_device` |
+| Policy create / update / delete | `create_firewall_policy`, `update_firewall_policy`, `delete_firewall_policy` |
+| Address / service create | `create_address_object`, `create_service_object` |
+| VIP create / update / delete | `create_virtual_ip`, `update_virtual_ip`, `delete_virtual_ip` |
+| Static route create / update / delete | `create_static_route`, `update_static_route`, `delete_static_route` |
 
-ACL/NAT changes can drop management or user traffic. State the risk, prefer
-narrow edits, and refuse “open everything” style asks without a clear target.
+Bare product name ("FortiGate") alone is **not** mutate authorization.
+
+## Irreversible — confirm blast radius
+
+Before proceeding when clearly authorized:
+
+| Action | State risk |
+| --- | --- |
+| Policy delete / broad accept | Drops or opens traffic; can cut management paths |
+| Default-route change/delete | Can blackhole the firewall or all downstream nets |
+| VIP delete / remap | Breaks DNAT / published services |
+| `remove_device` | Drops the device from this MCP registry (not the appliance OS) |
+| `add_device` with credentials | Handles secrets — never echo password/api_token in chat |
+
+State the object (id/name) and consequence in one sentence, then act only
+if authorization already covers that loss.
+
+## Credential posture
+
+- Prefer API-token auth fields over pasting long-lived passwords into
+  tool args when the user offers a choice.
+- Never reprint `password` or `api_token` values from `add_device` args or
+  tool output into the chat receipt.
+- If a secret appeared in tool output by mistake, say so and recommend
+  rotation — do not repeat the value.
+
+## Defaults
+
+1. Prefer the smallest mutate that satisfies the ask (update one policy
+   field set over recreate; single key object over bulk).
+2. Prefer listing/detail before every mutate so receipts name real ids.
+3. Prefer reusing listed address/service objects over creating duplicates.
+4. Refuse "open everything" / any-any accept without a named src, dst,
+   service, and interfaces.
+5. Prefer MCP tools discovered on the live FortiGate MCP
+   (`user-mcp_fortigate`); do not invent tool names.
+6. Neighbor firewall / cloud NGFW products are out of scope.
+
+## Related (this plugin)
+
+- `fortigate-inventory` — devices, health, interfaces, VDOMs
+- `fortigate-policies` — firewall policy craft
+- `fortigate-objects` — address / service / VIP
+- `fortigate-routes` — static routes and FIB read

@@ -1,12 +1,70 @@
 ---
 description: >-
-  List devices, policies, addresses, routes, and interfaces via MCP. Resolve ids — never invent.
+  FortiGate inventory via MCP: devices, status, health, VDOMs, interfaces.
+  Resolve device_id and names — never invent.
 alwaysApply: false
 ---
 
-# Fortigate Inventory
+# FortiGate inventory
 
-List devices, policies, addresses, routes, and interfaces via MCP. Resolve ids — never invent.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks to list FortiGate devices, check health/status,
+discover VDOMs, or inspect interfaces. Skip bare "firewall" with no
+FortiGate surface. Always load `fortigate-safety` when a mutate might
+follow.
+
+Never invent a `device_id`, interface name, or VDOM. Resolve from MCP
+listing this turn or from an id the user pasted.
+
+## Prefer MCP
+
+When a FortiGate MCP is ready (`user-mcp_fortigate` in Cursor), use these
+tools — do not invent a side CLI or raw REST client while MCP works:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List registered devices | `list_devices` | no args |
+| Device system status | `get_device_status` | requires `device_id` |
+| Test one device | `test_device_connection` | requires `device_id` |
+| Server health | `health` | MCP process health |
+| Server connectivity | `test_connection` | FortiGate MCP connectivity |
+| Discover VDOMs | `discover_vdoms` | requires `device_id` |
+| List interfaces | `list_interfaces` | `device_id`, optional `vdom` |
+| Interface detail | `get_interface_status` | `device_id` + `interface_name` |
+| Tool schemas | `get_schema_info` | discover params when unsure |
+
+## Discover first
+
+1. Prefer exact `device_id` the user named.
+2. Else `list_devices` — pick by id/host the user recognizes.
+3. If several devices match, list ids + hosts and ask once; do not guess
+   production.
+4. Call `discover_vdoms` before assuming `root` when the ask spans
+   multi-VDOM or the user named a non-root VDOM.
+5. Prefer `list_interfaces` before inventing interface names used in
+   policy or VIP craft.
+
+## Status and health
+
+1. `get_device_status` for firmware/uptime/system summary on a resolved
+   device.
+2. `test_device_connection` when reachability is in doubt.
+3. `health` / `test_connection` when the MCP itself may be down — report
+   that clearly instead of inventing device state.
+4. Summarize: device id, reachability, notable version/status fields.
+   Do not paste credentials or API tokens from tool output.
+
+## Report shape
+
+- Device id (+ host when known)
+- VDOM when scoped
+- Short status/finding (up/down, interface admin/oper state)
+- One recommended next check (policies, routes, or a gated mutate)
+
+## Out of scope
+
+- Neighbor NGFW / cloud firewall products
+- Site overlay hostnames or management IPs — resolve from MCP/`list_devices`
+  or user paste, never invent
+- Policy / object / route mutates (see those rules + `fortigate-safety`)

@@ -1,0 +1,83 @@
+---
+description: >-
+  FortiGate address, service, and virtual-IP (NAT) object craft via MCP.
+  Resolve names — never invent. Mutates need fortigate-safety.
+alwaysApply: false
+---
+
+# FortiGate objects
+
+## Gate
+
+Use when the user asks to list or create address objects, service objects,
+or virtual IPs (VIP / DNAT / port-forward). Skip when the ask is only
+policy list/status with no object work. Always load `fortigate-safety` for
+creates/updates/deletes.
+
+Never invent object names, VIP names, or mapped addresses. Resolve from
+MCP or user paste.
+
+## Prefer MCP
+
+When a FortiGate MCP is ready (`user-mcp_fortigate`), use:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List addresses | `list_address_objects` | `device_id`, optional `vdom` |
+| Create address | `create_address_object` | `name`, `address_type`, `address` |
+| List services | `list_service_objects` | `device_id`, optional `vdom` |
+| Create service | `create_service_object` | `name`, `service_type`, `protocol`, optional `port` |
+| List VIPs | `list_virtual_ips` | `device_id`, optional `vdom` |
+| VIP detail | `get_virtual_ip_detail` | `device_id` + `name` |
+| Create VIP | `create_virtual_ip` | extip/mappedip/extintf (+ portforward fields) |
+| Update VIP | `update_virtual_ip` | `name` + `vip_data` |
+| Delete VIP | `delete_virtual_ip` | destructive — explicit verb |
+
+## Address objects
+
+1. `list_address_objects` before creating a near-duplicate name.
+2. `create_address_object` requires `address_type` and `address` as the
+   MCP schema defines — prefer types the live schema/`get_schema_info`
+   documents; do not invent exotic type strings.
+3. Prefer reusing an existing object in policy craft over minting a new
+   one with a conflicting name.
+4. Receipt: device, vdom, name, type, address value (CIDR/FQDN as given —
+   not credentials).
+
+## Service objects
+
+1. `list_service_objects` before create.
+2. `create_service_object`: set `protocol` and `port` when the user named
+   a port/range; do not open "all" unless explicitly asked.
+3. Prefer built-in service names when listing shows them and they match
+   the ask.
+
+## Virtual IPs (NAT)
+
+1. `list_virtual_ips` / `get_virtual_ip_detail` before update/delete.
+2. `create_virtual_ip` needs `name`, `extip`, `mappedip`, `extintf`.
+   Optional port-forward: `portforward`, `protocol`, `extport`,
+   `mappedport`.
+3. Resolve `extintf` from `list_interfaces` — never invent WAN interface
+   names.
+4. Update via `update_virtual_ip` with the smallest `vip_data` change.
+5. Delete requires an explicit verb; state that DNAT for that VIP stops.
+
+## Mutate gates
+
+Creates/updates/deletes of address, service, or VIP objects need an
+explicit verb this turn (`fortigate-safety`). Do not remove objects still
+referenced by live policy without the user naming that consequence.
+
+## Report shape
+
+- Device id + VDOM
+- Object kind + name
+- Key fields (address/CIDR, port, extip→mappedip)
+- For mutates: created/updated/deleted + blast note
+
+## Out of scope
+
+- Firewall policy row authoring (see `fortigate-policies`)
+- Static routes (see `fortigate-routes`)
+- Site VIP numbering plans — take addresses from the user or inventory

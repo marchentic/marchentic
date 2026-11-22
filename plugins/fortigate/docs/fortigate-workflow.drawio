@@ -1,41 +1,57 @@
 <!-- LAYOUT CONTRACT
      LEGEND    x=40..300
      AMBIENT   x=40..300 (below legend)
-     LEFT      x=400..720 — skip / END skip
-     SPINE     x=780..1160 — gate → act → END
+     LEFT      x=400..720 — skip / END skip / refuse mutate
+     SPINE     x=780..1160 — gate → route → act → END
+     RIGHT     x=1220..1540 — policy / VIP / routes branches
      BUSES: x=350 skip drain
 -->
 <mxfile host="app.diagrams.net" agent="cursor" version="24.0.0">
   <diagram id="fortigate-workflow" name="FortiGate Workflow">
-    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
 
         <mxCell id="legend" value="Legend&#10;&#10;Boxes&#10;blue = work phase&#10;green = finish&#10;gray = START / END / skip&#10;&#10;Lines&#10;black = next step&#10;green = skip / finish" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fontSize=11;fillColor=#f5f5f5;strokeColor=#bbbbbb;fontColor=#222222" parent="1" vertex="1">
-          <mxGeometry x="40" y="40" width="260" height="220" as="geometry"/>
+          <mxGeometry x="40" y="40" width="260" height="200" as="geometry"/>
         </mxCell>
-        <mxCell id="ambient" value="AMBIENT — firewall&#10;&#10;Never invent&#10;policy · address · VDOM&#10;&#10;Read-only default&#10;ACL changes need verb" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fontSize=11;fontStyle=1;fillColor=#eeeeee;strokeColor=#999999;strokeWidth=2;fontColor=#333333" parent="1" vertex="1">
-          <mxGeometry x="40" y="300" width="260" height="320" as="geometry"/>
+        <mxCell id="ambient" value="AMBIENT — FortiGate&#10;&#10;Never invent&#10;device · policy · VIP · route&#10;&#10;MCP: list → detail →&#10;gated mutate&#10;&#10;Read-only default&#10;ACL/NAT need explicit verb&#10;Own FortiGate surface only" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fontSize=11;fontStyle=1;fillColor=#eeeeee;strokeColor=#999999;strokeWidth=2;fontColor=#333333" parent="1" vertex="1">
+          <mxGeometry x="40" y="280" width="260" height="360" as="geometry"/>
         </mxCell>
 
         <mxCell id="start" value="START — user ask" style="ellipse;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
-          <mxGeometry x="780" y="40" width="380" height="80" as="geometry"/>
+          <mxGeometry x="780" y="40" width="380" height="70" as="geometry"/>
         </mxCell>
-        <mxCell id="gate" value="gate · FortiGate?&#10;firewall / policy ask" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
-          <mxGeometry x="780" y="160" width="380" height="110" as="geometry"/>
+        <mxCell id="gate" value="gate · FortiGate?&#10;device / policy / VIP /&#10;route named?" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+          <mxGeometry x="780" y="150" width="380" height="90" as="geometry"/>
         </mxCell>
-        <mxCell id="skip" value="skip — no firewall&#10;ordinary coding" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
-          <mxGeometry x="400" y="160" width="320" height="110" as="geometry"/>
+        <mxCell id="skip" value="skip — no FortiGate&#10;surface this turn" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
+          <mxGeometry x="400" y="150" width="320" height="90" as="geometry"/>
         </mxCell>
-        <mxCell id="act" value="inventory / health&#10;mutate only with&#10;explicit verb + risk" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
-          <mxGeometry x="780" y="320" width="380" height="120" as="geometry"/>
+        <mxCell id="route" value="route · inventory vs&#10;policy vs VIP/objects vs&#10;routes vs mutate" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+          <mxGeometry x="780" y="280" width="380" height="90" as="geometry"/>
         </mxCell>
-        <mxCell id="end_ok" value="END — policy id&#10;+ change summary" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#12401A" parent="1" vertex="1">
-          <mxGeometry x="780" y="490" width="380" height="100" as="geometry"/>
+        <mxCell id="refuse" value="refuse mutate&#10;unless explicit verb&#10;(fortigate-safety)" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
+          <mxGeometry x="400" y="400" width="320" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="inventory" value="inventory&#10;list devices → status /&#10;VDOM / interfaces" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+          <mxGeometry x="780" y="410" width="380" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="policy" value="policy-change&#10;list → detail →&#10;gated create/update/delete" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+          <mxGeometry x="1220" y="250" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="vip" value="vip-nat / objects&#10;address · service · VIP&#10;gated DNAT" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+          <mxGeometry x="1220" y="370" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="routes" value="routes&#10;FIB / static list →&#10;gated route mutate" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#12305B" parent="1" vertex="1">
+          <mxGeometry x="1220" y="490" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="end_ship" value="END — evidence&#10;device / id / change" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#12401A" parent="1" vertex="1">
+          <mxGeometry x="780" y="550" width="380" height="90" as="geometry"/>
         </mxCell>
         <mxCell id="end_skip" value="END — stay out" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;fontSize=12;fillColor=#e0e0e0;strokeColor=#666666;fontColor=#222222" parent="1" vertex="1">
-          <mxGeometry x="400" y="490" width="320" height="100" as="geometry"/>
+          <mxGeometry x="400" y="550" width="320" height="90" as="geometry"/>
         </mxCell>
 
         <mxCell id="e_start_gate" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="start" target="gate" edge="1">
@@ -44,25 +60,57 @@
         <mxCell id="e_gate_skip" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0;exitY=0.5;entryX=1;entryY=0.5" parent="1" source="gate" target="skip" edge="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="chip_skip" value="no" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#333333" parent="1" vertex="1">
-          <mxGeometry x="730" y="195" width="40" height="22" as="geometry"/>
+        <mxCell id="chip_no" value="no" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#333333" parent="1" vertex="1">
+          <mxGeometry x="730" y="180" width="40" height="22" as="geometry"/>
         </mxCell>
-        <mxCell id="e_gate_act" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="gate" target="act" edge="1">
+        <mxCell id="e_gate_route" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="gate" target="route" edge="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
         <mxCell id="chip_yes" value="yes" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#333333" parent="1" vertex="1">
-          <mxGeometry x="920" y="278" width="40" height="22" as="geometry"/>
+          <mxGeometry x="920" y="248" width="40" height="22" as="geometry"/>
         </mxCell>
-        <mxCell id="e_act_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="act" target="end_ok" edge="1">
+        <mxCell id="e_route_inv" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="route" target="inventory" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_route_policy" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=1;exitY=0.25;entryX=0;entryY=0.5" parent="1" source="route" target="policy" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_route_vip" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5" parent="1" source="route" target="vip" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_route_routes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;exitX=1;exitY=0.75;entryX=0;entryY=0.5" parent="1" source="route" target="routes" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_route_refuse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0;exitY=0.5;entryX=1;entryY=0.5" parent="1" source="route" target="refuse" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_inv_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="inventory" target="end_ship" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_policy_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=1;entryY=0.2" parent="1" source="policy" target="end_ship" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1370" y="530"/>
+              <mxPoint x="1200" y="530"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_vip_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=1;entryY=0.45" parent="1" source="vip" target="end_ship" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_routes_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=1;entryY=0.7" parent="1" source="routes" target="end_ship" edge="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
         <mxCell id="e_skip_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="skip" target="end_skip" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="350" y="215"/>
-              <mxPoint x="350" y="540"/>
+              <mxPoint x="350" y="195"/>
+              <mxPoint x="350" y="595"/>
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="e_refuse_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;jumpStyle=arc;jumpSize=10;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0" parent="1" source="refuse" target="end_skip" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
       </root>
     </mxGraphModel>

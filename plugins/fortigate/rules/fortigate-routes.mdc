@@ -1,0 +1,81 @@
+---
+description: >-
+  FortiGate static route and routing-table craft via MCP. Resolve route_id
+  and device_id — never invent. Mutates need fortigate-safety.
+alwaysApply: false
+---
+
+# FortiGate routes
+
+## Gate
+
+Use when the user asks to list the routing table, list/inspect static
+routes, or create/update/delete a static route on FortiGate. Skip bare
+"routing" without FortiGate. Always load `fortigate-safety` for mutates.
+
+Never invent `device_id`, `route_id`, gateway, or outbound interface.
+Resolve from MCP or user paste.
+
+## Prefer MCP
+
+When a FortiGate MCP is ready (`user-mcp_fortigate`), use:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| Live routing table | `get_routing_table` | `device_id`, optional `vdom` |
+| List static routes | `list_static_routes` | `device_id`, optional `vdom` |
+| Static route detail | `get_static_route_detail` | `device_id` + `route_id` |
+| Create static route | `create_static_route` | `dst` + `gateway`, optional `device` (intf) |
+| Update static route | `update_static_route` | `route_id` + `route_data` |
+| Delete static route | `delete_static_route` | destructive — explicit verb |
+
+## Discover first
+
+1. Resolve `device_id` (`list_devices`) and VDOM when needed.
+2. Prefer `get_routing_table` for "how does traffic leave?" read questions.
+3. Prefer `list_static_routes` + `get_static_route_detail` before update
+   or delete — never guess `route_id`.
+4. Resolve outbound interface via `list_interfaces` when `device` (intf)
+   is required for create — do not invent interface names.
+
+## Read
+
+1. Summarize destination, gateway, interface, distance/priority when the
+   tool returns them.
+2. Call out default routes (`0.0.0.0/0` or equivalent) explicitly — high
+   blast radius if changed.
+3. Prefer a short table of matching prefixes over dumping the entire FIB
+   when the user named a destination.
+
+## Create / update
+
+1. Requires an explicit verb naming destination/gateway (or route id for
+   update) — `fortigate-safety`.
+2. `create_static_route`: `dst` + `gateway`; set `device` only when the
+   user named an interface or inventory resolved one.
+3. Prefer update of an existing route over a conflicting duplicate prefix
+   when listing shows a match.
+4. State blast radius (which prefixes / failover path change), then act
+   only if still authorized.
+5. Receipt: device, vdom, route_id (when known), dst, gateway, interface.
+
+## Delete
+
+1. Requires an explicit delete/remove verb naming the route.
+2. Detail first; refuse to delete a default route unless the user named
+   that consequence clearly.
+3. Receipt: deleted route_id + dst/gateway summary.
+
+## Report shape
+
+- Device id + VDOM
+- Route id (when known) + dst → gateway (+ intf)
+- For FIB reads: matching entries only when possible
+- Note when mutate refused for lack of verb
+
+## Out of scope
+
+- Dynamic routing protocol authoring (BGP/OSPF config) unless exposed by
+  a live MCP tool — do not invent tools
+- Policy or VIP craft (other rules)
+- Neighbor router products

@@ -1,0 +1,85 @@
+---
+description: >-
+  FortiGate firewall policy craft via MCP: list, detail, create, update,
+  delete. Resolve policy_id and device_id — never invent. Mutates need
+  fortigate-safety.
+alwaysApply: false
+---
+
+# FortiGate policies
+
+## Gate
+
+Use when the user asks to list, inspect, create, update, or delete a
+FortiGate firewall policy. Skip generic "ACL" without FortiGate. Always
+load `fortigate-safety` for create/update/delete.
+
+Never invent `device_id`, `policy_id`, address/service object names, or
+VDOM. Resolve from MCP this turn or from ids the user pasted.
+
+## Prefer MCP
+
+When a FortiGate MCP is ready (`user-mcp_fortigate`), use:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List policies | `list_firewall_policies` | `device_id`, optional `vdom` |
+| Policy detail | `get_firewall_policy_detail` | `device_id` + `policy_id` |
+| Create policy | `create_firewall_policy` | `device_id` + `policy_data` object |
+| Update policy | `update_firewall_policy` | `device_id` + `policy_id` + `policy_data` |
+| Delete policy | `delete_firewall_policy` | `device_id` + `policy_id` — destructive |
+
+## Discover first
+
+1. Resolve `device_id` via `list_devices` (or user paste).
+2. Confirm VDOM (`discover_vdoms` when multi-VDOM or non-root named).
+3. `list_firewall_policies` before editing — match by name/id the user
+   gave; do not pick "the production deny" by guess.
+4. `get_firewall_policy_detail` before update/delete so the receipt can
+   name src/dst/service/action that will change.
+5. Resolve address/service objects used in `policy_data` via
+   `list_address_objects` / `list_service_objects` (see
+   `fortigate-objects`) — never invent object names.
+
+## Read / list
+
+1. Prefer listing then detailing one policy over dumping every field for
+   all policies.
+2. Report: policy id/name, action, interfaces, src/dst, service, status
+   (enable/disable) when present.
+3. If the list is huge, filter by the name/id/substring the user named
+   before summarizing.
+
+## Create / update
+
+1. Requires an explicit verb this turn naming the policy intent
+   (`fortigate-safety`).
+2. Build `policy_data` from resolved object names and the user's stated
+   action (accept/deny), interfaces, and schedule — do not invent
+   management-access openings.
+3. Prefer the smallest change: update one field set over recreating a
+   near-duplicate policy.
+4. State blast radius in one sentence (traffic that will newly match or
+   stop matching), then call the tool only if still authorized.
+5. Receipt: device_id, vdom, policy_id/name, summary of change — no
+   secrets.
+
+## Delete
+
+1. Requires an explicit delete/remove/destroy verb naming the policy.
+2. Detail first; confirm id in the receipt.
+3. Warn once if the policy appears to be a catch-all or management path,
+   then proceed only if still authorized.
+
+## Report shape
+
+- Device id + VDOM
+- Policy id/name + action summary
+- For mutates: before→after or "created/deleted" with key fields
+- Explicit note when mutate was refused for lack of verb
+
+## Out of scope
+
+- Address/service/VIP authoring details (see `fortigate-objects`)
+- Static route craft (see `fortigate-routes`)
+- Non-FortiGate firewall products
