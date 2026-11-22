@@ -1,0 +1,71 @@
+---
+description: >-
+  NPM access-list inventory and craft (clients, auth, satisfy). Discover-first;
+  never invent access-list ids; widening access needs an explicit verb.
+alwaysApply: false
+---
+
+# Nginx Proxy Manager access lists
+
+## Gate
+
+Use when the user authorized NPM work and the turn needs **access lists**
+(IP allow/deny clients, optional HTTP basic auth satisy rules). Host-only or
+SSL-only asks → other rules. Removing restrictions / deleting lists → also
+`nginx-proxy-manager-safety`.
+
+## Transport
+
+No NPM MCP discovered. Prefer REST API on operator-resolved `BASE` with
+Bearer auth, or admin UI. **Do not invent MCP tool names.**
+
+## API map (HTTP)
+
+| Need | Method + path |
+| --- | --- |
+| List access lists | `GET /api/nginx/access-lists` |
+| One access list | `GET /api/nginx/access-lists/{id}` |
+| Create access list | `POST /api/nginx/access-lists` |
+| Update access list | `PUT /api/nginx/access-lists/{id}` |
+| Delete access list | `DELETE /api/nginx/access-lists/{id}` (safety gate) |
+
+Attach to a proxy host via host update (`access_list_id`) after both ids are
+resolved (`nginx-proxy-manager-hosts`).
+
+## Craft fields (typical)
+
+Confirm field names from a live get on this instance:
+
+- **name** — human label
+- **clients** — directive + address (allow/deny + CIDR or IP)
+- **items** / auth items — basic-auth usernames; **never** put passwords in
+  chat — set via UI/API with operator-provided secret channel
+- **satisfy_any** — whether any client/auth match passes
+
+## Discover first
+
+1. Never invent access-list ids — list/resolve this turn.
+2. Before widening (adding allow-all, removing deny, clearing auth), show the
+   current clients/auth summary from get evidence.
+3. Before attach/detach on a host, prove host id + access_list id.
+
+## Defaults
+
+1. Prefer update-in-place of an existing list over delete+recreate.
+2. Tightening access (adding deny, removing public allow) is fine with an
+   ordinary update verb naming the list.
+3. **Widening** access (0.0.0.0/0 allow, drop auth, satisfy_any that opens
+   the door) needs an explicit widen/open verb per `nginx-proxy-manager-safety`.
+4. Receipts: id + name + client count / auth user count — no password hashes.
+
+## Report shape
+
+- **id** + **name**
+- **clients** summary (count + whether any public allow)
+- **auth** — username list only
+- **hosts using this list** when known from host inventory
+
+## Related (this plugin)
+
+- `nginx-proxy-manager-hosts` — attach access_list_id
+- `nginx-proxy-manager-safety` — widen / delete gates

@@ -8,7 +8,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.44",
+    "version": "0.12.45",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -781,7 +781,7 @@
       "name": "nodadyoushutup-nginx-proxy-manager",
       "source": "./nginx-proxy-manager",
       "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-      "version": "0.12.0",
+      "version": "0.12.1",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -1038,7 +1038,7 @@
       "name": "nodadyoushutup-zot",
       "source": "./zot",
       "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"

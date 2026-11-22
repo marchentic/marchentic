@@ -1,0 +1,84 @@
+---
+description: >-
+  NPM SSL certificate inventory and issue/renew via product API or UI.
+  Discover-first; never invent certificate ids; no private keys in chat.
+alwaysApply: false
+---
+
+# Nginx Proxy Manager SSL
+
+## Gate
+
+Use when the user authorized NPM work and the turn needs **SSL certificate**
+list, issue, renew, or attach-to-host. Host structure without cert work →
+`nginx-proxy-manager-hosts`. Delete cert / bulk renew → also
+`nginx-proxy-manager-safety`.
+
+## Transport
+
+No NPM MCP discovered. Prefer REST API on an operator-resolved `BASE` with
+Bearer auth (see hosts rule), or admin UI. **Do not invent MCP tool names.**
+Never paste private keys, CF tokens used for DNS challenge, or admin
+passwords into chat — reference secret **names** or “token already on NPM
+settings” only.
+
+## API map (HTTP)
+
+| Need | Method + path |
+| --- | --- |
+| List certificates | `GET /api/nginx/certificates` |
+| One certificate | `GET /api/nginx/certificates/{id}` |
+| Request / upload cert | `POST /api/nginx/certificates` (provider-specific body) |
+| Delete certificate | `DELETE /api/nginx/certificates/{id}` (safety gate) |
+
+Attach a cert to a proxy host by updating the host (`certificate_id` /
+SSL fields) via `nginx-proxy-manager-hosts` after the cert id is resolved.
+
+## Providers (craft language)
+
+| Provider shape | Notes |
+| --- | --- |
+| HTTP-01 (standard Let’s Encrypt) | Domain must already point at NPM; wait for DNS |
+| DNS-01 | Needs a DNS plugin/credential **already configured in NPM** — do not dump provider API tokens into chat |
+| Custom / upload | User supplies cert material through UI/API upload channels they control — do not paste PEM private keys into the agent chat |
+
+Confirm provider enum values from a live list/get or NPM docs for that
+version — do not invent provider strings.
+
+## Discover first
+
+1. Never invent certificate ids — list/resolve this turn.
+2. Before renew/delete, `GET` the cert and show domain names + expiry /
+   provider from evidence.
+3. Before attaching to a host, prove the host id and cert id both exist.
+
+## Craft defaults
+
+1. Prefer renew / re-issue on the **same cert id** when the product supports
+   it over delete+create.
+2. Multi-SAN certs: list every domain in the receipt.
+3. Do not force-renew unrelated certs in bulk without named ids
+   (`nginx-proxy-manager-safety`).
+4. After issue, optionally show which proxy hosts reference `certificate_id`
+   (from host list filter) — do not guess.
+
+## Report shape
+
+- **id**
+- **domain_names** (SANs)
+- **provider** / nice name
+- **expires_on** when present
+- **attached hosts** (ids/domains) when known from host inventory
+
+## Refuse
+
+- Pasting private keys, intermediate PEMs, or DNS provider API tokens
+- Inventing cert ids or claiming LE success without API/UI evidence
+- Deleting a cert still attached to enabled hosts without an explicit delete
+  verb naming the cert **and** acknowledgment of attached hosts
+
+## Related (this plugin)
+
+- `nginx-proxy-manager-hosts` — attach cert id on proxy host
+- `nginx-proxy-manager-safety` — delete / bulk renew gates
+- Skill: `nginx-proxy-manager-ssl-issue`

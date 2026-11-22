@@ -442,7 +442,7 @@
     {
       "name": "nodadyoushutup-nginx-proxy-manager",
       "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-      "version": "0.12.0",
+      "version": "0.12.1",
       "source": {
         "source": "local",
         "path": "./plugins/nginx-proxy-manager"
@@ -592,7 +592,7 @@
     {
       "name": "nodadyoushutup-zot",
       "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/zot"
