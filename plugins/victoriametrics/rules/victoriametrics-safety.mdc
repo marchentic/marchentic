@@ -1,0 +1,58 @@
+---
+description: >-
+  VictoriaMetrics MCP safety: bound query cardinality, redact secrets from
+  alerts/query output, avoid heavy global TSDB dumps unless asked.
+alwaysApply: false
+---
+
+# VictoriaMetrics safety
+
+## Gate
+
+Load on every VictoriaMetrics discover or query turn that may touch MCP
+output. Skip only when the turn never uses VictoriaMetrics MCP.
+
+## Cardinality and payload hygiene
+
+1. Discover metric/labels before wide selectors.
+2. Aggregate (`sum by`, `topk`) instead of dumping raw high-cardinality
+   series into chat.
+3. Keep `limit` / `topN` modest on first discovery pulls.
+4. Prefer larger `step` on long `query_range` windows.
+5. Do not call `tsdb_status` with global `date=1970-01-01` unless the
+   user explicitly asked for cluster-wide cardinality (expensive).
+6. Do not paste multi-thousand-line raw matrix dumps — summarize.
+
+## Redact before quote
+
+Do **not** paste into chat:
+
+- Tokens, passwords, private keys, or connection strings found in alert
+  annotations, rule labels, or query strings
+- Unredacted PII if a summary answers the ask
+- Full tenant label maps when a count or top-N answers the ask
+
+Prefer: metric names, matcher strings, counts, alert names/states, and
+redacted snippets with `[REDACTED]` for secret-looking substrings.
+
+## Trace and debug flags
+
+- `trace=true` on `query` / `query_range` can return large debug payloads —
+  use only when the operator asked to debug query performance.
+- `nocache=true` bypasses rollup cache — confirm when used on heavy shared
+  backends.
+
+## Operator replies
+
+Safe receipt shape:
+
+- MetricsQL/PromQL or discovery tool + window
+- Finding summary (values / cardinality / alert state)
+- Explicit note that secrets were redacted when present
+- Explicit "heavy global TSDB stats not run" when declined
+
+## Mutates
+
+This MCP surface is read-oriented (discover / query / explain / inventory).
+Do not invent delete/admin APIs. Stop if the user asks for destructive
+storage ops this plugin cannot gate via MCP.

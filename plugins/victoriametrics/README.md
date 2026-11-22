@@ -1,23 +1,28 @@
 # victoriametrics
 
-Agnostic VictoriaMetrics craft: discover metrics/labels, MetricsQL/PromQL query and range, TSDB status, and alerts/rules via MCP. Prefer VictoriaMetrics MCP; discover before guessing.
+Agnostic VictoriaMetrics craft: discover metrics/labels/series/TSDB,
+MetricsQL/PromQL instant/range queries, and alerts/rules inventory via
+MCP. Prefer VictoriaMetrics MCP; discover before guessing.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `victoriametrics-discover` | Discover metrics/labels/series and TSDB status before complex MetricsQL |
-| `victoriametrics-query` | Instant and range queries: rate-then-sum; bound cardinality |
+| `victoriametrics-discover` | MCP metrics/labels/series/TSDB/alerts discovery |
+| `victoriametrics-query` | Instant / range / explain / prettify via MCP |
+| `victoriametrics-safety` | Cardinality hygiene and redaction |
 
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
-| `victoriametrics` | Index / gate |
+| `victoriametrics` | Index / gate / procedure |
+| `victoriametrics-discover-then-query` | Fuzzy surface → discover → bounded query |
 
 ## Commands
 
-- `/victoriametrics` → VictoriaMetrics discover or query
+- `/victoriametrics` → VictoriaMetrics discover, query, or discover-then-query
+- `/victoriametrics-discover` → Discover-then-query checklist
 
 ## Related capabilities
 
@@ -26,4 +31,4 @@ Agnostic VictoriaMetrics craft: discover metrics/labels, MetricsQL/PromQL query 
 
 ## Diagrams
 
-- [`docs/victoriametrics-workflow.drawio`](docs/victoriametrics-workflow.drawio) — gate → act → evidence
+- [`docs/victoriametrics-workflow.drawio`](docs/victoriametrics-workflow.drawio) — gate → route → discover / query / safety

@@ -1,14 +1,72 @@
 ---
 description: >-
-  Instant and range queries: prefer rate-then-sum; keep cardinality bounded;
-  never invent metric names. Use explain_query / prettify_query when helpful.
+  VictoriaMetrics MetricsQL/PromQL instant and range queries via MCP:
+  rate-then-sum, bound cardinality, never invent metric names. Prefer
+  discover-before-query; use explain/prettify when helpful.
 alwaysApply: false
 ---
 
-# VictoriaMetrics Query
+# VictoriaMetrics query
 
-Instant and range queries: prefer rate-then-sum; keep cardinality bounded;
-never invent metric names. Use `explain_query` / `prettify_query` when helpful.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks for a MetricsQL/PromQL value, rate, trend, top-N,
+histogram quantile, or wants an expression explained/prettified. Skip when
+they only want names/TSDB inventory (`victoriametrics-discover`). Always
+load `victoriametrics-safety` with this rule.
+
+Never invent a metric or label name. If unknown this turn, discover first
+(`metrics` / `series` / `metrics_metadata`) or stop.
+
+## Prefer MCP
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| Instant value | `query` | required `query`; optional `time`, `step`, `timeout`, `nocache`, `trace` |
+| Range / trend | `query_range` | required `query` + `start`; optional `end`, `step`, `timeout`, `nocache`, `trace` |
+| Explain expression | `explain_query` | required `query` — how MetricsQL works |
+| Format expression | `prettify_query` | required `query` — readable formatting |
+| Existing rules | `rules` | reuse recording/alert expressions when relevant |
+| Firing alerts | `alerts` | correlate query findings (`state=firing`) |
+
+## Instant vs range
+
+- **Instant (`query`)** — evaluate at `time` (default now). Use for
+  snapshots, alert smoke checks, topk-at-now.
+- **Range (`query_range`)** — series from `start` to `end` with `step`.
+  Use for trends and incident windows. If the user omitted a window,
+  pick a sensible default (e.g. last 1h) and say so; `start` is required.
+- **Step** — enlarge on long windows so the payload stays manageable
+  (default often `5m` when unset).
+
+## MetricsQL / PromQL craft
+
+1. **Counters** — prefer `rate(...[5m])` (or a window that fits scrape
+   cadence). Prefer MetricsQL rollups the backend documents when they
+   simplify the ask; do not invent functions — verify via
+   `explain_query` or live docs when unsure.
+2. **Aggregation** — **rate then sum** (or other aggregators), never
+   sum-then-rate. Drop high-cardinality labels in `by ()` deliberately.
+3. **Bound results** — `topk` / `bottomk`, modest response size; avoid
+   naked wide selectors.
+4. **Prettify / explain** — use `prettify_query` before sharing a long
+   expression; `explain_query` when teaching or debugging semantics.
+5. **Recording / alerts** — check `rules` before reinventing a heavy
+   repeated aggregation the instance already evaluates.
+6. **Empty / slow** — re-check metric existence and matchers via discover;
+   tighten `timeout` / window; optional `trace=true` only when debugging
+   performance with the operator's consent (noisy).
+
+## Report shape
+
+- Exact MetricsQL/PromQL string used (prettified when long)
+- Tool (`query` vs `query_range`) + time window / step
+- Short finding (values, top series, trend direction)
+- Metric/label provenance (discovered this turn or user-pasted)
+- One next check (tighter matchers, longer window, or TSDB cardinality)
+
+## Out of scope
+
+- Pure metric/label/TSDB inventory → `victoriametrics-discover`
+- Neighbor dashboard products — stop; this plugin owns VictoriaMetrics MCP
+- Pasting secrets from alert annotations → `victoriametrics-safety`

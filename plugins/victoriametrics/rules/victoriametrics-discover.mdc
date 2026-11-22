@@ -1,15 +1,76 @@
 ---
 description: >-
-  Discover metric and label names (metrics, labels, label_values, series,
-  metrics_metadata, tsdb_status) before writing complex MetricsQL/PromQL.
+  Discover VictoriaMetrics metrics, labels, series, TSDB cardinality, and
+  alerts/rules via MCP before writing MetricsQL/PromQL. Never invent names.
 alwaysApply: false
 ---
 
-# VictoriaMetrics Discover
+# VictoriaMetrics discover
 
-Discover metric and label names (`metrics`, `labels`, `label_values`, `series`,
-`metrics_metadata`, `tsdb_status`) before writing complex MetricsQL/PromQL.
-Read alerts/rules and top/active queries as inventory when useful.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks which metrics/labels exist, series shape, TSDB
+cardinality, alert/rule inventory, top/active queries, or needs names before
+a query. Skip bare "VictoriaMetrics" / "VM" with no discover/query ask.
+Load `victoriametrics-safety` with this rule.
+
+Never invent a metric name, label name, or selector — resolve from MCP this
+turn or from a name the user pasted.
+
+## Prefer MCP
+
+When a VictoriaMetrics MCP is ready (`user-mcp_victoriametrics`), use these
+tools — do not invent a side CLI or raw HTTP client while MCP works:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List metric names | `metrics` | optional `match`, `start`/`end`, `limit` |
+| Label names | `labels` | optional `match`, time window, `limit` |
+| Label values | `label_values` | required `label_name`; optional `match` |
+| Series selectors | `series` | optional `match`, time window, `limit` |
+| Metric type/help | `metrics_metadata` | `metric`, `search`, `type`, `unit`, `limit` |
+| Cardinality / TSDB | `tsdb_status` | `topN`, `focusLabel`, `match`, `date` |
+| Query usage stats | `metric_statistics` | unused/hot metrics (`le`, `match_pattern`) |
+| Active queries | `active_queries` | currently running queries |
+| Top queries | `top_queries` | required `topN`; optional `maxLifetime` |
+| Alerts inventory | `alerts` | optional `state`, `group`, `limit`/`offset` |
+| Rules inventory | `rules` | alert/record filters; `unhealthy` / `noMatch` |
+
+## Discover-before-query ladder
+
+1. Prefer exact metric the user named.
+2. Else `metrics` with a tightening `match` selector when the surface is
+   known, or `metrics_metadata` with `search` for a keyword in name/help.
+3. Read type/help via `metrics_metadata` — counters need `rate()`-style
+   rollups; gauges usually do not.
+4. `series` with `match` on the chosen metric to see which labels exist.
+5. `label_values` for key labels before writing matchers — confirm
+   spelling and case (`label_name` required).
+6. For "why is this huge?": `tsdb_status` (optionally `focusLabel`) before
+   guessing high-cardinality labels; `metric_statistics` for never-queried
+   vs hot names.
+7. For load/incident context: `active_queries` / `top_queries` /
+   `alerts` / `rules` as inventory (not query execution).
+8. If several metrics match, list a short shortlist and ask once; do not
+   pick a production metric by guess.
+
+## Time windows and limits
+
+- Discovery tools accept `start` / `end` as RFC3339 or Unix epoch when a
+  historical window matters.
+- Prefer modest `limit` / `topN` on first pulls; raise only when truncated.
+- `tsdb_status` `date` defaults to today; use `1970-01-01` only when the
+  user asked for global cardinality (heavy).
+
+## Report shape
+
+- Metric / label names actually returned by MCP (not guessed)
+- Short type/help note when metadata was used
+- Cardinality / alert / top-query notes when those were the ask
+- One recommended next step (query, tighter matchers, or cardinality dig)
+
+## Out of scope
+
+- Instant/range MetricsQL execution → `victoriametrics-query`
+- Dashboard / Explore UX on other products — own VictoriaMetrics MCP only
+- Dumping full alert payloads with secrets → `victoriametrics-safety`
