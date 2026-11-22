@@ -1,6 +1,6 @@
 {
   "name": "nodadyoushutup-security",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Security practices: secrets, authentication, authorization, injection, cryptography, transport, supply chain, and data exposure. No product or vendor hard-coded.",
   "author": {
     "name": "nodadyoushutup",

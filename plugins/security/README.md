@@ -16,7 +16,7 @@ or a product's account model.
 | `security-secrets` | Credential storage, logs, examples, chat-paste refuse |
 | `security-crypto` | Hashing, encryption, randomness, JWT verify, TLS verification |
 | `security-transport` | Listeners, cookies, CORS, CSRF, HSTS, and response headers |
-| `security-supply-chain` | Dependencies, lockfiles, pins, install scripts, CI least-privilege floor |
+| `security-supply-chain` | Dependencies, lockfiles, pins, install scripts, CI least-privilege, agent-job secret floor |
 | `security-data` | Errors, logs, tenant scope, and sensitive data |
 
 `security-baseline` is always on while this plugin is installed. The other
