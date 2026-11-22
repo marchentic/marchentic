@@ -1,14 +1,93 @@
 ---
 description: >-
-  List pods, endpoints, templates, GPU types, and billing via MCP. Never invent
-  pod or endpoint ids.
+  List RunPod pods, endpoints, templates, GPU/CPU types, volumes, billing, and
+  capacity via user-mcp_runpod. Discover-first; never invent pod or endpoint ids.
 alwaysApply: false
 ---
 
-# RunPod Inventory
+# RunPod inventory
 
-List pods, endpoints, templates, GPU types, network volumes, and billing via
-MCP. Never invent pod or endpoint ids.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user authorized RunPod work and the turn needs **read**
+inventory: pods, endpoints, templates, GPU/CPU types, network volumes,
+billing, capacity, hub repos, or registry auth metadata. Skip bare "GPU
+cloud" talk without RunPod. Load `runpod-safety` on every RunPod turn; load
+`runpod-mutate` only when the user also authorized create/start/stop/delete.
+Out of scope: other GPU clouds and local CUDA debugging.
+
+## Prefer MCP
+
+Namespace: `user-mcp_runpod`. Do not invent tool names or resource ids.
+List/resolve this turn before referencing a pod, endpoint, template, volume,
+or job.
+
+## Live read tool map
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List pods | `list-pods` | start here for pod inventory |
+| One pod | `get-pod` | id from list/user paste |
+| Stream pod logs | `stream-pod-logs` | resolved pod id |
+| List endpoints | `list-endpoints` | serverless fleet |
+| One endpoint | `get-endpoint` | id from list |
+| Endpoint health | `endpoint-health` | workers / queue hints |
+| Endpoint workers | `list-endpoint-workers` | resolved endpoint |
+| Endpoint releases | `list-endpoint-releases` | resolved endpoint |
+| Public endpoints | `list-public-endpoints` | catalog browse |
+| List templates | `list-templates` | reusable configs |
+| One template | `get-template` | id from list |
+| GPU types | `list-gpu-types` / `get-gpu-type` | pick `pool` / type ids |
+| CPU types | `list-cpu-types` / `get-cpu-type` | CPU pods |
+| Data centers | `list-data-centers` / `get-data-center` | region choice |
+| Capacity matrix | `get-capacity` | CUDA / GPU availability |
+| Network volumes | `list-network-volumes` / `get-network-volume` | persistent storage |
+| Hub repos | `list-hub-repos` | deploy-from-hub browse |
+| Registry auths | `list-container-registry-auths` / `get-container-registry-auth` | **ids/names only** — never dump secrets |
+| Registry delegations | `list-registry-delegations` | ECR pull access |
+| Job status | `get-job-status` | serverless job id |
+| Stream job / worker logs | `stream-job` / `stream-worker-logs` | resolved ids |
+| Billing | `get-billing` | spend history; no payment secrets |
+
+## Discover first
+
+1. Never invent pod, endpoint, template, volume, or job ids — resolve from
+   list tools this turn or exact paste from the user.
+2. Before `get-pod` / `get-endpoint` / `get-template`, prove the id exists in
+   the matching list (same turn).
+3. For GPU selection, list types and capacity before recommending a create.
+4. Cap large listings; summarize idle vs running counts when many pods.
+
+## Procedure (read paths)
+
+1. **Scope** — pods vs endpoints vs templates vs catalog (GPU/DC) vs billing.
+   **Done when** one read surface is named.
+2. **List** — run the list tool; tighten filters when the schema allows.
+   **Done when** rows come from MCP, not guesses.
+3. **Detail** — optional get/health/log tools on resolved ids only.
+   **Done when** each get uses an id from step 2 or user paste.
+4. **Report** — short table (see shape). No API keys or registry passwords.
+   **Done when** receipt is evidence-backed.
+
+## Report shape
+
+For each pod/endpoint in focus:
+
+- **id** — RunPod resource id
+- **name** — display name when present
+- **status** — running / exited / unhealthy / queue depth as applicable
+- **gpu / image** — type or image hint when present
+
+For billing: time bucket + resource type totals — never payment instruments.
+
+## Out of scope
+
+- Creating, updating, starting, stopping, deleting → `runpod-mutate` +
+  `runpod-safety`
+- Pasting API keys, registry passwords, or env secret values
+- Non-RunPod GPU providers
+
+## Related (this plugin)
+
+- `runpod-mutate` — gated create/update/lifecycle via MCP
+- `runpod-safety` — cost gates, secret refuse, explicit verbs

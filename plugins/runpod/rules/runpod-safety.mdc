@@ -1,30 +1,81 @@
 ---
 description: >-
-  RunPod mutate gates — create/start/stop/delete pod or endpoint, cancel job,
-  and registry-auth writes need an explicit verb naming the object. Cost-aware;
-  never paste secrets.
+  RunPod safety: read-only default, explicit mutate verbs, cost-aware create/start,
+  refuse API keys and registry password dumps.
 alwaysApply: false
 ---
 
 # RunPod safety
 
+## Gate
+
+Load on every authorized RunPod turn (inventory or mutate). Skip when the
+turn never touches RunPod or the RunPod MCP.
+
 ## Read-only default
 
-List pods, endpoints, templates, GPU types, workers, jobs, volumes, and billing
-are fine when RunPod work is authorized. Do **not**:
+These are fine without an extra destructive verb when RunPod is authorized:
 
-- create or update a pod / endpoint / template / network volume
-- start, stop, restart, or delete a pod
-- delete an endpoint or purge its queue
-- cancel or retry a job
-- create or delete container-registry auth
+- `list-pods`, `get-pod`, `stream-pod-logs`
+- `list-endpoints`, `get-endpoint`, `endpoint-health`, workers/releases lists
+- `list-templates`, `get-template`
+- `list-gpu-types`, `get-gpu-type`, `list-cpu-types`, `get-cpu-type`
+- `list-data-centers`, `get-data-center`, `get-capacity`
+- `list-network-volumes`, `get-network-volume`
+- `list-hub-repos`, `list-public-endpoints`
+- `list-container-registry-auths`, `get-container-registry-auth` (metadata only)
+- `list-registry-delegations`
+- `get-job-status`, `stream-job`, `stream-worker-logs`
+- `get-billing`
 
-…unless the user gave an explicit verb this turn naming the object (or clear
-create intent with required fields).
+Do **not** run mutate tools unless the user gave an explicit verb **this
+turn** naming the target object or clear create intent with required fields.
 
-## Cost and secrets
+## Mutate gates (explicit verb required)
 
-Before create/start: state that GPU time bills while running. Prefer scale-to-zero
-or stop when idle if the user did not ask to leave it up. Never paste API keys,
-registry passwords, or env secret values into chat — refuse dumps
-(security secrets posture).
+| Risk | Needs this turn |
+| --- | --- |
+| Create pod / endpoint / template / volume | **create** / **deploy** + required fields |
+| Start / stop / restart pod | **start** / **stop** / **restart** + pod id |
+| Delete pod / endpoint / template / volume / auth | **delete** + id |
+| Update pod / endpoint / template / volume | **update** + id + fields |
+| Purge queue | **purge** + endpoint id |
+| Cancel / retry job | **cancel** / **retry** + job id |
+| Run endpoint job | **run** + endpoint id |
+| Registry auth write | **create**/**delete** auth + named registry (no secret echo) |
+
+Ambiguous scope (e.g. "clean up idle pods") → ask once for ids; do not
+mass-delete without listed targets.
+
+## Cost risk
+
+GPU and serverless workers **bill while running**.
+
+1. Before create/start: state that time is billed while up.
+2. Prefer stop / scale-to-zero when idle unless the user asked to leave it up.
+3. Prefer cheaper GPU types that still meet the stated need (`list-gpu-types`,
+   `get-capacity`).
+
+Use skill `runpod-pod-lifecycle` for start/stop/delete checklists and
+`runpod-endpoint-deploy` for serverless create/deploy.
+
+## Refuse
+
+- Pasting API keys, registry passwords/tokens, or env secret values into chat
+- Inventing pod, endpoint, template, volume, or job ids
+- Echoing `create-container-registry-auth` secrets in receipts
+- Absorbing other GPU clouds into this surface
+
+## Receipt examples (safe)
+
+Inventory turn: pod `abc123` name `train-1` status `RUNNING` GPU type
+`NVIDIA A40` — no mutate.
+
+Stop turn (authorized): stated billing stops when exited; `stop-pod` on
+`abc123`; follow-up `get-pod` status `EXITED` — no secrets.
+
+## Related (this plugin)
+
+- `runpod-inventory` — discover-first list/get
+- `runpod-mutate` — tool args and mutate sequence
+- Skills: `runpod-pod-lifecycle`, `runpod-endpoint-deploy`

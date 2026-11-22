@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.40"
+    "version": "0.12.41"
   },
   "plugins": [
     {
@@ -564,7 +564,7 @@
       "name": "nodadyoushutup-runpod",
       "source": "./plugins/runpod",
       "description": "Agnostic RunPod craft: list pods/endpoints/templates/GPUs and gated create/start/stop/delete via MCP. Prefer RunPod MCP; never invent pod or endpoint ids; cost-aware defaults.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "logo": "assets/avatar.png"
     },
     {

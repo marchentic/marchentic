@@ -1,0 +1,80 @@
+---
+description: >-
+  Gated RunPod mutate via user-mcp_runpod: create/update/start/stop/delete pods
+  and endpoints, jobs, volumes, templates, registry auth. Inventory-before-mutate.
+alwaysApply: false
+---
+
+# RunPod mutate
+
+## Gate
+
+Load only when the user authorized RunPod **and** used an explicit mutate
+verb this turn (**create**, **start**, **stop**, **restart**, **delete**,
+**update**, **cancel**, **deploy**, **run**) naming the object or clear
+create fields. Otherwise stay on `runpod-inventory`. Always pair with
+`runpod-safety` before any mutate tool.
+
+Prefer namespace `user-mcp_runpod`. Never invent tool names or resource ids.
+
+## Inventory before mutate
+
+1. List matching pods/endpoints/templates/volumes **this turn**
+   (`runpod-inventory`).
+2. Resolve every id from MCP or user paste — never guess.
+3. For create: `list-gpu-types` / `get-capacity` (and data centers when
+   region matters) before `create-pod` / `create-endpoint`.
+4. State planned action + cost impact in one line; then call the mutate tool.
+
+## Live mutate tool map
+
+| Action | Tool | Notes |
+| --- | --- | --- |
+| Create pod | `create-pod` | `gpuTypeIds` or `computeType`; `imageName` or `templateId`; cost while running |
+| Update pod | `update-pod` | resolved pod id + fields user named |
+| Start / stop / restart pod | `start-pod` / `stop-pod` / `restart-pod` | resolved pod id |
+| Delete pod | `delete-pod` | permanent — explicit **delete** |
+| Create endpoint | `create-endpoint` | image + `gpuPoolIds` from `list-gpu-types` `pool` |
+| Update endpoint | `update-endpoint` | resolved endpoint id |
+| Set endpoint GPUs | `set-endpoint-gpus` | pool ids from inventory |
+| Delete endpoint | `delete-endpoint` | permanent |
+| Purge endpoint queue | `purge-endpoint-queue` | explicit purge verb |
+| Run / runsync endpoint | `run-endpoint` / `runsync-endpoint` | job invoke |
+| Cancel / retry job | `cancel-job` / `retry-job` | resolved job id |
+| Deploy hub repo | `deploy-hub-repo` | repo from `list-hub-repos` |
+| Create / update / delete template | `create-template` / `update-template` / `delete-template` | |
+| Create / update / delete volume | `create-network-volume` / `update-network-volume` / `delete-network-volume` | size 10–4096 GB; tier immutable after create |
+| Registry auth create / delete | `create-container-registry-auth` / `delete-container-registry-auth` | never echo password/token in chat |
+| Registry delegation create / delete | `create-registry-delegation` / `delete-registry-delegation` | ECR ARN path |
+
+## Defaults
+
+- Prefer the cheapest GPU type that meets the stated need; cite
+  `list-gpu-types` / `get-capacity` evidence.
+- Prefer stop or scale-to-zero when the user did not ask to leave GPU time
+  running.
+- Default image when neither image nor template given and user wants a
+  general PyTorch pod: `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`
+  (per MCP create-pod guidance) — state that default in the receipt.
+- SSH: only pass `sshPublicKey` as the **public** key contents when the user
+  provided it — never invent or paste private keys.
+- State which defaults you relied on in the receipt.
+
+## Delete / cost discipline
+
+- Delete pod/endpoint/volume/template/auth: explicit **delete** + resolved id.
+- Create/start: warn that GPU time bills while running.
+- Registry auth: refuse to print password/token back; confirm id only.
+
+## Operator receipt (mutate)
+
+- action (create/start/stop/delete/update/run/…)
+- resource id(s) + name
+- GPU / image / pool summary
+- cost note (running vs stopped)
+- no API keys, registry passwords, or env secret values
+
+## Related (this plugin)
+
+- `runpod-inventory` — list/get before mutate
+- `runpod-safety` — gates, cost, secret refuse
