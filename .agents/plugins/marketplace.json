@@ -232,7 +232,7 @@
     {
       "name": "nodadyoushutup-cloudflare",
       "description": "Cloudflare DNS craft: list/create/update/delete records with explicit destructive gates. Prefer Cloudflare MCP; never invent zone ids.",
-      "version": "0.10.1",
+      "version": "0.10.2",
       "source": {
         "source": "local",
         "path": "./plugins/cloudflare"
@@ -592,7 +592,7 @@
     {
       "name": "nodadyoushutup-zot",
       "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
-      "version": "0.12.0",
+      "version": "0.11.0",
       "source": {
         "source": "local",
         "path": "./plugins/zot"
