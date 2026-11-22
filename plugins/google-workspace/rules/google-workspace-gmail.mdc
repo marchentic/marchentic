@@ -1,27 +1,89 @@
 ---
 description: >-
-  Gmail search, read, draft, send, and label craft via Google Workspace MCP.
-  Use when working with email threads or drafts.
+  Gmail search, read, draft, send, label, and filter craft via Google Workspace
+  MCP. Prefer search/read/draft before send. Use when working with email.
 alwaysApply: false
 ---
 
 # Google Workspace Gmail
 
-## Gate
+## When to use
 
-Use when the user asks to search mail, read a thread, draft/send/reply, or
-manage labels. Prefer Google Workspace MCP.
+User asked to search mail, read a message/thread, draft/reply/send, manage
+labels, or manage filters. Prefer a connected Google Workspace MCP.
+
+## MCP tool map
+
+Pass `user_google_email` on every call as the connected MCP documents
+(example pattern: `admin@nodadyoushutup.com`). Never invent message or
+thread ids — resolve via search/get.
+
+| Job | Tools |
+| --- | --- |
+| Search inbox | `search_gmail_messages` (`query`, optional `page_size`,
+  `page_token`) — Gmail search syntax (`from:`, `subject:`, `newer_than:`,
+  `label:`, `is:unread`, …) |
+| Read one message | `get_gmail_message_content` (`message_id`, optional
+  `body_format`) |
+| Read many messages | `get_gmail_messages_content_batch` (`message_ids`) |
+| Read one thread | `get_gmail_thread_content` (`thread_id`, optional
+  `include_analysis`) |
+| Read many threads | `get_gmail_threads_content_batch` (`thread_ids`) |
+| Attachment bytes / URL | `get_gmail_attachment_content` (`message_id`,
+  `attachment_id`) — do not paste large binaries into chat |
+| List labels | `list_gmail_labels` |
+| Create / update / delete label | `manage_gmail_label`
+  (`action=create\|update\|delete`) |
+| Label a message | `modify_gmail_message_labels` (`message_id`,
+  `add_label_ids` / `remove_label_ids`) |
+| Label many messages | `batch_modify_gmail_message_labels` (`message_ids`,
+  add/remove label ids) |
+| List filters | `list_gmail_filters` |
+| Create / delete filter | `manage_gmail_filter` (`action=create\|delete`) |
+| Draft (default outbound) | `draft_gmail_message` (`subject`, `body`; optional
+  `to`/`cc`/`bcc`, `thread_id`, `in_reply_to`, `references`, `attachments`,
+  `quote_original`, `from_email` Send-As alias) |
+| Send (explicit verb) | `send_gmail_message` (`to`, `subject`, `body`; same
+  optional threading/attachment fields) |
+
+Outbound / label / filter mutates require an explicit verb — see
+`google-workspace-safety`.
+
+## Procedure
+
+1. **Search first** — `search_gmail_messages` with a tight query before claiming
+   empty results. Prefer ids from search hits over user-pasted guesses.
+   **Done when** candidate message/thread ids are listed from MCP, or none
+   match.
+2. **Read lean** — use `get_gmail_message_content` / `get_gmail_thread_content`
+   (or batch variants) for the ids you need. Summarize; redact secrets.
+   **Done when** you have enough body/headers to answer or draft.
+3. **Draft before send** — for new outbound or careful replies, call
+   `draft_gmail_message` unless the user explicitly said send. Keep replies on
+   the same `thread_id` when known; set `in_reply_to` / `references` when
+   threading.
+   **Done when** a draft id exists, or send was authorized and completed.
+4. **Labels / filters** — resolve label ids via `list_gmail_labels` before
+   modify; resolve filter ids via `list_gmail_filters` before delete. Create
+   only when asked.
+   **Done when** MCP confirms the change, or you refused for lack of verb.
+5. **Evidence** — return message/thread ids, subject, and what changed (draft
+   vs sent). **Done when** the reply cites MCP evidence and no unauthorized
+   `send_gmail_message` ran.
 
 ## Defaults
 
-1. Search before claiming “no mail” — use a tight query.
-2. **Draft** new outbound mail unless the user explicitly said send.
-3. Replies stay on the same thread when a thread id is known.
-4. Never invent message or thread ids.
-5. Redact secrets and tokens from excerpts in chat.
-6. Batch reads when fetching several messages.
+1. Never invent message, thread, label, or filter ids.
+2. Draft is the default for new outbound; send needs an explicit verb.
+3. Do not auto-forward or bulk-send without an explicit ask naming recipients.
+4. Prefer batch read tools when fetching several messages/threads.
+5. Redact tokens, passwords, and full mailbox dumps from chat.
+6. Attachments: prefer MCP attachment URLs / Drive download URLs over embedding
+   raw base64 in chat.
+7. Neighbor non-Workspace mail systems are out of scope for this plugin.
 
 ## Refuse
 
-- Do not auto-forward or bulk-send without an explicit ask.
-- Do not delete mail unless the user clearly asked to delete/trash.
+- Do not send, bulk-label, delete filters/labels, or invent recipients without
+  an explicit ask this turn (`google-workspace-safety`).
+- Do not claim mail was sent without a successful `send_gmail_message` result.

@@ -1,26 +1,105 @@
 ---
 description: >-
-  Google Docs and Sheets read/edit craft via Workspace MCP. Use when working
-  with documents or spreadsheets.
+  Google Docs and Sheets read/edit craft via Workspace MCP. Prefer
+  search/inspect/read before write; scoped ranges over full rewrites.
 alwaysApply: false
 ---
 
 # Google Workspace Docs / Sheets
 
-## Gate
+## When to use
 
-Use when the user asks to read or edit a Google Doc or Spreadsheet. Prefer
-Google Workspace MCP.
+User asked to find, read, comment on, or edit a Google Doc or Spreadsheet
+(including tabs, tables, ranges, formatting). Prefer a connected Google
+Workspace MCP.
+
+## MCP tool map — Docs
+
+Pass `user_google_email` as the connected MCP documents (example pattern:
+`admin@nodadyoushutup.com`). Never invent document ids.
+
+| Job | Tools |
+| --- | --- |
+| Search docs | `search_docs` (`query`) |
+| List docs in folder | `list_docs_in_folder` (optional `folder_id`) |
+| Plain text | `get_doc_content` (`document_id`) |
+| Markdown + comments | `get_doc_as_markdown` (`document_id`, comment opts) |
+| Structure / indices | `inspect_doc_structure` (`document_id`) — **required**
+  before index-based inserts |
+| Create | `create_doc` (`title`, optional `content`) |
+| Safe text swap | `find_and_replace_doc` (no index math) |
+| Targeted text / style | `modify_doc_text`, `update_paragraph_style` |
+| Headers / footers | `update_doc_headers_footers` |
+| Batch ops | `batch_update_doc` (`operations`; prefer
+  `end_of_segment=true` when appending) |
+| Tables | `create_table_with_data` (index from
+  `inspect_doc_structure.total_length`); `debug_table_structure` |
+| Images / elements | `insert_doc_image`, `insert_doc_elements` |
+| Tabs | `manage_doc_tab` |
+| Comments | `list_document_comments`, `manage_document_comment` |
+| Export PDF | `export_doc_to_pdf` (`document_id`, optional folder) |
+
+## MCP tool map — Sheets
+
+Never invent spreadsheet ids. Name the tab and A1 `range_name` on writes.
+
+| Job | Tools |
+| --- | --- |
+| List spreadsheets | `list_spreadsheets` |
+| Sheet metadata | `get_spreadsheet_info` (`spreadsheet_id`) |
+| Read values | `read_sheet_values` (`spreadsheet_id`, optional
+  `range_name`, formulas/notes/hyperlinks flags) |
+| Write / clear values | `modify_sheet_values` (`range_name`, `values` or
+  `clear_values=true`) |
+| Format range | `format_sheet_range` |
+| Conditional format | `manage_conditional_formatting` |
+| Structured tables | `list_sheet_tables` → `append_table_rows` |
+| Create workbook / tab | `create_spreadsheet`, `create_sheet` |
+| Rows / columns | `resize_sheet_dimensions` (insert/hide/delete/
+  freeze/auto-resize) |
+| Move rows | `move_sheet_rows` |
+| Comments | `list_spreadsheet_comments`, `manage_spreadsheet_comment` |
+
+Creates, writes, clears, deletes, and PDF export need an explicit verb when
+destructive or content-changing beyond an authorized edit — see
+`google-workspace-safety`.
+
+## Procedure
+
+1. **Resolve id** — `search_docs` / `list_spreadsheets` / `list_docs_in_folder`
+   (or Drive search) before inventing ids. **Done when** `document_id` /
+   `spreadsheet_id` is from MCP.
+2. **Read first** — Docs: prefer `get_doc_as_markdown` or `get_doc_content`;
+   call `inspect_doc_structure` before any index-based insert. Sheets:
+   `get_spreadsheet_info` then `read_sheet_values` for the target range.
+   **Done when** you know structure and the range/section to touch.
+3. **Edit smallest** — Docs: prefer `find_and_replace_doc` or scoped
+   `modify_doc_text` over full rewrite; append via batch with
+   `end_of_segment`. Sheets: write only the named A1 range; never clear a
+   sheet unless asked.
+   **Done when** MCP confirms the edit and unrelated cells/sections stay
+   intact.
+4. **Tables** — Docs tables: inspect → create/populate →
+   `debug_table_structure` if wrong. Sheets tables: `list_sheet_tables` before
+   `append_table_rows`.
+   **Done when** table shape matches the data.
+5. **Evidence** — return title, id, tab/range or section touched, and what
+   changed. **Done when** no unauthorized wipe/delete/export ran.
 
 ## Defaults
 
-1. Never invent document or spreadsheet ids.
-2. Prefer section / range edits over full-document rewrites.
-3. Sheets: name the tab and A1 range; do not overwrite unrelated cells.
+1. Never invent document, spreadsheet, tab, or table ids.
+2. Prefer section / range edits over full-document or full-sheet rewrites.
+3. Sheets: always name tab + A1 range on write; do not overwrite unrelated
+   cells.
 4. Preserve existing structure unless asked to reformat.
 5. Export to PDF only when requested.
+6. Do not paste secrets into shared docs or cells.
+7. Neighbor desktop office formats are out of scope except via Drive import
+   helpers when the user asked.
 
 ## Refuse
 
-- Do not delete tabs or wipe sheets without an explicit ask.
-- Do not paste secrets into shared docs.
+- Do not delete tabs, wipe sheets (`clear_values` on large ranges), or drop
+  rows/columns without an explicit ask (`google-workspace-safety`).
+- Do not skip `inspect_doc_structure` when using index-based Doc inserts.

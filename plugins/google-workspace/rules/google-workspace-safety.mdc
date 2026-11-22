@@ -1,0 +1,87 @@
+---
+description: >-
+  Destructive Google Workspace gates — send mail, share/public link, trash,
+  delete events/labels/filters, wipe sheet ranges, and ownership transfer need
+  an explicit verb. Search/read/draft is the default.
+alwaysApply: false
+---
+
+# Google Workspace safety
+
+## Read-only / draft default
+
+When Workspace craft is authorized, these are fine without a mutate/outbound
+verb:
+
+- Gmail: `search_gmail_messages`, `get_gmail_message_content`,
+  `get_gmail_messages_content_batch`, `get_gmail_thread_content`,
+  `get_gmail_threads_content_batch`, `get_gmail_attachment_content`,
+  `list_gmail_labels`, `list_gmail_filters`, `draft_gmail_message`
+- Drive: `search_drive_files`, `list_drive_items`, `get_drive_file_content`,
+  `get_drive_file_download_url`, `get_drive_file_permissions`,
+  `get_drive_shareable_link`, `check_drive_file_public_access`
+- Calendar: `list_calendars`, `get_events`, `query_freebusy`
+- Docs: `search_docs`, `list_docs_in_folder`, `get_doc_content`,
+  `get_doc_as_markdown`, `inspect_doc_structure`, `debug_table_structure`,
+  `list_document_comments`
+- Sheets: `list_spreadsheets`, `get_spreadsheet_info`, `read_sheet_values`,
+  `list_sheet_tables`, `list_spreadsheet_comments`
+
+Do **not** do any of the following unless the user gave an explicit verb this
+turn naming the target (message/thread, file, event, doc/sheet, label, filter):
+
+| Mutate / outbound | Tools |
+| --- | --- |
+| Send mail | `send_gmail_message` |
+| Apply / remove labels on mail | `modify_gmail_message_labels`,
+  `batch_modify_gmail_message_labels` |
+| Create / update / delete labels | `manage_gmail_label` |
+| Create / delete filters | `manage_gmail_filter` |
+| Share / revoke / transfer ownership | `manage_drive_access`
+  (`grant`, `grant_batch`, `update`, `revoke`, `transfer_owner`, `list`) |
+| Anyone-with-link / link role | `set_drive_file_permissions` (`link_sharing`
+  `reader`/`commenter`/`writer`) |
+| Trash Drive file | `update_drive_file` with `trashed=true` |
+| Create / update / delete calendar event | `manage_event`
+  (`create`/`update`/`delete`); RSVP is also mutate |
+| Create calendar | `create_calendar` |
+| OOO / focus create/update/delete | `manage_out_of_office`,
+  `manage_focus_time` (non-list actions) |
+| Create / rewrite Docs or Sheets | `create_doc`, `create_spreadsheet`,
+  `create_sheet`, `modify_doc_text`, `batch_update_doc`,
+  `find_and_replace_doc`, `modify_sheet_values` (write or `clear_values`),
+  `append_table_rows`, `resize_sheet_dimensions` delete/hide rows-cols |
+| Export Doc to PDF | `export_doc_to_pdf` |
+| Auth bootstrap | `start_google_auth` only when MCP reports auth is required |
+
+`list` on `manage_drive_access` is read-only once a `file_id` is known.
+
+## Irreversible — confirm blast radius
+
+Before proceeding when clearly authorized:
+
+| Action | State risk |
+| --- | --- |
+| `send_gmail_message` | Mail leaves the mailbox; cannot unsend via MCP |
+| `share_type=anyone` / link_sharing on | File becomes reachable without a named
+  account |
+| `transfer_owner` | You may lose control of the file |
+| `trashed=true` / event `delete` | Removes from active view; recovery is
+  manual |
+| `modify_sheet_values` + `clear_values` | Wipes the named A1 range |
+| `resize_sheet_dimensions` `delete_rows` /
+  `delete_row_range` / `delete_columns` | Drops sheet structure and data |
+| Filter / label `delete` | Changes inbox routing for future mail |
+
+State the object (subject / file name / event summary / range) and consequence
+in one sentence, then act only if authorization already covers that loss.
+
+## Account and secrets posture
+
+1. Pass `user_google_email` as the connected MCP documents (example pattern:
+   `admin@nodadyoushutup.com`). Never invent a different address.
+2. Never ask the operator to paste OAuth tokens, app passwords, or refresh
+   tokens into chat. Prefer `start_google_auth` when the namespace requires it.
+3. Redact secrets, tokens, and full mailbox dumps from chat excerpts.
+4. Do not broaden sharing beyond the role and audience the user named.
+5. Bare product name alone is not a send / share / delete authorization.

@@ -1,27 +1,84 @@
 ---
 description: >-
-  Google Calendar list, create, update, free/busy, and OOO craft via Workspace
-  MCP. Use when working with calendar events.
+  Google Calendar list, free/busy, event create/update/delete, OOO, and focus
+  time craft via Workspace MCP. Prefer list/get/freebusy before booking.
 alwaysApply: false
 ---
 
 # Google Workspace Calendar
 
-## Gate
+## When to use
 
-Use when the user asks about events, meetings, free/busy, OOO, or focus time.
-Prefer Google Workspace MCP.
+User asked about calendars, events, meetings, free/busy, out-of-office, or
+focus time. Prefer a connected Google Workspace MCP.
+
+## MCP tool map
+
+Pass `user_google_email` as the connected MCP documents (example pattern:
+`admin@nodadyoushutup.com`). Never invent calendar or event ids — resolve via
+list/get.
+
+| Job | Tools |
+| --- | --- |
+| List calendars | `list_calendars` |
+| Create calendar | `create_calendar` (`summary`, optional `description`,
+  `timezone`) — explicit create verb |
+| List / get events | `get_events` (optional `calendar_id`, `event_id`,
+  `time_min` / `time_max`, `query`, `detailed`, `include_attachments`) |
+| Free / busy | `query_freebusy` (`time_min`, `time_max`, optional
+  `calendar_ids`) |
+| Create / update / delete / RSVP | `manage_event` (`action=create\|update\|
+  delete\|rsvp`; create needs `summary`, `start_time`, `end_time`; update/
+  delete need `event_id`) |
+| Meet / guests / recurrence | same `manage_event` — `add_google_meet`,
+  `attendees`, `recurrence`, `send_updates`, guest capability flags |
+| Out of office | `manage_out_of_office` (`action` create/update/delete/list;
+  times + `auto_decline_mode`) |
+| Focus time | `manage_focus_time` (same action pattern; optional
+  `chat_status`, decline mode) |
+
+Event create/update/delete, calendar create, OOO/focus mutates, and RSVP need
+an explicit verb — see `google-workspace-safety`. Read/list/freebusy is the
+default.
+
+## Procedure
+
+1. **Resolve calendar** — `list_calendars` when the calendar is unclear; use
+   `primary` only when the MCP/user treat that as the default. Never invent a
+   calendar id.
+   **Done when** `calendar_id` is from MCP or an explicit user value you
+   verified.
+2. **Window the ask** — for “what’s on my calendar” / conflicts, set
+   `time_min` / `time_max` (RFC3339) and call `get_events` and/or
+   `query_freebusy`. Prefer free/busy before booking over someone else’s
+   calendar.
+   **Done when** busy blocks or event list answer the question.
+3. **Detail when needed** — `get_events` with `event_id` or `detailed=true`
+   for description, attendees, Meet link, attachments.
+   **Done when** you have the fields required to report or update.
+4. **Mutate when authorized** — `manage_event` create/update/delete with
+   explicit times/timezone; only invite attendees the user named. Use
+   `manage_out_of_office` / `manage_focus_time` for those block types — do not
+   fake them as ordinary events unless asked.
+   **Done when** MCP confirms the event/block id, or you refused for lack of
+   verb.
+5. **Evidence** — return summary, start/end with timezone, calendar id, event
+   id, and Meet link when present. **Done when** times are clear and no
+   unauthorized invite/delete ran.
 
 ## Defaults
 
-1. Resolve calendar id from MCP defaults or a named calendar — never invent.
-2. Confirm timezone from the event or calendar; state times clearly.
-3. Creating or moving events needs an explicit ask; cancelling/deleting needs
-   a clear destructive verb.
-4. Prefer free/busy checks before booking over someone else’s calendar.
-5. OOO / focus time: use the dedicated MCP helpers when available.
+1. Never invent calendar or event ids.
+2. State times with timezone; prefer the calendar’s timezone when known.
+3. Creating, moving, cancelling, or RSVPing needs an explicit ask.
+4. Prefer `query_freebusy` before proposing slots across calendars.
+5. Do not invite external guests the user did not name.
+6. Prefer `send_updates` values the user implied (`all` / `externalOnly` /
+   `none`); do not spam guests on silent edits when they asked for quiet.
+7. Neighbor calendar products outside Workspace are out of scope here.
 
 ## Refuse
 
-- Do not invite external guests the user did not name.
-- Do not wipe a calendar range without an explicit ask.
+- Do not wipe a calendar range, mass-delete events, or add unnamed attendees
+  without an explicit ask (`google-workspace-safety`).
+- Do not claim an event exists without a fresh `get_events` / create result.

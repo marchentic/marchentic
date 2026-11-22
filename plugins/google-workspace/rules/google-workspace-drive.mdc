@@ -1,27 +1,93 @@
 ---
 description: >-
-  Google Drive search, read, create, upload, and sharing craft via Workspace
-  MCP. Use when working with Drive files or folders.
+  Google Drive search, read, create, copy, upload, permissions, and sharing
+  craft via Workspace MCP. Prefer search/get before share or trash.
 alwaysApply: false
 ---
 
 # Google Workspace Drive
 
-## Gate
+## When to use
 
-Use when the user asks to find, read, create, upload, copy, or share Drive
-files/folders. Prefer Google Workspace MCP.
+User asked to find, list, read, create, copy, upload, move, share, or audit
+Drive files/folders (including Shared Drives). Prefer a connected Google
+Workspace MCP.
+
+## MCP tool map
+
+Pass `user_google_email` as the connected MCP documents (example pattern:
+`admin@nodadyoushutup.com`). Never invent file or folder ids — resolve via
+search/list/get.
+
+| Job | Tools |
+| --- | --- |
+| Search by name/query | `search_drive_files` (`query`, optional `file_type`,
+  `drive_id`, `corpora`, `page_size`, `detailed`) |
+| List folder / drive | `list_drive_items` (optional `folder_id`, `drive_id`,
+  `query`, `file_type`, `resource_type`, `detailed`) |
+| Read file text / metadata content | `get_drive_file_content` (`file_id`) |
+| Download / export URL | `get_drive_file_download_url` (`file_id`, optional
+  `export_format`) — do not paste binary blobs into chat |
+| Permissions inventory | `get_drive_file_permissions` (`file_id`);
+  `manage_drive_access` with `action=list` |
+| Public / link exposure check | `check_drive_file_public_access`
+  (`file_name`, optional `drive_id`) |
+| Existing shareable link | `get_drive_shareable_link` (`file_id`) — read of
+  current link; enabling anyone-with-link is a mutate |
+| Create file | `create_drive_file` (`file_name`, optional `content`,
+  `folder_id`, `mime_type`, `fileUrl`) |
+| Create folder | `create_drive_folder` (`folder_name`, optional
+  `parent_folder_id`) |
+| Copy | `copy_drive_file` (`file_id`, optional `new_name`,
+  `parent_folder_id`) |
+| Import to Google Doc | `import_to_google_doc` (`file_name` + content /
+  path / url) |
+| Metadata / move / trash | `update_drive_file` (`file_id`; `name`,
+  `add_parents` / `remove_parents`, `trashed`, …) |
+| Grant / revoke / transfer | `manage_drive_access` (`action=grant\|
+  grant_batch\|update\|revoke\|transfer_owner`, `role`, `share_type`, …) |
+| Anyone-with-link toggle | `set_drive_file_permissions` (`link_sharing`
+  `off\|reader\|commenter\|writer`) |
+
+Share / public-link / trash / ownership transfer need an explicit verb — see
+`google-workspace-safety`.
+
+## Procedure
+
+1. **Search / list first** — `search_drive_files` or `list_drive_items` before
+   creating a near-duplicate name in the same folder. Scope Shared Drives with
+   `drive_id` / `corpora` when the user named one.
+   **Done when** candidate file/folder ids are from MCP, or none match.
+2. **Resolve** — pick `file_id` / `folder_id` from results (or verify a
+   user-supplied id with get/list). **Done when** every id you will use was
+   returned by MCP.
+3. **Read or audit** — `get_drive_file_content` for contents;
+   `get_drive_file_permissions` / `manage_drive_access` `list` /
+   `check_drive_file_public_access` for sharing posture.
+   **Done when** you can answer the ask with evidence.
+4. **Create / copy / move** — when authorized: prefer copy of a template over
+   rebuilding; set `parent_folder_id` intentionally. Trash only with
+   `trashed=true` and an explicit delete/trash verb.
+   **Done when** MCP returns the new/updated id, or you refused.
+5. **Share** — grant the narrowest role (`reader` / `commenter` / `writer`)
+   and audience (`user` / `group` / `domain` / `anyone`) the user named. Prefer
+   named users over `anyone`. Enable link sharing only with an explicit public
+   / anyone-with-link verb.
+   **Done when** permissions match the ask and evidence cites MCP.
+6. **Evidence** — return file name, id, link when useful, and what changed.
+   **Done when** no unauthorized share/trash/transfer ran.
 
 ## Defaults
 
-1. Search before creating a near-duplicate name in the same folder.
-2. Never invent file or folder ids.
-3. Prefer link-sharing changes the user named (viewer/commenter/writer).
-4. Public / anyone-with-link sharing needs an explicit verb this turn.
-5. Downloads and exports: use MCP download/export helpers; do not paste
-   binary contents into chat.
+1. Never invent file, folder, permission, or Shared Drive ids.
+2. Prefer updating/sharing an existing file over minting a near-duplicate.
+3. Prefer named-user grants over domain/anyone discovery.
+4. Public / anyone-with-link needs an explicit verb this turn.
+5. Downloads/exports: use MCP URL helpers; do not dump binaries into chat.
+6. Neighbor object stores / other clouds are out of scope for this plugin.
 
 ## Refuse
 
-- Do not delete files or folders unless the user clearly asked.
-- Do not broaden sharing beyond what was requested.
+- Do not trash, broaden sharing, transfer ownership, or set link_sharing on
+  without an explicit ask (`google-workspace-safety`).
+- Do not claim a file is private without checking permissions / public access.
