@@ -292,7 +292,7 @@
     {
       "name": "nodadyoushutup-argocd",
       "description": "Agnostic Argo CD craft: list/get apps, sync status, and gated sync/action via MCP. Prefer Argo CD MCP; never invent app names.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/argocd"
@@ -337,7 +337,7 @@
     {
       "name": "nodadyoushutup-minio",
       "description": "Agnostic MinIO / S3 craft: buckets, objects, tags, and gated delete via MCP. Prefer MinIO MCP; never invent bucket names; refuse secret dumps.",
-      "version": "0.12.0",
+      "version": "0.11.0",
       "source": {
         "source": "local",
         "path": "./plugins/minio"
@@ -397,7 +397,7 @@
     {
       "name": "nodadyoushutup-victoriametrics",
       "description": "Agnostic VictoriaMetrics craft: discover metrics/labels, MetricsQL/PromQL query and range, TSDB status, and alerts/rules via MCP. Prefer VictoriaMetrics MCP; discover before guessing.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/victoriametrics"

@@ -1,12 +1,109 @@
 ---
 description: >-
-  Sync / refresh / resource actions need an explicit verb naming the app. Prefer dry-run or status read first.
+  Argo CD mutate gates — sync, resource actions, create/update/delete need
+  an explicit verb naming the Application. Prefer status read first.
 alwaysApply: false
 ---
 
-# Argocd Sync
+# Argocd sync
 
-Sync / refresh / resource actions need an explicit verb naming the app. Prefer dry-run or status read first.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks to sync, refresh, prune, run a resource action,
+create/update/delete an Application, or otherwise mutate Argo CD state.
+Skip pure status / tree / events asks (those stay on `argocd-apps`).
+
+Never invent `applicationName`, `applicationNamespace`, revision, or
+resource refs. Resolve from MCP this turn or from ids the user pasted.
+
+## Prefer MCP
+
+When an Argo CD MCP is ready, use these tools — do not invent a side CLI
+while MCP works:
+
+| Need | Tool | Gate |
+| --- | --- | --- |
+| Sync | `sync_application` | explicit sync/refresh verb + named app |
+| Dry-run sync | `sync_application` with `dryRun=true` | prefer before live prune/sync when unsure |
+| List resource actions | `get_resource_actions` | read-only discovery |
+| Run resource action | `run_resource_action` | explicit action verb + named resource |
+| Create Application | `create_application` | explicit create + full spec from user |
+| Update Application | `update_application` | explicit update naming the app |
+| Delete Application | `delete_application` | explicit delete naming the app |
+
+Optional params on sync: `prune`, `revision`, `syncOptions`,
+`applicationNamespace`, `argocdBaseUrl`. Do not enable `prune` unless the
+user asked to prune or accepted prune risk this turn.
+
+## Read-only default
+
+List/get/tree/events/logs/projects/clusters are fine when Argo CD work is
+authorized (`argocd-apps`). Do **not**:
+
+- sync or refresh live (non-dryRun)
+- prune during sync
+- run a resource action (`run_resource_action`)
+- create, update, or delete an Application
+
+…unless the user gave an explicit verb this turn naming the Application
+(and resource when the action is resource-scoped).
+
+## Sync procedure
+
+1. Resolve the app (`list_applications` / `get_application`).
+2. Read status/events first when the reason for sync is unclear —
+   OutOfSync alone is not permission to sync.
+3. Prefer `dryRun=true` when the user is unsure, or when prune is in play.
+4. Call `sync_application` only with an explicit sync/refresh verb and a
+   named app. Pass `applicationNamespace` when non-default.
+5. Re-read `get_application` (and tree if needed) after sync — do not
+   claim Synced from the sync RPC alone when a follow-up get is cheap.
+6. Report app + sync result + health honestly (Synced / OutOfSync /
+   Progressing / failed).
+
+## Resource actions
+
+1. Discover with `get_resource_actions` using a real `resourceRef` from
+   the tree — never invent actions.
+2. Run `run_resource_action` only when the user named the action (or
+   clearly asked to execute one listed option) and the resource.
+3. Treat restart / delete-pod style actions as disruptive: state blast
+   radius briefly before running when practical.
+
+## Create / update / delete
+
+- **Create** (`create_application`): require name, namespace, project,
+  source (`repoURL` / `path` / `targetRevision`), and destination from
+  the user or a pasted manifest — never invent repo URLs or destinations.
+- **Update** (`update_application`): explicit update verb + named app;
+  prefer showing the intended field change before applying when practical.
+- **Delete** (`delete_application`): explicit delete verb + named app.
+  `cascade` / `propagationPolicy` are destructive — only set when the
+  user asked for cascade/orphan behavior; state that live cluster
+  resources may be removed.
+- Automated syncPolicy (`automated.prune` / `selfHeal`) changes are
+  policy mutations — require an explicit ask, not a silent add-on to a
+  status turn.
+
+## Irreversible / blast radius
+
+- Prune sync and cascade delete can remove live cluster objects.
+- Wrong Application namespace can hit a different app with the same name.
+- State the risk in one sentence when prune/cascade/delete is requested;
+  proceed only when clearly authorized.
+
+## Report shape
+
+1. Application name + namespace
+2. Action taken (dry-run sync / sync / action / create / update / delete)
+3. Post-read sync + health (or delete confirmation)
+4. Short failure signal when unsuccessful (event / message, redacted)
+5. Stop — do not chain unrelated mutates
+
+## Refuse
+
+- Mass-sync "all apps" or sync every OutOfSync app without each being
+  named or clearly in scope
+- Invented revisions, prune flags, or cascade defaults
+- Pasting repo credentials, tokens, or private kubeconfig material from
+  Application secrets into chat

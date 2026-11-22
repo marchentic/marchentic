@@ -1,12 +1,102 @@
 ---
 description: >-
-  List and inspect Applications / AppProjects via MCP. Resolve names from the cluster — never invent.
+  List and inspect Argo CD Applications / AppProjects / clusters via MCP:
+  status, resource tree, events, managed resources, workload logs. Never
+  invent app names.
 alwaysApply: false
 ---
 
-# Argocd Apps
+# Argocd apps
 
-List and inspect Applications / AppProjects via MCP. Resolve names from the cluster — never invent.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks for Application status, sync health, resource tree,
+events, managed resources, AppProject details, registered clusters, or
+workload logs through Argo CD. Skip bare "GitOps" with no Argo CD /
+Application ask. Load `argocd-sync` when the turn also mutates (sync,
+resource action, create/update/delete).
+
+Never invent an Application name, Application namespace, project name, or
+cluster server. Resolve from MCP listing this turn or from an id the user
+pasted.
+
+## Prefer MCP
+
+When an Argo CD MCP is ready, use these tools — do not invent a side CLI
+or raw API client while MCP works:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List apps | `list_applications` | optional `search`, `limit`, `offset` |
+| Get app | `get_application` | `applicationName`; optional `applicationNamespace` |
+| Resource tree | `get_application_resource_tree` | health / sync children |
+| App events | `get_application_events` | controller / sync events |
+| Managed resources | `get_application_managed_resources` | filter with `kind` / `namespace` / `name` / `group` / `version` |
+| Resource manifests | `get_resources` | `resourceRefs` (empty = all — prefer filters) |
+| Resource events | `get_resource_events` | needs resource identity from tree |
+| Workload logs | `get_application_workload_logs` | `resourceRef` + optional `container` |
+| AppProject | `get_appproject` | `projectName` |
+| Clusters | `list_clusters` | optional `server` / `name` filter |
+
+Optional `argocdBaseUrl` on tools when the MCP is multi-instance — only when
+the user named a base URL or the connection already implies it. Do not
+guess private hostnames.
+
+## Resolve the app
+
+1. Prefer exact `applicationName` (+ namespace) the user named.
+2. Else `list_applications` with a `search` substring when known.
+3. Confirm with `get_application` before claiming Healthy / Synced /
+   OutOfSync / Degraded.
+4. If several apps match, list name + namespace + project + sync/health
+   and ask once — do not pick prod by vibes.
+5. Non-default Application namespaces: pass `applicationNamespace` on
+   every follow-up call to avoid permission / not-found errors.
+
+## Status and tree
+
+1. Call `get_application` for sync status, health, source revision, and
+   destination.
+2. Use `get_application_resource_tree` when the ask is "what is broken"
+   or which child is Degraded / Progressing / Missing.
+3. Prefer filtered `get_application_managed_resources` over dumping every
+   object when the app is large (token limits).
+4. `get_application_events` / `get_resource_events` for recent sync or
+   reconcile failures — summarize, do not paste secrets from event
+   messages.
+5. Workload logs via `get_application_workload_logs` only when the user
+   asked for logs and you have a real `resourceRef` from the tree —
+   never invent pod names. Keep excerpts short and redacted.
+
+## Projects and clusters
+
+- `get_appproject` when the ask is about allowed sources, destinations,
+  or RBAC-shaped project limits — report the project name and constraints,
+  not credentials.
+- `list_clusters` to resolve destination cluster names/servers the user
+  referred to vaguely. Never invent a cluster server URL.
+
+## Honesty
+
+- Do **not** claim Synced / Healthy without a fresh `get_application`
+  (or tree) read this turn.
+- Distinguish Desired vs Live when the payload exposes it; OutOfSync is
+  not Healthy.
+- Auto-sync enabled in the Application spec is not the same as "I just
+  synced" — say which evidence you have.
+
+## Report shape
+
+1. Application name + namespace (+ project when known)
+2. Sync status + health (+ revision / destination when cheap)
+3. Failing child kind/name from the tree when degraded
+4. Short event or log excerpt when it explains the failure (redacted)
+5. Next action (wait, sync with explicit verb, fix source, or stop)
+
+## Out of scope
+
+- Raw cluster API triage without Argo CD Application context (pods,
+  Deployments outside an Application) — stop or keep the answer at the
+  Application boundary
+- Site-specific app catalogs — resolve from MCP, never invent
+- Mutating sync / create / delete / resource actions — see `argocd-sync`
