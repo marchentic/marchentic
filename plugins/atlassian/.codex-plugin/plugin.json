@@ -1,6 +1,6 @@
 {
   "name": "marchentic-atlassian",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Atlassian craft: Jira and Confluence create gates, issue and page shape, and status. No project or space ids hard-coded.",
   "author": {
     "name": "marchentic",

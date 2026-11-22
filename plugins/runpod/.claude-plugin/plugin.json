@@ -1,7 +1,7 @@
 {
   "name": "marchentic-runpod",
   "description": "Agnostic RunPod craft: list pods/endpoints/templates/GPUs and gated create/start/stop/delete via MCP. Prefer RunPod MCP; never invent pod or endpoint ids; cost-aware defaults.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

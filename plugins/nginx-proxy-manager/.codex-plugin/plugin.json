@@ -1,7 +1,7 @@
 {
   "name": "marchentic-nginx-proxy-manager",
   "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

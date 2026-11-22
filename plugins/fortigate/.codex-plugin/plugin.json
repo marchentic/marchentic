@@ -1,7 +1,7 @@
 {
   "name": "marchentic-fortigate",
   "description": "Agnostic FortiGate craft: inventory policies/addresses/routes and gated firewall changes via MCP. Prefer FortiGate MCP; never invent policy ids; destructive needs explicit verb.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

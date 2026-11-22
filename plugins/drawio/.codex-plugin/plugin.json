@@ -1,6 +1,6 @@
 {
   "name": "marchentic-drawio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Diagram craft: author and repair .drawio files with lanes, gaps, and readable labels.",
   "author": {
     "name": "marchentic",

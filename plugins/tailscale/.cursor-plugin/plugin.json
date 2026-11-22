@@ -1,7 +1,7 @@
 {
   "name": "marchentic-tailscale",
   "description": "Agnostic Tailscale craft: devices, ACLs/grants, and gated key/device/route changes. CLI/Admin API craft (no Tailscale MCP assumed). Never invent device ids or paste auth keys.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

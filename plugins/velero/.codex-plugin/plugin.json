@@ -1,7 +1,7 @@
 {
   "name": "marchentic-velero",
   "description": "Agnostic Velero craft: backup/restore inventory, status, and gated create/delete via MCP. Prefer Velero MCP; discover-first; restores are overwrite-shaped without explicit ask.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

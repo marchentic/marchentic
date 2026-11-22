@@ -1,7 +1,7 @@
 {
   "name": "marchentic-vault",
   "description": "HashiCorp Vault craft: KV read/write/delete, PKI issue, auth/policy hygiene, and hard refuse to leak credentials. Prefer Vault MCP.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

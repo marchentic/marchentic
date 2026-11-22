@@ -1,7 +1,7 @@
 {
   "name": "marchentic-authentik",
   "description": "Agnostic Authentik IdP craft: applications, providers, flows, and gated destructive changes. REST API craft (no Authentik MCP assumed). Never invent object ids or paste secrets.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

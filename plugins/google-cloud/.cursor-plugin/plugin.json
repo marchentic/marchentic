@@ -1,7 +1,7 @@
 {
   "name": "marchentic-google-cloud",
   "description": "Agnostic Google Cloud craft: project inventory, Compute/GKE, Cloud Storage, IAM/network, and hard gates on delete/IAM/public ACL. Uses gcloud; prefer Cloud MCP when ready.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

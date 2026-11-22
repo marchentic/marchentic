@@ -1,7 +1,7 @@
 {
   "name": "marchentic-security",
   "description": "Security practices: secrets, authentication, authorization, injection, cryptography, transport, supply chain, and data exposure. No product or vendor hard-coded.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"

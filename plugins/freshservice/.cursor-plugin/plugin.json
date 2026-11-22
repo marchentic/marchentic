@@ -1,7 +1,7 @@
 {
   "name": "marchentic-freshservice",
   "description": "Agnostic Freshservice ITSM craft: create-only ticket filing, description shape, and honest status. Prefer Freshservice MCP when ready.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
