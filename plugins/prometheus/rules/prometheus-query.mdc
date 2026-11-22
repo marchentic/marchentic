@@ -1,12 +1,79 @@
 ---
 description: >-
-  Instant and range queries: prefer rate-then-sum; keep cardinality bounded; never invent metric names.
+  Prometheus PromQL instant and range queries via MCP: rate-then-sum, bound
+  cardinality, never invent metric names. Prefer discover-before-query.
 alwaysApply: false
 ---
 
-# Prometheus Query
+# Prometheus query
 
-Instant and range queries: prefer rate-then-sum; keep cardinality bounded; never invent metric names.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks for a PromQL value, rate, trend, top-N, histogram
+quantile, alert expression check, or exemplar lookup. Skip when they only
+want names/targets inventory (`prometheus-discover`). Always load
+`prometheus-safety` with this rule when destructive tools might appear.
+
+Never invent a metric or label name. If the name is unknown this turn,
+discover first (`label_values` / `series` / `metric_metadata`) or stop.
+
+## Prefer MCP
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| Instant value | `query` | required `query`; optional `timestamp`, `truncation_limit` |
+| Range / trend | `range_query` | required `query`; `start_time` / `end_time` / `step` |
+| Trace exemplars | `exemplar_query` | required `query`; time window |
+| Docs / syntax | `docs_search`, `docs_read` | when PromQL form is unclear |
+| Existing recordings | `list_rules` | reuse recording rules before reinventing |
+| Active alerts | `list_alerts` | correlate query findings |
+
+## Instant vs range
+
+- **Instant (`query`)** — single evaluation (now or `timestamp`). Use for
+  "what is X right now?", alert expression smoke checks, topk snapshots.
+- **Range (`range_query`)** — series over time. Use for graphs, trends,
+  "last 1h / 24h", comparing before/after. Default window often `1h` when
+  the user did not name one — say so in the reply.
+- **Step** — for long windows, enlarge `step` so the response stays
+  manageable; tiny steps over days explode cardinality in the payload.
+
+## PromQL craft
+
+1. **Counters** — prefer `rate(...[5m])` (or a window that fits scrape
+   interval). Use `irate()` only for short-spike graphing — never as the
+   sole expression in alerting/recording rules.
+2. **Aggregation** — **rate then sum** (or other aggregators), never
+   `sum` then `rate`. Drop high-cardinality labels in the `by ()` clause
+   deliberately.
+3. **Histograms** — `histogram_quantile(0.99, sum by (le, …) (rate(...)))`
+   after confirming `_bucket` metrics exist via discover.
+4. **Bound results** — `topk()` / `bottomk()`, or MCP `truncation_limit`
+   (start ~50–100). Avoid naked `{__name__=~".+"}` scans.
+5. **Recording rules** — check `list_rules` for an existing recording
+   before inventing a heavy repeated aggregation.
+6. **Empty results** — re-check metric existence, label matchers (case),
+   and time window via discover tools; do not invent alternate metric
+   names without MCP evidence.
+
+## Time and truncation
+
+- Accept Unix seconds, RFC3339, or relative durations (`5m`, `1h30m`).
+- Start narrow; expand only after a justified empty or when the user
+  named a wider incident window.
+- Prefer explaining the PromQL in one sentence with the result.
+
+## Report shape
+
+- Exact PromQL string used
+- Tool (`query` vs `range_query`) + time window / step
+- Short finding (values, top series, trend direction)
+- Metric/label provenance (discovered this turn or user-pasted)
+- One next check (tighter matchers, longer window, or targets health)
+
+## Out of scope
+
+- Pure metric/label/target inventory → `prometheus-discover`
+- Neighbor dashboard products — stop; this plugin owns Prometheus MCP
+- TSDB delete / tombstone / quit → `prometheus-safety` only with explicit
+  operator confirmation

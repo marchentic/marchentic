@@ -1,12 +1,90 @@
 ---
 description: >-
-  Discover metric and label names (`label_values`, `series`, `metric_metadata`) before writing complex PromQL.
+  Discover Prometheus metrics, labels, series, targets, and metadata via MCP
+  before writing PromQL. Never invent metric or label names.
 alwaysApply: false
 ---
 
-# Prometheus Discover
+# Prometheus discover
 
-Discover metric and label names (`label_values`, `series`, `metric_metadata`) before writing complex PromQL.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks which metrics/labels exist, what a job scrapes, target
+health, series shape, cardinality inventory, or needs names before a query.
+Skip bare "Prometheus" with no discover/query ask. Load `prometheus-safety`
+with this rule when admin/config tools may run.
+
+Never invent a metric name, label name, job, or instance — resolve from MCP
+this turn or from a name the user pasted.
+
+## Prefer MCP
+
+When a Prometheus MCP is ready (`user-mcp_prometheus`), use these tools —
+do not invent a side CLI or raw HTTP client while MCP works:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List metric names | `label_values` | `label="__name__"`; optional `matches`, time window |
+| Label names | `label_names` | optional `matches`, `start_time` / `end_time` |
+| Label values | `label_values` | required `label`; optional `matches` |
+| Series selectors | `series` | required `matches` (array of selectors) |
+| Metric type/help | `metric_metadata` | optional `metric`, `limit` |
+| Scrape targets | `list_targets` | up/down / health inventory |
+| Target metric meta | `targets_metadata` | optional `match_target`, `metric` |
+| Cardinality / TSDB | `tsdb_stats` | series counts, heavy labels |
+| Alerts / rules | `list_alerts`, `list_rules` | inventory only here |
+| Server health | `healthy`, `ready`, `build_info`, `runtime_info` | status |
+| Scrape config read | `config`, `flags` | read-only inventory |
+| Alertmanager discovery | `alertmanagers` | discovery overview |
+| Docs (syntax) | `docs_search`, `docs_list`, `docs_read` | official Prom docs |
+
+## Discover-before-query ladder
+
+1. Prefer exact metric / job / instance the user named.
+2. Else `label_values` with `label="__name__"` (and a pattern via `matches`
+   when the surface is known, e.g. `{__name__=~".*cpu.*"}`).
+3. `metric_metadata` on candidates to learn type (counter/gauge/histogram)
+   and help text — counters need `rate()`, gauges usually do not.
+4. `series` with `matches=["metric_name"]` (or a tighter selector) to see
+   which labels exist on that metric.
+5. `label_values` for key labels (`job`, `instance`, `namespace`, custom)
+   before writing matchers — confirm spelling and case.
+6. For scrape problems: `list_targets` first; then `targets_metadata` if you
+   need what a target exposes.
+7. For "why is this huge?": `tsdb_stats` → top series-by-metric / label
+   value counts before guessing high-cardinality labels.
+8. If several metrics match, list a short shortlist and ask once; do not
+   pick a production metric by guess.
+
+## Time windows on discovery
+
+- `label_names`, `label_values`, and `series` accept `start_time` /
+  `end_time` (Unix seconds, RFC3339, or relative like `1h`, `5m`).
+- Default discovery windows are often short — widen when the metric is
+  rare or the user named a historical window.
+- Keep `truncation_limit` modest on first pulls (tens–low hundreds); raise
+  only when the truncated answer is clearly incomplete.
+
+## Targets and missing data
+
+When metrics are missing or stale:
+
+1. `list_targets` — look for down / unknown scrape health.
+2. Confirm the metric still exists via `label_values` / `series`.
+3. `targets_metadata` for what the target claims to expose.
+4. Optional `config` to verify scrape jobs (read-only; do not rewrite
+  scrape configs from chat unless the user asked for file edits).
+
+## Report shape
+
+- Metric / label names actually returned by MCP (not guessed)
+- Short type/help note when `metric_metadata` was used
+- Target job/instance + health when targets were the ask
+- One recommended next step (query, tighter matchers, or cardinality check)
+
+## Out of scope
+
+- Instant/range PromQL execution → `prometheus-query`
+- Dashboard / Explore UX on other products — own Prometheus MCP only
+- Destructive TSDB admin (`delete_series`, `clean_tombstones`, `quit`) →
+  `prometheus-safety` gate; never run as part of discovery

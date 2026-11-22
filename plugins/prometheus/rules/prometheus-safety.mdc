@@ -1,0 +1,69 @@
+---
+description: >-
+  Prometheus MCP safety: confirm before TSDB admin/destructive tools; bound
+  query cardinality; redact secrets from config/query output.
+alwaysApply: false
+---
+
+# Prometheus safety
+
+## Gate
+
+Load on every Prometheus discover or query turn that may touch MCP output,
+config, or admin tools. Skip only when the turn never uses Prometheus MCP.
+
+## Destructive / admin tools — confirm first
+
+Do **not** call these unless the user explicitly asked for that admin
+action this turn and confirmed the scope:
+
+| Tool | Risk |
+| --- | --- |
+| `delete_series` | Marks series for deletion (tombstones); needs `matches` + time |
+| `clean_tombstones` | Disk I/O; physically removes deleted data |
+| `snapshot` | Safe-ish but confirm; optional `skip_head` |
+| `reload` | Reloads config (usually safe; still confirm in shared env) |
+| `quit` | Shuts down the Prometheus process — never casual |
+
+Notes:
+
+- Admin TSDB tools often require both MCP `--dangerous.enable-tsdb-admin-tools`
+  and Prometheus `--web.enable-admin-api`. Failures mean the gate is off —
+  do not bypass with raw HTTP.
+- For `delete_series`, require explicit `matches` and a bounded
+  `start_time` / `end_time`. Never omit the window "to clear everything."
+
+## Query cardinality hygiene
+
+1. Discover metric/labels before wide selectors.
+2. Aggregate (`sum by`, `topk`) instead of dumping raw high-cardinality
+   series into chat.
+3. Keep `truncation_limit` low on first pulls; raise deliberately.
+4. Prefer larger `step` on long `range_query` windows.
+5. Do not paste multi-thousand-line raw matrix dumps — summarize.
+
+## Redact before quote
+
+Do **not** paste into chat:
+
+- Bearer tokens, basic-auth passwords, or private keys found in `config`
+  / `flags` output
+- Connection strings or cloud credentials embedded in scrape configs
+- Unredacted PII if a summary answers the ask
+
+Prefer: job names, metric names, matcher strings, counts, and redacted
+snippets with `[REDACTED]` for secret-looking substrings.
+
+## Operator replies
+
+Safe receipt shape:
+
+- PromQL or discovery tool + window
+- Finding summary (values / target health / cardinality note)
+- Explicit "admin tool not run" when the user asked a read-only question
+- Explicit confirmation + matches/window when an admin tool did run
+
+## Out of scope
+
+- Authoring scrape configs for unrelated products
+- Shutting down or wiping TSDB without an explicit operator ask
