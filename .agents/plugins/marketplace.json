@@ -171,8 +171,8 @@
     },
     {
       "name": "nodadyoushutup-google-cloud",
-      "description": "Agnostic Google Cloud craft: project inventory, Compute/GKE, Cloud Storage, and hard gates on delete/IAM/public ACL. Prefer Cloud MCP when ready; else gcloud.",
-      "version": "0.10.1",
+      "description": "Agnostic Google Cloud craft: project inventory, Compute/GKE, Cloud Storage, IAM/network, and hard gates on delete/IAM/public ACL. Uses gcloud; prefer Cloud MCP when ready.",
+      "version": "0.11.0",
       "source": {
         "source": "local",
         "path": "./plugins/google-cloud"
@@ -201,7 +201,7 @@
     },
     {
       "name": "nodadyoushutup-vault",
-      "description": "HashiCorp Vault craft: secret read/write posture, mount hygiene, and hard refuse to leak credentials into chat or commits. Prefer Vault MCP.",
+      "description": "HashiCorp Vault craft: KV read/write/delete, PKI issue, auth/policy hygiene, and hard refuse to leak credentials. Prefer Vault MCP.",
       "version": "0.10.1",
       "source": {
         "source": "local",
@@ -591,7 +591,7 @@
     },
     {
       "name": "nodadyoushutup-zot",
-      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
+      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor \u2014 install what you run.",
       "version": "0.11.0",
       "source": {
         "source": "local",
@@ -606,7 +606,7 @@
     },
     {
       "name": "nodadyoushutup-harbor",
-      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot — install what you run.",
+      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot \u2014 install what you run.",
       "version": "0.11.0",
       "source": {
         "source": "local",

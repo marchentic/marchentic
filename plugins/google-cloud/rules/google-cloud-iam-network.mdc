@@ -1,0 +1,89 @@
+---
+description: >-
+  Google Cloud IAM and VPC/network inventory — service accounts, bindings,
+  firewall, and routes via gcloud. Broad grants and firewall opens need
+  explicit verbs.
+alwaysApply: false
+---
+
+# Google Cloud IAM / network
+
+## Gate
+
+Use when the user asks about IAM bindings, service accounts, VPC networks,
+subnets, firewall rules, routes, or external IPs. Skip pure VM/GKE/GCS
+list asks that do not touch identity or network.
+
+## Transport
+
+No Google Cloud MCP discovered. Use `gcloud`. Prefer a Cloud MCP later if
+ready — do not invent tool names.
+
+## IAM inventory
+
+Never invent service-account emails or role ids. Resolve first:
+
+| Need | Command |
+| --- | --- |
+| List SAs | `gcloud iam service-accounts list --project=PROJECT` |
+| Describe SA | `gcloud iam service-accounts describe EMAIL` |
+| Project IAM get | `gcloud projects get-iam-policy PROJECT_ID` |
+| SA keys metadata | `gcloud iam service-accounts keys list --iam-account=EMAIL` |
+
+### Policy receipts
+
+- Prefer a filtered view: the named principal or role, not a full policy
+  paste when avoidable.
+- Never paste private key JSON, or create/download SA keys, unless the
+  user gave an explicit key-create verb **and** `google-cloud-safety`
+  allows it. Prefer workload identity / short-lived tokens over keys.
+- Broad roles (`roles/owner`, `roles/editor`, org-wide bindings) need an
+  explicit grant verb naming project + principal + role.
+
+## Network inventory
+
+| Need | Command |
+| --- | --- |
+| VPC networks | `gcloud compute networks list --project=PROJECT` |
+| Subnets | `gcloud compute networks subnets list --project=PROJECT` |
+| Firewall rules | `gcloud compute firewall-rules list --project=PROJECT` |
+| Describe firewall | `gcloud compute firewall-rules describe NAME --project=PROJECT` |
+| Routes | `gcloud compute routes list --project=PROJECT` |
+| Addresses | `gcloud compute addresses list --project=PROJECT` |
+| Forwarding rules | `gcloud compute forwarding-rules list --project=PROJECT` |
+
+Receipts: name, network/subnet, direction, allow/deny, source ranges, and
+target tags/SAs — keep one rule per summary line when listing.
+
+## Mutate (gated)
+
+| Action | Gate |
+| --- | --- |
+| Add IAM binding | Explicit grant verb + principal + role + resource |
+| Remove IAM binding | Explicit revoke/remove verb |
+| Create SA key | Explicit key verb + `google-cloud-safety` (strongly discouraged) |
+| Create/update firewall | Explicit firewall verb naming ports/ranges/targets |
+| Delete firewall / network | Explicit delete + `google-cloud-safety` |
+
+Do **not** open `0.0.0.0/0` to SSH/RDP/DB ports as a “quick fix” unless
+the user named that exposure. Prefer IAP / identity-aware paths when the
+user asks for secure access patterns in prose — do not invent product
+defaults beyond what they named.
+
+## Defaults
+
+1. Read-only get/list is the default.
+2. State project id on every IAM/network receipt.
+3. Redact customer emails in chat only when the user asked for redaction;
+   never invent principals.
+4. DNS / load-balancer product deep-dives beyond list/describe stay
+   inventory-level unless the user named a specific mutate.
+
+## Refuse
+
+- Granting `allUsers` / `allAuthenticatedUsers` or `roles/owner` without
+  an explicit verb.
+- Creating or downloading SA keys without an explicit key ask.
+- Wiping firewall rules or deleting VPC peering without safety + delete.
+- Dumping full project IAM JSON into chat when a narrow answer works.
+- Pasting private keys, ADC JSON, or OAuth refresh tokens.

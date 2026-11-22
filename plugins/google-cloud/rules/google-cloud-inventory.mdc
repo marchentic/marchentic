@@ -1,7 +1,8 @@
 ---
 description: >-
   Google Cloud project and resource inventory — resolve project id, list and
-  describe before mutate. Prefer Cloud MCP or gcloud.
+  describe before mutate. Use authenticated gcloud (no Google Cloud MCP
+  discovered). Prefer a Cloud MCP when one is ready without inventing tools.
 alwaysApply: false
 ---
 
@@ -9,18 +10,71 @@ alwaysApply: false
 
 ## Gate
 
-Use when the user asks which project is active, to list projects/resources,
-or to resolve a named GCP id. Prefer Google Cloud MCP; else `gcloud`.
+Use when the user asks which project is active, to list projects or top-level
+resources, or to resolve a named GCP id before further work. Skip bare
+"Google Cloud" with no project or inventory ask.
+
+## Transport
+
+No Google Cloud MCP was discovered for this harness. Prefer authenticated
+`gcloud` (Application Default Credentials or an active `gcloud auth` login).
+If a Cloud MCP appears later, use its list/describe tools when ready —
+**do not invent MCP tool names**.
+
+## Resolve project
+
+1. Prefer an exact project id the user named this turn.
+2. Else read the active config: `gcloud config get-value project`.
+3. Else list candidates: `gcloud projects list --format='table(projectId,name,projectNumber)'`.
+4. Confirm with `gcloud projects describe PROJECT_ID` before mutate or
+   claiming ownership.
+5. Do **not** run `gcloud config set project` unless the user named the
+   target project and asked to switch.
+
+Never invent billing accounts, org ids, folder ids, or project ids.
+
+## Auth and config (read-only)
+
+| Need | Command |
+| --- | --- |
+| Active project | `gcloud config get-value project` |
+| Account in use | `gcloud config get-value account` |
+| Config list | `gcloud config list` |
+| Auth list (emails only) | `gcloud auth list` |
+| ADC present? | `gcloud auth application-default print-access-token` only to verify; **never paste the token** |
+
+## Project / org inventory
+
+| Need | Command |
+| --- | --- |
+| List projects | `gcloud projects list` |
+| Describe project | `gcloud projects describe PROJECT_ID` |
+| Enabled APIs | `gcloud services list --enabled --project=PROJECT_ID` |
+| Billing link (metadata) | `gcloud billing projects describe PROJECT_ID` |
+
+Keep receipts short: project id + name + (optional) number. Do not dump full
+org trees or billing account secrets.
+
+## Region / zone orientation
+
+When compute or GKE work follows, state region or zone from the ask or from
+a prior list — do not guess `us-central1-a`. Useful reads:
+
+- `gcloud compute regions list` / `gcloud compute zones list` (filter when
+  the user named a region)
+- `gcloud config get-value compute/region` / `compute/zone` when set
 
 ## Defaults
 
-1. Resolve project with `gcloud config get-value project` / MCP equivalent
-   before mutate — never guess a project id.
-2. Prefer list/describe over create when the ask is “what do we have”.
-3. State project + region/zone in receipts when relevant.
-4. Do not switch the active project unless the user named the target.
+1. Prefer list/describe over create when the ask is “what do we have”.
+2. State project + region/zone in every receipt that touches resources.
+3. Cap listings (page size / `--limit` / filters) — do not flood chat with
+   hundreds of rows; summarize and offer a tighter filter.
+4. Workspace mail/docs/Drive are out of scope for this plugin.
 
 ## Refuse
 
-- Do not invent billing accounts or org ids.
-- Do not dump full `gcloud auth` token material into chat.
+- Inventing billing accounts, org ids, or folder paths.
+- Dumping `gcloud auth` tokens, refresh tokens, or ADC JSON into chat.
+- Switching the active project without an explicit switch ask + target id.
+- Claiming a project exists without a list/describe this turn.

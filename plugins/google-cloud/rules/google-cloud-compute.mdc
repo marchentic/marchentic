@@ -1,8 +1,8 @@
 ---
 description: >-
-  Google Compute Engine and GKE inventory craft — list/describe VMs and
-  clusters; mutate only with an explicit verb. In-cluster pod triage is
-  out of scope here.
+  Google Compute Engine and GKE inventory craft — list/describe VMs, disks,
+  MIGs, and clusters via gcloud; mutate only with an explicit verb. In-cluster
+  pod triage is out of scope here.
 alwaysApply: false
 ---
 
@@ -10,21 +10,83 @@ alwaysApply: false
 
 ## Gate
 
-Use when the user asks about Compute Engine VMs, instance groups, or GKE
-clusters/node pools. Prefer Google Cloud MCP; else `gcloud`.
+Use when the user asks about Compute Engine VMs, disks, instance groups, or
+GKE clusters/node pools. Prefer authenticated `gcloud`. Skip when the ask is
+only in-cluster pods/events/logs after credentials exist — that surface is
+out of scope for this plugin.
+
+## Transport
+
+No Google Cloud MCP discovered. Use `gcloud`. If a Cloud MCP becomes ready,
+prefer its inventory tools — do not invent tool names.
+
+## Resolve ids
+
+Never invent instance name, zone, cluster, location, or node-pool name.
+Resolve from the user, a prior list this turn, or:
+
+| Need | Command |
+| --- | --- |
+| List VMs | `gcloud compute instances list --project=PROJECT` |
+| Describe VM | `gcloud compute instances describe NAME --zone=ZONE --project=PROJECT` |
+| List disks | `gcloud compute disks list --project=PROJECT` |
+| Describe disk | `gcloud compute disks describe NAME --zone=ZONE --project=PROJECT` |
+| List MIGs | `gcloud compute instance-groups managed list --project=PROJECT` |
+| List GKE clusters | `gcloud container clusters list --project=PROJECT` |
+| Describe cluster | `gcloud container clusters describe NAME --location=LOCATION --project=PROJECT` |
+| List node pools | `gcloud container node-pools list --cluster=CLUSTER --location=LOCATION --project=PROJECT` |
+
+If several match, list candidates and ask once — do not pick prod by vibes.
+
+## Status receipts
+
+For VMs report: name, zone, status (`RUNNING` / `TERMINATED` / …), machine
+type, and primary internal/external IP when present.
+
+For GKE report: name, location, status, master version, node-pool count /
+versions, and network when relevant. Do not claim healthy without a fresh
+describe/list this turn.
+
+## Mutate (gated)
+
+Create / start / stop / reset / resize / upgrade need an **explicit verb**
+this turn naming the resource. Examples (only when authorized):
+
+| Action | Command shape |
+| --- | --- |
+| Start / stop VM | `gcloud compute instances start\|stop NAME --zone=ZONE` |
+| Reset VM | `gcloud compute instances reset NAME --zone=ZONE` |
+| Resize MIG | `gcloud compute instance-groups managed resize …` |
+| Get kubeconfig | `gcloud container clusters get-credentials NAME --location=LOCATION` (fine for authorized triage setup) |
+| Cluster upgrade | `gcloud container clusters upgrade …` — irreversible risk; follow `google-cloud-safety` |
+
+Delete of VMs, disks, MIGs, or clusters → `google-cloud-safety` plus an
+explicit delete verb naming each resource.
 
 ## Defaults
 
-1. Never invent instance name, zone, cluster, or location — list/resolve.
-2. Read-only status is the default (list/describe/get-credentials is fine
-   when triage is authorized).
-3. Create / start / stop / resize / upgrade need an explicit verb naming
-   the resource.
-4. After GKE context is known, in-cluster pod/event/log triage is out of
-   scope for this plugin.
+1. Read-only status is the default (list/describe).
+2. Always pass `--project` (and zone/location) once resolved — do not rely on
+   a silent config default the user did not confirm.
+3. Prefer `--format=yaml` or a tight table for one object; summarize lists.
+4. After GKE context is known, in-cluster pod/event/log triage is **out of
+   scope** here — stop or hand the operator the cluster name/location only.
+5. Do not open firewall rules or expose ports as a side effect of compute
+   work — that is `google-cloud-iam-network` with an explicit ask.
+
+## Symptom hints (control plane)
+
+| Signal | Likely check |
+| --- | --- |
+| VM `TERMINATED` / unexpected stop | describe + recent operations (`gcloud compute operations list`) |
+| Cannot SSH | network tags / firewall / OS Login — see iam-network; do not punch holes |
+| GKE `RECONCILING` / `ERROR` | cluster describe conditions + node-pool status |
+| Node pool stuck upgrading | node-pools describe; do not force unless asked |
+| Quota errors on create | `gcloud compute project-info describe` / regions — report quota name |
 
 ## Refuse
 
-- Do not delete VMs, disks, or clusters without `google-cloud-safety` and
-  an explicit delete verb.
-- Do not open firewall or expose ports beyond what the user named.
+- Deleting VMs, disks, snapshots, or clusters without safety + explicit delete.
+- Opening firewall or public IPs beyond what the user named.
+- Inventing zones, machine types, or image families.
+- Pasting service-account keys used by instances into chat.

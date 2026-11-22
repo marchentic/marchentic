@@ -1,7 +1,7 @@
 ---
 description: >-
-  Google Cloud Storage craft — list/read buckets and objects; gated write and
-  public ACL. Prefer Cloud MCP or gcloud / gsutil.
+  Google Cloud Storage craft — list/read buckets and objects via gcloud
+  storage / gsutil; gated write, delete, and public ACL.
 alwaysApply: false
 ---
 
@@ -9,18 +9,72 @@ alwaysApply: false
 
 ## Gate
 
-Use when the user asks about GCS buckets or objects. Prefer Google Cloud
-MCP; else `gcloud storage` / `gsutil`.
+Use when the user asks about GCS buckets, objects, lifecycle, or bucket IAM.
+Prefer `gcloud storage` (or `gsutil` when already the local habit). Skip when
+the ask is only Compute/GKE with no bucket named.
+
+## Transport
+
+No Google Cloud MCP discovered. Use `gcloud storage` / `gsutil`. Prefer a
+Cloud MCP later if ready — do not invent tool names.
+
+## Resolve ids
+
+Never invent bucket or object names. Resolve from the user or a list:
+
+| Need | Command |
+| --- | --- |
+| List buckets | `gcloud storage buckets list --project=PROJECT` |
+| Describe bucket | `gcloud storage buckets describe gs://BUCKET` |
+| List objects (prefix) | `gcloud storage ls gs://BUCKET/PREFIX` |
+| Object metadata | `gcloud storage objects describe gs://BUCKET/OBJECT` |
+| Bucket IAM get | `gcloud storage buckets get-iam-policy gs://BUCKET` |
+
+Prefer metadata and short prefix listings over dumping object bodies into
+chat. Cap listings with prefixes / `--recursive` only when asked.
+
+## Read vs body
+
+1. Metadata-first: name, location, storage class, versioning, uniform
+   bucket-level access.
+2. Downloads: follow the user’s named local path
+   (`gcloud storage cp gs://… ./path`). Do not paste binaries or large
+   payloads into chat.
+3. Text peek: only small, non-secret objects the user named; redact
+   credentials if they appear.
+
+## Write / copy (gated)
+
+Uploads, copies, and lifecycle edits need an explicit verb naming the
+bucket/object:
+
+| Action | Command shape |
+| --- | --- |
+| Upload | `gcloud storage cp LOCAL gs://BUCKET/OBJECT` |
+| Copy | `gcloud storage cp gs://SRC gs://DST` |
+| Lifecycle / class | `gcloud storage buckets update …` — only named fields |
+
+## Public ACL and IAM (high risk)
+
+Making a bucket or object public, or granting `allUsers` /
+`allAuthenticatedUsers`, needs an **explicit** public/share verb this turn.
+Prefer uniform bucket-level access + narrow principals. Follow
+`google-cloud-safety`.
+
+Do not print full IAM policy dumps with every member when a short answer
+suffices (bucket + role + principal count / named principal).
 
 ## Defaults
 
-1. Never invent bucket or object names — list/resolve first.
-2. Prefer metadata and short listings over dumping object bodies into chat.
-3. Uploads/downloads: follow the user’s named path; do not paste binaries
-   into chat.
+1. Always include `gs://bucket` (and object) in receipts.
+2. Prefer project-scoped bucket lists before mutating.
+3. Soft-delete / versioning: mention retention implications before delete.
+4. Signed URLs: only when asked; never paste long-lived credentials.
 
 ## Refuse
 
-- Do not make a bucket public or grant `allUsers` without an explicit verb.
-- Do not delete buckets/objects without `google-cloud-safety` and a clear
-  delete ask.
+- Public ACL / `allUsers` without an explicit public verb.
+- Delete buckets/objects without `google-cloud-safety` and a clear delete
+  ask naming each target.
+- Inventing bucket names or assuming a prod bucket from a short alias.
+- Committing GCS HMAC keys or service-account keys into the repo or chat.

@@ -1,7 +1,8 @@
 ---
 description: >-
   Destructive Google Cloud gates — delete, broad IAM, service-account keys,
-  and public ACL need explicit verbs. Read-only is the default.
+  public ACL, and firewall opens need explicit verbs. Read-only is the
+  default.
 alwaysApply: false
 ---
 
@@ -9,22 +10,61 @@ alwaysApply: false
 
 ## Read-only default
 
-List/describe/get are fine when GCP work is authorized. Do **not**:
+List / describe / get / `get-credentials` are fine when GCP work is
+authorized. Do **not** do any of the following unless the user gave an
+**explicit verb this turn naming the resource**:
 
-- delete projects, VMs, disks, clusters, buckets, or objects
-- grant broad IAM (`roles/owner`, `allUsers`, org-wide bindings)
-- create or download service-account keys
-- disable billing or wipe firewall rules
+| Class | Examples |
+| --- | --- |
+| Delete | projects, VMs, disks, snapshots, images, MIGs, GKE clusters/node pools, buckets, objects, networks, firewall rules |
+| Broad IAM | `roles/owner`, `roles/editor`, org-wide bindings, `allUsers`, `allAuthenticatedUsers` |
+| Keys | create / download / upload service-account keys; print ADC or refresh tokens |
+| Exposure | public bucket ACL, `0.0.0.0/0` SSH/RDP/DB firewall, disable billing |
+| Irreversible ops | project delete, production cluster delete, wipe disk |
 
-…unless the user gave an explicit verb this turn naming the resource.
+Bare “fix it” / “clean up” / “harden” without naming the resource is **not**
+authorization.
+
+## Authorization checklist
+
+Before a gated mutate:
+
+1. Project id resolved from list/describe (not guessed).
+2. Resource name + location/zone/region stated in the planned command.
+3. Explicit verb matches the action (delete ≠ stop; public ≠ private IAM).
+4. One-sentence risk when the action is irreversible or publicly exposing.
+5. Prefer the smallest blast radius (single object over bucket; one role
+   over owner).
+
+If any step fails → refuse, say what is missing, and stop.
 
 ## Irreversible
 
-Project deletes, production cluster deletes, and public bucket ACL changes:
-state the risk in one sentence and only proceed when clearly authorized
-(execute-first posture scope grill for irreversible loss).
+Project deletes, production GKE cluster deletes, public bucket ACL changes,
+and opening management ports to the world: state the risk in one sentence
+and only proceed when clearly authorized this turn.
 
 ## Secrets
 
-Never paste SA keys, refresh tokens, or application-default credentials
-into chat or commits — prefer vault.
+Never paste into chat or commits:
+
+- Service-account key JSON
+- OAuth / refresh tokens / ADC files
+- HMAC keys, signed-URL query secrets, kubeconfig client keys
+- Full IAM policy dumps when a narrow receipt works
+
+Land long-lived credentials in the project’s secret store when the user
+asks to store them — do not invent a store path.
+
+## Auth surface hygiene
+
+- Prefer workload identity / short-lived tokens over SA keys.
+- `gcloud auth print-access-token` / ADC print: verify only; never echo.
+- Do not switch billing accounts or org IAM without an explicit org-admin
+  ask naming the target.
+
+## Aftercare
+
+After an authorized mutate, re-read with list/describe and report the new
+state (or the error). Do not claim success from the command echo alone
+when a follow-up describe is cheap.
