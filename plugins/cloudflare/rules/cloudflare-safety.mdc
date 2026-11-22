@@ -1,21 +1,68 @@
 ---
 description: >-
-  Destructive Cloudflare DNS gates — delete and bulk changes need explicit
-  verbs. Use whenever deleting or rewriting records.
+  Cloudflare DNS safety: read-only default, explicit delete/bulk verbs,
+  apex/mail risk callouts, refuse API tokens in chat.
 alwaysApply: false
 ---
 
 # Cloudflare DNS safety
 
-## Hard gates
+## Gate
 
-1. **Delete** only with an explicit delete/remove verb naming the record.
-2. Do not “clean up” unrelated records while fixing one name.
-3. Do not replace an entire zone’s records from a guessed desired state.
-4. Apex / email (MX/TXT) changes: double-check the named values; say what
-   will break if wrong (mail, ACME, verification).
+Load on every authorized Cloudflare DNS turn (inventory or mutate). Skip when
+the turn never touches Cloudflare DNS.
+
+## Read-only default
+
+These are fine without an extra destructive verb when Cloudflare DNS is
+authorized:
+
+- `list_dns_records`
+- `get_dns_record`
+
+Do **not** call `create_dns_record`, `update_dns_record`, or
+`delete_dns_record` unless the user gave an explicit verb **this turn**
+naming the record (FQDN and type, or record id).
+
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn | MCP |
+| --- | --- | --- |
+| Delete record | **delete** / **remove** + name/type or recordId | `delete_dns_record` |
+| Create record | **create** / **add** + type + name + content | `create_dns_record` |
+| Update record | **update** / **point** / **change** + name/type + new content | `update_dns_record` |
+| Bulk / “point everything at X” | **all** / **every** / named list of FQDNs — not a guess | per-record tools only; no zone replace |
+| Apex / MX / mail TXT | named FQDN + values + acknowledgment of blast radius | create/update/delete as asked |
+
+Ambiguous “clean up DNS” → ask once for names/types; do not mass-delete.
+
+## Prefer update-in-place
+
+Prefer `update_dns_record` over delete+create. Delete+create only when the
+user asked to replace or type cannot be updated in place — state why.
+
+## Refuse
+
+- Pasting Cloudflare API tokens, global keys, or Origin CA keys into chat
+- Inventing `recordId` or zone ids
+- Replacing an entire zone from a guessed desired state
+- Touching non-DNS Cloudflare products under this plugin
+- Inventing MCP tool names beyond the live `user-mcp_cloudflare` map
 
 ## Irreversible
 
-If the ask would remove production traffic records and the user did not name
-them, **stop** and state the risk in one sentence — do not guess.
+If the ask would remove production traffic or mail records and the user did
+not name them, **stop** and state the risk in one sentence — do not guess.
+
+## Receipt examples (safe)
+
+Inventory: `list_dns_records` name `app.example.com` → `A`
+`203.0.113.10`, proxied true, id `abc…` — no mutate.
+
+Authorized point: update id `abc…` content → `203.0.113.20`; receipt FQDN +
+type + content + proxied — no tokens.
+
+## Related (this plugin)
+
+- `cloudflare-dns` — list/get/create/update craft
+- Skills: `cloudflare-dns-inventory`, `cloudflare-record-change`

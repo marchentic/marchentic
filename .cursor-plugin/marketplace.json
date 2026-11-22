@@ -5,8 +5,8 @@
     "email": "admin@nodadyoushutup.com"
   },
   "metadata": {
-    "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex \u2014 posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.50",
+    "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
+    "version": "0.12.51",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -426,7 +426,7 @@
       "name": "nodadyoushutup-cloudflare",
       "source": "cloudflare",
       "description": "Cloudflare DNS craft: list/create/update/delete records with explicit destructive gates. Prefer Cloudflare MCP; never invent zone ids.",
-      "version": "0.10.2",
+      "version": "0.11.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -1035,7 +1035,7 @@
     {
       "name": "nodadyoushutup-zot",
       "source": "zot",
-      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor \u2014 install what you run.",
+      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
       "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
@@ -1061,7 +1061,7 @@
     {
       "name": "nodadyoushutup-harbor",
       "source": "harbor",
-      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot \u2014 install what you run.",
+      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot — install what you run.",
       "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",

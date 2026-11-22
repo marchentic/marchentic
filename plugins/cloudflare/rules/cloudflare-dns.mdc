@@ -1,14 +1,86 @@
 ---
 description: >-
-  Cloudflare DNS record list/create/update craft via MCP.
+  Cloudflare DNS record list/get/create/update via user-mcp_cloudflare.
+  Discover-first; never invent record ids; prefer update-in-place.
 alwaysApply: false
 ---
 
 # Cloudflare DNS
 
-## Defaults
+## Gate
 
-1. List records for the named zone/name before create to avoid duplicates.
-2. Create/update only the record types and names the user specified.
-3. TTL / proxied flags: keep existing values unless the user set them.
-4. Prefer MCP tools over raw Cloudflare API while MCP works.
+Use when the user authorized Cloudflare DNS work and the turn needs **list**,
+**get**, **create**, or **update** of DNS records. Delete / bulk rewrite →
+also `cloudflare-safety`. Bare “DNS” without Cloudflare is out of scope.
+
+## Prefer MCP
+
+Namespace: `user-mcp_cloudflare`. The connected server is typically scoped to
+**one configured zone** — do not invent zone ids or assume another zone. Use
+only tools on the live map. If MCP is down, say so; do not invent tool names
+or paste API tokens to “raw curl” unless the user explicitly asked for API
+craft with their own auth channel.
+
+## Live tool map
+
+| Need | Tool | Args |
+| --- | --- | --- |
+| List records | `list_dns_records` | optional `name`, optional `type` (`A` `AAAA` `CNAME` `MX` `TXT` `NS` `SRV` `CAA` `PTR`) |
+| One record | `get_dns_record` | `recordId` from list/get |
+| Create | `create_dns_record` | **required** `type`, `name`, `content`; optional `ttl` (default `1` = auto), `priority` (MX), `proxied` |
+| Update | `update_dns_record` | **required** `recordId`; optional `type`, `name`, `content`, `ttl`, `priority`, `proxied` |
+| Delete | `delete_dns_record` | `recordId` — **safety gate** only |
+
+## Discover first
+
+1. Never invent `recordId` — resolve from `list_dns_records` this turn or
+   exact id the user pasted.
+2. Before create: `list_dns_records` with `name` (and `type` when known) to
+   avoid duplicate records for the same name/type.
+3. Before update: `get_dns_record` (or list row) so TTL/proxied/content
+   defaults come from evidence unless the user overrode them.
+4. Cap large lists with `name`/`type` filters; summarize instead of dumping
+   the whole zone.
+
+## Craft defaults
+
+1. Prefer **update-in-place** (`update_dns_record`) over delete+create when
+   changing content, TTL, or proxied on an existing name/type.
+2. **TTL**: keep existing unless the user set one; on create, MCP default
+   `1` means auto — state that in the receipt when used.
+3. **Proxied**: keep existing orange-cloud state unless the user set
+   proxied/DNS-only explicitly. Note that some record types cannot be
+   proxied — if MCP rejects, report the error; do not force.
+4. **MX**: require `priority` from the user or from the existing record.
+5. **TXT** (SPF/DKIM/DMARC/ACME): quote content carefully; do not “fix”
+   quoting by deleting siblings.
+6. Create/update only the names and types the user specified this turn.
+
+## Apex / email / verification
+
+When touching apex `A`/`AAAA`/`CNAME`, `MX`, or mail-related `TXT`:
+
+- State what breaks if wrong (web traffic, mail, ACME, domain verification).
+- Require the FQDN and target values to be named — do not guess IPs or MX
+  hosts.
+
+## Report shape
+
+- **name** (FQDN)
+- **type**
+- **content**
+- **ttl** / **proxied** when present
+- **recordId** when mutating (from MCP, not invented)
+
+No API tokens in chat.
+
+## Out of scope
+
+- WAF, Workers, Tunnels, Registrar, R2, and non-DNS Cloudflare products
+- Other DNS providers
+- Delete / zone-wide rewrite → `cloudflare-safety`
+
+## Related (this plugin)
+
+- `cloudflare-safety` — delete and bulk gates
+- Skills: `cloudflare-dns-inventory`, `cloudflare-record-change`

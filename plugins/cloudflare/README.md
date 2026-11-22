@@ -1,30 +1,36 @@
 # cloudflare
 
-Cloudflare DNS craft — record changes with destructive gates. Install when
-Cloudflare MCP is available.
+Cloudflare DNS craft via `user-mcp_cloudflare`: list/create/update/delete
+records with explicit destructive gates. Never invent record ids; prefer
+update-in-place; no API tokens in chat.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `cloudflare-dns` | List / create / update |
-| `cloudflare-safety` | Delete / bulk risk gates |
+| `cloudflare-dns` | MCP list/get/create/update + craft defaults |
+| `cloudflare-safety` | Delete / bulk / apex-mail gates, refuse tokens |
 
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
-| `cloudflare` | Index / gate |
+| `cloudflare` | Index / gate / procedure |
+| `cloudflare-dns-inventory` | Filtered list → FQDN + type + content |
+| `cloudflare-record-change` | List first → update-in-place or create |
 
 ## Commands
 
-- `/cloudflare` → DNS craft
+- `/cloudflare` → DNS inventory or gated mutate
+- `/cloudflare-inventory` → List records pass
+- `/cloudflare-record` → Create/update checklist
 
 ## Related capabilities
 
-- Neighbor products and surfaces are out of scope for this plugin — stop if
-  the ask is not this product.
+- Non-DNS Cloudflare products (WAF, Workers, Tunnels, R2) and other DNS
+  providers are out of scope — this plugin owns DNS records only.
 
 ## Diagrams
 
-- [`docs/cloudflare-workflow.drawio`](docs/cloudflare-workflow.drawio) — gate → act → evidence
+- [`docs/cloudflare-workflow.drawio`](docs/cloudflare-workflow.drawio) — gate →
+  route → inventory / record-change / delete branches

@@ -1,12 +1,15 @@
 ---
 name: cloudflare
 description: >-
-  Manage Cloudflare DNS records with explicit destructive gates (MCP first).
+  Cloudflare DNS list/create/update/delete with MCP and destructive gates.
 ---
 
 # /cloudflare
 
-1. If the user did not authorize Cloudflare/DNS work, say so and stop.
-2. Load `cloudflare` and follow `cloudflare-dns` / `cloudflare-safety`.
-3. Prefer Cloudflare MCP. Never invent zone or record ids.
-4. Confirm changes with FQDN, type, and content.
+1. If the user did not authorize Cloudflare DNS work, say so and stop.
+2. Load skill `cloudflare` with rules `cloudflare-dns` and always
+   `cloudflare-safety`.
+3. Prefer `user-mcp_cloudflare`. Never invent record ids; list before mutate.
+4. Return FQDN + type + content (read) or action + record receipt (mutate).
+   For inventory use `cloudflare-dns-inventory` or `/cloudflare-inventory`;
+   for create/update use `cloudflare-record-change` or `/cloudflare-record`.
