@@ -1,0 +1,91 @@
+---
+description: >-
+  Craft and attach Traefik middlewares (headers, stripPrefix, auth, rate
+  limit, redirect, IP allowlist). Discover-first; never invent middleware names.
+alwaysApply: false
+---
+
+# Traefik middlewares
+
+## Gate
+
+Use when the user authorized Traefik work and the turn needs **middleware**
+inventory, authoring, or attach/detach on a router/IngressRoute. Router-only
+or IngressRoute structure without middleware → `traefik-routes`. Removing
+auth / allowlist / forcing insecure → also `traefik-safety`.
+
+## Transport
+
+Same as routes: no Traefik MCP discovered. Prefer checked-in Middleware CRs /
+file-provider middleware blocks / Docker middleware labels; else cluster or
+API inventory the user authorized. **Do not invent MCP tool names.**
+
+## Common middleware kinds (craft language)
+
+Prefer capability names in receipts; use the Traefik type field the provider
+expects:
+
+| Need | Typical type / CR field | Notes |
+| --- | --- | --- |
+| Strip or replace path prefix | stripPrefix / replacePath / replacePathRegex | Align with upstream path expectations |
+| Add/remove headers | headers | Do not put secrets in header values in chat |
+| Redirect HTTP→HTTPS or host | redirectScheme / redirectRegex | Confirm entrypoint split first |
+| Basic / forward auth | basicAuth / forwardAuth | Credentials stay out of chat; refs only |
+| Rate limit | rateLimit | State average/burst from ask or existing CR |
+| IP allow / deny | ipAllowList / ipWhiteList (legacy name) | Removing these is a safety gate |
+| Retry / circuit breaker | retry / circuitBreaker | Tunables from existing evidence |
+| Compress / buffering | compress / buffering | Optional; keep defaults unless asked |
+
+Never invent a middleware **name** — resolve from list or user paste before
+attach.
+
+## Attach patterns
+
+1. **IngressRoute** — reference middlewares under `routes[].middlewares[]`
+   with `name` + `namespace` when cross-namespace is supported and intended.
+2. **File provider** — router `middlewares:` list must match keys under
+   `http.middlewares`.
+3. **Docker labels** — `traefik.http.routers.<name>.middlewares=` comma list
+   must match defined `traefik.http.middlewares.<mw>.*` labels.
+
+Order matters: document the chain order you set (for example stripPrefix
+before forwardAuth) in the receipt.
+
+## Discover first
+
+1. List existing Middleware CRs / file keys / label-defined middlewares
+   before creating a duplicate.
+2. Before changing a chain, show the current router’s middleware list from
+   evidence.
+3. When cloning a pattern, copy field shapes from a live example in-repo or
+   on-cluster — do not freestyle undocumented fields.
+
+## Craft defaults
+
+1. Prefer **update-in-place** of an existing Middleware over delete+recreate.
+2. Path middlewares must match the router `PathPrefix` / `Path` rule — call
+   out mismatches.
+3. Auth and IP allowlist middlewares are **protective**; do not drop them
+   without an explicit verb naming the middleware and router
+   (`traefik-safety`).
+4. Forward-auth address and basic-auth secret refs: cite the secret **name**
+   only — never paste password hashes or tokens into chat.
+
+## Report shape
+
+- **middleware name** (+ namespace)
+- **type**
+- **attached routers / IngressRoutes** (from evidence)
+- **chain order** when multiple
+
+## Out of scope
+
+- Creating routers/services → `traefik-routes`
+- TLS secret or ACME account mutation secrets in chat → refuse via
+  `traefik-safety`
+- Non-Traefik middleware products
+
+## Related (this plugin)
+
+- `traefik-routes` — routers, services, IngressRoute
+- `traefik-safety` — destructive and expose gates

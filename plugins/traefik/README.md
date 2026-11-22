@@ -1,29 +1,37 @@
 # traefik
 
-Agnostic Traefik craft: routers, services, middlewares, and IngressRoute shape with destructive gates. Prefer MCP when connected; otherwise API/manifests. Never invent router names.
+Agnostic Traefik craft: routers, services, middlewares, and IngressRoute
+shape with destructive gates. No Traefik MCP discovered — use CRDs, file
+provider, Docker labels, or a confirmed API. Never invent router names.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `traefik-routes` | List/craft routers, services, middlewares, IngressRoute CRDs |
-| `traefik-safety` | Delete/expose/TLS drop need an explicit verb naming the object |
+| `traefik-routes` | Routers, services, entrypoints, IngressRoute inventory/craft |
+| `traefik-middlewares` | Middleware types, attach patterns, chain order |
+| `traefik-safety` | Delete / insecure expose / TLS drop / auth-removal gates |
 
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
-| `traefik` | Index / gate |
+| `traefik` | Index / gate / procedure |
+| `traefik-route-inventory` | List routers/IngressRoutes → rule + service + TLS |
+| `traefik-ingressroute-author` | Author/patch IngressRoute CRs update-in-place |
 
 ## Commands
 
-- `/traefik` → Traefik routes or gated mutate
+- `/traefik` → Traefik routes, middlewares, or gated mutate
+- `/traefik-inventory` → Route inventory pass
+- `/traefik-ingressroute` → IngressRoute author checklist
 
 ## Related capabilities
 
-- Neighbor products and surfaces are out of scope for this plugin — stop if
-  the ask is not this product.
+- Other reverse-proxy products and DNS zone edits are out of scope — this
+  plugin owns Traefik routing craft only.
 
 ## Diagrams
 
-- [`docs/traefik-workflow.drawio`](docs/traefik-workflow.drawio) — gate → act → evidence
+- [`docs/traefik-workflow.drawio`](docs/traefik-workflow.drawio) — gate →
+  route → inventory / IngressRoute / middleware-mutate branches

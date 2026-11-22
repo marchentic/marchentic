@@ -1,0 +1,75 @@
+---
+description: >-
+  Portainer endpoint inventory: list/resolve environments, status, and
+  access shape. Never invent endpoint ids; resolve base URL from config.
+alwaysApply: false
+---
+
+# Portainer endpoints
+
+## Gate
+
+Use when the user authorized Portainer work and the turn needs **endpoint**
+(environment) inventory: list environments, pick which Docker/Kubernetes
+endpoint a stack or container lives on, or audit endpoint health. Skip
+bare Docker talk without Portainer. Load `portainer-safety` on every
+Portainer turn. Stack deploy/delete → `portainer-stacks`; container stop/
+remove → `portainer-containers`.
+
+## Prefer live surface
+
+No Portainer MCP was discovered in the live harness catalog. Prefer:
+
+1. Portainer **API** with a base URL from operator config / env / MCP
+   (if one appears later — discover tools from the live map; do not invent
+   names)
+2. Authenticated Portainer **UI** when API access is unavailable
+
+Never hardcode a host. Never invent endpoint ids or names — list/resolve
+this turn, or use exact names the user pasted.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List endpoints | API environments list, or UI Environments |
+| One endpoint | Resolve by id/name from the list; report type (Docker / Swarm / K8s) + status |
+| Scope a stack/container ask | Resolve endpoint first, then load stacks/containers rules |
+| Endpoint credentials / TLS | Out of scope to change without `portainer-safety` verb |
+
+## Discover first
+
+1. Resolve **base URL** from config/env — refuse guessing.
+2. List endpoints before naming one in a mutate or stack deploy.
+3. Report **name + id + type + status** — never paste API tokens or JWT.
+
+## Procedure (read paths)
+
+1. **Scope** — fleet list vs one named endpoint. **Done when** the ask is
+   clear.
+2. **List / resolve** — evidence from API/UI this turn. **Done when** every
+   endpoint id you will cite was listed or user-pasted.
+3. **Report** — short table (see shape). **Done when** no secrets appear.
+
+## Report shape
+
+- **name** / **id**
+- **type** — Docker standalone, Swarm, Kubernetes (as Portainer reports)
+- **status** — up / down / snapshot age when available
+- **base URL** — product URL only; no credentials
+
+## Out of scope
+
+- Deploying or deleting stacks → `portainer-stacks` + `portainer-safety`
+- Stopping or removing containers → `portainer-containers` +
+  `portainer-safety`
+- Changing endpoint access control, API keys, or TLS trust store without
+  an explicit safety-gated verb
+- Checked-in Compose file authorship (layout/merge) — Portainer UI/API
+  ops against live endpoints only
+
+## Related (this plugin)
+
+- `portainer-stacks` — stack inventory and gated deploy
+- `portainer-containers` — container inventory and gated ops
+- `portainer-safety` — mutate / prune / credential refuse

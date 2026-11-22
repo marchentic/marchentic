@@ -1,0 +1,76 @@
+---
+description: >-
+  Portainer stack inventory and gated deploy/update/delete craft. Resolve
+  endpoint + stack name first; never invent stack ids.
+alwaysApply: false
+---
+
+# Portainer stacks
+
+## Gate
+
+Use when the user authorized Portainer work and the turn needs **stack**
+inventory or gated stack mutate: list stacks, show stack status, deploy /
+update / delete a named stack. Load `portainer-safety` always. Endpoint
+selection → `portainer-endpoints` first when the endpoint is ambiguous.
+Container-only stop/remove without stack context → `portainer-containers`.
+
+## Prefer live surface
+
+No Portainer MCP in the live harness catalog. Use Portainer API or
+authenticated UI. If an MCP appears later, discover tools from the live
+map — do not invent tool names.
+
+Resolve **endpoint** then **stack name/id** before any mutate.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List stacks | API stacks for the resolved endpoint, or UI Stacks |
+| One stack | Name + id + status + service count from list/detail |
+| Deploy / update | Explicit deploy/update verb + named stack + endpoint (`portainer-safety`) |
+| Delete stack | Explicit delete/remove verb naming the stack (`portainer-safety`) |
+| Stack env / secrets | Cite **key names** only — never paste values |
+
+## Discover first
+
+1. Resolve endpoint (`portainer-endpoints`) — never assume the default.
+2. List stacks on that endpoint before naming one to mutate.
+3. Prefer updating a named stack over recreating from scratch when that
+   answers the ask.
+4. Prefer stopping a named service/container over whole-stack teardown
+   when that is enough (`portainer-containers`).
+
+## Procedure
+
+1. **Scope** — inventory vs deploy/update vs delete. **Done when** one
+   surface is named.
+2. **Resolve** — endpoint + stack from list or user paste.
+   **Done when** every id/name used was proven this turn.
+3. **Act** — read-only report, or gated mutate per `portainer-safety`.
+   **Done when** the action matches the ask and no unauthorized delete
+   ran.
+4. **Receipt** — endpoint + stack + status (and action if mutated).
+
+## Report shape
+
+- **endpoint** — name/id
+- **stack** — name/id
+- **status** — active / inactive / limited (as Portainer reports)
+- **services** — count or short list when useful
+- **action** — only when a gated mutate ran
+
+## Out of scope
+
+- Endpoint fleet audit without stacks → `portainer-endpoints`
+- Container prune / volume wipe without stack context →
+  `portainer-containers` + `portainer-safety`
+- Authoring checked-in Compose merge layouts (this plugin operates the
+  live Portainer stack surface)
+
+## Related (this plugin)
+
+- `portainer-endpoints` — environment inventory
+- `portainer-containers` — container-level ops
+- `portainer-safety` — deploy/delete/prune gates

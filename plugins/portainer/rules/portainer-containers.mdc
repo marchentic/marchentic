@@ -1,0 +1,77 @@
+---
+description: >-
+  Portainer container inventory and gated stop/restart/remove craft. Resolve
+  endpoint + container first; prefer service-scoped actions over prune.
+alwaysApply: false
+---
+
+# Portainer containers
+
+## Gate
+
+Use when the user authorized Portainer work and the turn needs **container**
+inventory or gated container ops: list containers, logs/status, stop /
+restart / remove a named container, or image summary on an endpoint. Load
+`portainer-safety` always. Whole-stack deploy/delete → `portainer-stacks`.
+Endpoint pick → `portainer-endpoints` when ambiguous.
+
+## Prefer live surface
+
+No Portainer MCP in the live harness catalog. Use Portainer API or
+authenticated UI. If an MCP appears later, discover tools from the live
+map — do not invent tool names.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List containers | API/UI containers for the resolved endpoint |
+| One container | Name + id + state + image from list/detail |
+| Logs / inspect | Read-only once container is resolved — redact secret-looking env |
+| Stop / restart / kill | Explicit verb naming the container (`portainer-safety`) |
+| Remove container | Explicit remove/delete verb naming it (`portainer-safety`) |
+| Prune unused images/volumes | Explicit prune/wipe verb + scope (`portainer-safety`) |
+
+## Discover first
+
+1. Resolve endpoint, then list containers before mutating one.
+2. Prefer **named container** stop/restart over stack teardown or prune.
+3. Prefer **service-scoped** action when the container belongs to a stack
+   and the ask is narrow.
+4. Never invent container ids — list/resolve or user paste only.
+
+## Procedure
+
+1. **Scope** — list vs one container vs gated mutate/prune.
+   **Done when** the surface is clear.
+2. **Resolve** — endpoint + container (and stack when relevant).
+   **Done when** names come from list/detail this turn.
+3. **Act** — inventory report, or gated mutate per `portainer-safety`.
+   **Done when** no unauthorized stop/remove/prune ran.
+4. **Receipt** — endpoint + container + state (+ action).
+
+## Report shape
+
+- **endpoint** — name/id
+- **container** — name/id
+- **state** — running / exited / created / …
+- **image** — repo:tag when useful
+- **action** — only when a gated mutate ran
+
+## Secrets in inspect/logs
+
+When inspect or logs surface env values that look like credentials,
+redact (`[REDACTED]`) — cite key names only. Never paste API tokens.
+
+## Out of scope
+
+- Stack deploy/update/delete → `portainer-stacks` + `portainer-safety`
+- Endpoint credential or ACL changes → `portainer-safety` with explicit
+  verb (otherwise refuse)
+- Host Docker CLI outside Portainer when the user asked for Portainer
+
+## Related (this plugin)
+
+- `portainer-endpoints` — environment inventory
+- `portainer-stacks` — stack inventory / deploy
+- `portainer-safety` — stop/remove/prune gates

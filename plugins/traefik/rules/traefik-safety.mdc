@@ -1,23 +1,69 @@
 ---
 description: >-
-  Traefik mutate gates — delete routers/middlewares, open insecure entrypoints,
-  or drop TLS need an explicit verb naming the object.
+  Traefik safety: read-only default, explicit verbs for delete/expose/TLS
+  drop/auth removal, refuse secrets in chat.
 alwaysApply: false
 ---
 
 # Traefik safety
 
+## Gate
+
+Load on every authorized Traefik turn (inventory or mutate). Skip when the
+turn never touches Traefik.
+
 ## Read-only default
 
-List routers, services, and middlewares are fine when Traefik work is
-authorized. Do **not**:
+These are fine without an extra destructive verb when Traefik is authorized:
 
-- delete a router, service, or middleware
-- expose an entrypoint without TLS when the user did not ask
-- remove auth / IPAllowList middlewares that protect a route
-- point a production host at a guessed upstream
+- Listing routers, services, middlewares, entrypoints, IngressRoutes
+- Reading CR YAML / file-provider snippets / Docker labels
+- Explaining a rule match or middleware chain from evidence
 
-…unless the user gave an explicit verb this turn naming the object.
+Do **not** mutate unless the user gave an explicit verb **this turn** naming
+the target object (router, service, middleware, IngressRoute, TLS option).
 
-Prefer update-in-place. Never paste dashboard credentials or ACME account
-secrets into chat.
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn |
+| --- | --- |
+| Delete router / service / middleware / IngressRoute | **delete** + object name (+ namespace if CR) |
+| Expose entrypoint or router without TLS | **expose** / **insecure** / **disable TLS** + named entrypoint or router |
+| Drop TLS / clear cert secret or certresolver | **remove TLS** / **clear cert** + named router or IngressRoute |
+| Remove auth / IP allowlist / forwardAuth middleware | **remove** / **drop** + middleware name + router |
+| Point production host at new upstream | **point** / **retarget** / **change service** + host or router + new service |
+| Broad catch-all rule (`HostRegexp` / Path `/`) on public entrypoint | **create** / **widen** + explicit acknowledgment of catch-all scope |
+
+Ambiguous scope (e.g. "clean up old routers") → ask once for names; do not
+mass-delete without listed targets.
+
+## Prefer update-in-place
+
+Prefer patching rule, service, middleware refs, or TLS block on the existing
+object. Delete+recreate only when the user asked to replace or the provider
+cannot update the field in place — state why in the receipt.
+
+## Refuse
+
+- Pasting Traefik dashboard credentials, basic-auth password hashes, ACME
+  account private keys, or TLS private keys into chat
+- Inventing router, middleware, IngressRoute, or entrypoint names
+- Opening `web` (cleartext) as the only public entrypoint when the user did
+  not ask to go insecure
+- Absorbing another reverse-proxy product’s API/UI into this surface
+- Inventing MCP tool names when no Traefik MCP is connected
+
+## Receipt examples (safe)
+
+Inventory: IngressRoute `app-web` ns `default`, match
+`Host(\`app.example.com\`) && PathPrefix(\`/\`)`, entryPoints `websecure`,
+service `app:80`, TLS secret name `app-tls` — no mutate.
+
+Authorized retarget: stated host `app.example.com`; updated IngressRoute
+`app-web` service → `app-v2:80`; middleware chain unchanged — no secrets.
+
+## Related (this plugin)
+
+- `traefik-routes` — discover-first route/IngressRoute craft
+- `traefik-middlewares` — middleware craft and attach
+- Skills: `traefik-route-inventory`, `traefik-ingressroute-author`

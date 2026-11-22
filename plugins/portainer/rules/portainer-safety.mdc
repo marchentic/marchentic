@@ -1,24 +1,79 @@
 ---
 description: >-
-  Portainer mutate gates — stack deploy/delete, container stop/remove, and
-  volume prune need an explicit verb naming the object.
+  Portainer mutate gates — stack deploy/delete, container stop/remove,
+  volume/image prune, and credential refuse. Explicit verb naming the object.
 alwaysApply: false
 ---
 
 # Portainer safety
+
+## Gate
+
+Load on every Portainer turn. Skip only when the turn never touches
+Portainer endpoints, stacks, or containers.
 
 ## Read-only default
 
 List endpoints, stacks, and containers are fine when Portainer work is
 authorized. Do **not**:
 
-- deploy/update/delete a stack
-- stop/kill/remove a container
-- prune volumes/images that drop data
-- change endpoint credentials or access control
+- deploy / update / delete a stack
+- stop / kill / restart / remove a container
+- prune volumes or images that drop data
+- change endpoint credentials, TLS trust, or access control
+- widen team/RBAC on an endpoint or stack
 
-…unless the user gave an explicit verb this turn naming the object.
+…unless the user gave an **explicit verb this turn naming the object**.
 
-Prefer stopping a named service over whole-stack teardown. Never paste API
-tokens or env secrets into chat. Pair volume-wipe risk with compose safety
-discipline.
+## Mutate gates
+
+| Action | Require |
+| --- | --- |
+| Deploy / update stack | deploy / update / apply + stack name + endpoint |
+| Delete stack | delete / remove / destroy + stack name |
+| Stop / restart / kill container | matching verb + container name |
+| Remove container | remove / delete + container name |
+| Prune volumes / images | prune / wipe / purge + scope (unused vs all) |
+| Endpoint ACL / credentials | explicit change verb + endpoint |
+
+Prefer the narrowest action that answers the ask:
+
+1. Named container stop/restart over stack teardown
+2. Named stack update over delete+redeploy
+3. Unused prune over "prune everything"
+
+Ambiguous mass-delete or prune → **ask once** to scope before acting.
+
+## Refuse secrets
+
+Do **not** paste into chat:
+
+- Portainer API tokens, JWTs, or session cookies
+- Stack env secret values, `.env` bodies, or registry passwords
+- Endpoint credential material
+
+Prefer: endpoint/stack/container **names**, status, and "key is set"
+language. Redact secret-looking inspect/log lines.
+
+## No invented MCP tools
+
+No Portainer MCP was discovered in the live harness catalog. Do not invent
+MCP tool names for deploy/delete. Use API/UI paths the operator authorized.
+If an MCP appears later, use only tools on the live map and still apply
+these gates.
+
+## Operator receipt (mutate)
+
+Safe shape:
+
+- Base URL product host (no credentials)
+- Endpoint name/id
+- Stack and/or container name
+- Action taken
+- "No API tokens or env secrets shown"
+
+## Related (this plugin)
+
+- `portainer-endpoints` — endpoint inventory
+- `portainer-stacks` — stack craft
+- `portainer-containers` — container craft
