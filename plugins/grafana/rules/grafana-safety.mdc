@@ -1,0 +1,85 @@
+---
+description: >-
+  Destructive Grafana gates — dashboard overwrite, datasource create/update,
+  alert rule mutate, incident create, plugin install, and raw API writes need
+  an explicit verb. Read/search/query is the default.
+alwaysApply: false
+---
+
+# Grafana safety
+
+## Read-only default
+
+When Grafana craft is authorized, these are fine without a mutate verb:
+
+- Dashboards: `search_dashboards`, `search_folders`, `get_dashboard_by_uid`,
+  `get_dashboard_summary`, `get_dashboard_property`,
+  `get_dashboard_panel_queries`, `get_panel_image`, `list_snapshots`,
+  `get_snapshot`, `get_annotations`, `get_annotation_tags`,
+  `list_provisioning_repositories`, `generate_deeplink`
+- Datasources: `list_datasources`, `get_datasource`,
+  `check_datasources_health`
+- Explore: Prometheus/Loki/Pyroscope list + query tools,
+  `analyze_loki_labels`, Sift read tools (`list_sift_investigations`,
+  `get_sift_investigation`, `get_sift_analysis`)
+- Alerting (read): `alerting_manage_rules` with `operation=list|get|versions`,
+  `alerting_manage_routing` (all ops are get_*), `list_alert_groups`,
+  `get_alert_group`
+- Incidents (read): `list_incidents`, `get_incident`, OnCall list/get tools
+- Plugins (read): `search_plugin_information`, `get_plugin`
+- Config check: `validate_provisioning_file`
+
+Do **not** do any of the following unless the user gave an explicit verb this
+turn naming the target (dashboard UID, datasource name/UID, rule UID,
+incident, snapshot key, plugin id):
+
+| Mutate | Tools |
+| --- | --- |
+| Create / overwrite dashboard | `update_dashboard` (full JSON or patch) |
+| Create folder | `create_folder` |
+| Create / update datasource | `create_datasource`, `update_datasource` |
+| Alert rule create / update / delete | `alerting_manage_rules` `create`/`update`/`delete` |
+| Contact-point / routing write | Not exposed as dedicated write ops on
+  `alerting_manage_routing` (get-only). Do not invent writes; if the user
+  insists via `grafana_api_request`, treat as mutate and require an explicit
+  verb + endpoint |
+| Open incident | `create_incident` |
+| Incident activity | `add_activity_to_incident` |
+| Annotation create / update | `create_annotation`, `update_annotation` |
+| Snapshot create / delete | `create_snapshot`, `delete_snapshot` |
+| Install plugin | `install_plugin` |
+| Raw mutating API | `grafana_api_request` with POST/PUT/PATCH/DELETE |
+
+## Irreversible — confirm blast radius
+
+Before proceeding when clearly authorized:
+
+| Action | State risk |
+| --- | --- |
+| `update_dashboard` overwrite | Loses prior panel/layout version without a clear message |
+| `update_datasource` / `create_datasource` | Breaks Explore and dashboards that bind that UID |
+| Alert rule `delete` | Stops paging for that symptom |
+| `delete_snapshot` | Removes shared snapshot URL |
+| `install_plugin` | Changes instance plugin set; version must be user-confirmed |
+| `create_incident` | Notifies people; tool itself says use sparingly |
+
+State the object (title/UID) and consequence in one sentence, then act only if
+authorization already covers that loss.
+
+## Datasource credential posture
+
+- `create_datasource` is a two-call schema flow: first call with `type` only,
+  then ask the user for every required field; never invent secrets or paste
+  tokens into chat.
+- Never dump `secureJsonData` values. Remind the user to rotate if a secret
+  appeared in tool output by mistake.
+
+## Defaults
+
+1. Prefer the smallest mutate that satisfies the ask (patch via
+   `update_dashboard` `operations` over full JSON replace).
+2. Prefer updating a named dashboard over minting a near-duplicate title.
+3. Prefer listing/getting alert rules before create to avoid duplicates.
+4. Prefer `generate_deeplink` for operator navigation over pasting host guesses.
+5. Do not use `grafana_api_request` when a dedicated tool exists.
+6. Bare product name alone is not a mutate authorization.

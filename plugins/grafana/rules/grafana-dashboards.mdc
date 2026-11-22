@@ -1,14 +1,69 @@
 ---
 description: >-
-  Grafana dashboard search, summary, panel queries, and update craft via MCP.
+  Grafana dashboard search, summary, panel queries, folder, snapshot, and
+  update craft via MCP. Prefer search/get before mutate.
 alwaysApply: false
 ---
 
 # Grafana dashboards
 
+## When to use
+
+User asked to find, summarize, author, patch, snapshot, annotate, or deeplink
+a Grafana dashboard or folder.
+
+## MCP tool map
+
+Prefer a connected Grafana MCP. Never invent dashboard, folder, or datasource
+UIDs — resolve via search/get.
+
+| Job | Tools |
+| --- | --- |
+| Find dashboards | `search_dashboards` (`query`, `limit`, `page`) |
+| Find folders | `search_folders` |
+| Overview without full JSON | `get_dashboard_summary` |
+| Targeted JSONPath slice | `get_dashboard_property` |
+| Full model (large — use sparingly) | `get_dashboard_by_uid` |
+| Panel PromQL/LogQL/etc. | `get_dashboard_panel_queries` (`uid`, optional `panelId`, `variables`) |
+| Panel PNG | `get_panel_image` (only when a visual was asked) |
+| Create / patch dashboard | `update_dashboard` — full `dashboard` JSON **or** `uid` + `operations` patches; optional `folderUid`, `message`, `overwrite` |
+| Create folder | `create_folder` (`title`, optional `uid`, `parentUid`) |
+| Annotation events | `get_annotations`, `get_annotation_tags`, `create_annotation`, `update_annotation` |
+| Snapshots | `list_snapshots`, `get_snapshot`, `create_snapshot`, `delete_snapshot` |
+| Provisioning preview | `list_provisioning_repositories`, `validate_provisioning_file` |
+| Operator link | `generate_deeplink` (`dashboard` / `panel` types; `dashboardUid` or `provisioningPreview`) |
+
+Mutates (`update_dashboard`, `create_folder`, annotation write, snapshot
+create/delete) require an explicit verb — see `grafana-safety`.
+
+## Procedure
+
+1. **Search first** — `search_dashboards` / `search_folders` with a meaningful
+   query. Prefer updating a hit over creating a near-duplicate title.
+   **Done when** candidate UIDs/titles are listed from MCP, or none exist.
+2. **Resolve** — pick UID from search results (or user-supplied UID after
+   verifying with get/summary). **Done when** every UID you will use was
+   returned by MCP.
+3. **Read small** — prefer `get_dashboard_summary` or
+   `get_dashboard_panel_queries` / `get_dashboard_property` before
+   `get_dashboard_by_uid`. Full JSON only when authoring/patching needs it.
+   **Done when** you have the panels/queries/variables you need.
+4. **Author / patch** — when authorized: prefer `operations` patches
+   (`replace`/`add`/`remove` on JSONPath) for small edits; full `dashboard`
+   for new or wholesale replacements. Multi-select variables in regex
+   matchers: save `${var:regex}`, not bare `$var`. Saved annotation
+   *definitions* live in `annotations.list` inside dashboard JSON; event
+   tools create timeline events only.
+   **Done when** `update_dashboard` succeeded and UID is known.
+5. **Evidence** — return title, UID, folder if known, what changed, and a
+   `generate_deeplink` when useful. **Done when** the reply cites MCP
+   evidence, not guessed URLs.
+
 ## Defaults
 
-1. Search before creating a near-duplicate dashboard title.
-2. Prefer updating a named dashboard over minting a new one.
-3. Never invent dashboard or folder UIDs — resolve via search/get.
-4. Panel image / snapshot only when the user asked for a visual.
+1. Never invent dashboard or folder UIDs.
+2. Prefer patch over full overwrite; set a clear `message` when versioning.
+3. Panel image / snapshot only when the user asked for a visual or share link.
+4. Do not dump megabyte dashboard JSON into chat — summarize.
+5. Neighbor metrics backends used only as Grafana datasources here; standalone
+   metrics-server craft is out of scope for this plugin.

@@ -1,14 +1,84 @@
 ---
 description: >-
-  Grafana alerting rules and routing craft via MCP. Use when managing alerts.
+  Grafana alert rules (CRUD) and routing read (policies, contact points, time
+  intervals) via MCP. Prefer list/get before mutate.
 alwaysApply: false
 ---
 
 # Grafana alerting
 
+## When to use
+
+User asked to list, audit, create, update, pause, or delete Grafana alert
+rules, or to inspect notification policies / contact points / mute intervals.
+
+## MCP tool map
+
+Prefer a connected Grafana MCP. Never invent rule UIDs, folder UIDs, or
+contact-point names — resolve via list/get.
+
+### Alert rules — `alerting_manage_rules`
+
+| `operation` | Use |
+| --- | --- |
+| `list` | Filter with `states`, `search_rule_name`, `search_folder` / `folder_uid`, `label_selectors`, `rule_type`, `datasource_uid`, `rule_limit` |
+| `get` | Full rule by `rule_uid` (optional `limit_alerts`, `matchers`) |
+| `versions` | Compare history for `rule_uid` |
+| `create` | New rule — requires title, folder_uid, rule_group, condition, data[], for, no_data_state, exec_err_state, org_id |
+| `update` | Get first, then update with full required fields + changes |
+| `delete` | Remove by `rule_uid` |
+
+Notes from the tool:
+
+- `data[]` entries need `datasourceUid` + `model` (PromQL/LogQL expr or
+  `__expr__` threshold/expressions).
+- `notification_settings.receiver` routes to a contact point when set.
+- `is_paused` keeps a rule inactive without deleting it.
+- `disable_provenance` defaults true so the UI stays editable.
+
+### Routing (read) — `alerting_manage_routing`
+
+All operations are get-only:
+
+| `operation` | Use |
+| --- | --- |
+| `get_notification_policies` | Policy tree / grouping / timing |
+| `get_contact_points` / `get_contact_point` | Receivers (`contact_point_title` for one; optional `name` filter) |
+| `get_time_intervals` / `get_time_interval` | Mute / active windows |
+
+There is no dedicated MCP write for contact points or policies. Do not invent
+write tool names. Treat any routing write via `grafana_api_request` as a
+mutate under `grafana-safety`.
+
+### OnCall alert groups (read)
+
+| Job | Tools |
+| --- | --- |
+| Groups | `list_alert_groups`, `get_alert_group` |
+
+## Procedure
+
+1. **List before create** — `alerting_manage_rules` `list` (and routing get_*
+   when debugging "who got paged"). **Done when** existing rules/receivers
+   are known or clearly absent.
+2. **Get before update** — `get` (and `versions` if comparing). **Done when**
+   the rule_uid and current config are from MCP.
+3. **Craft** — prefer symptom-based, actionable alerts; set a sensible `for`
+   to reduce flapping; avoid high-cardinality label explosion in `labels`.
+   **Done when** required create/update fields are filled from resolved UIDs.
+4. **Mutate only if asked** — create/update/delete/pause need an explicit
+   verb this turn (`grafana-safety`). Prefer `is_paused` over delete when
+   silencing temporarily.
+   **Done when** mutate result is confirmed, or you stopped for lack of verb.
+5. **Evidence** — rule title/UID, state, folder/group, receiver if known.
+   **Done when** the reply cites MCP output.
+
 ## Defaults
 
 1. List existing rules before adding duplicates.
-2. Prefer symptom-based, actionable alerts; avoid noisy flapping.
-3. Changes to routing / contact points need an explicit ask.
-4. Never invent rule UIDs — resolve via list/get.
+2. Prefer symptom-based alerts; avoid noisy flapping.
+3. Contact-point / routing *writes* need an explicit ask and a real write path
+   (not invented tools).
+4. Never invent rule or folder UIDs.
+5. Explore queries to validate expressions belong under `grafana-explore`;
+   keep rule JSON/craft here.

@@ -1,14 +1,73 @@
 ---
 description: >-
-  Grafana Incident create/update/activity craft via MCP.
+  Grafana Incident list/get/create/activity and OnCall schedule/user lookup via
+  MCP. Create only when explicitly asked.
 alwaysApply: false
 ---
 
 # Grafana incidents
 
+## When to use
+
+User asked about Grafana Incident lifecycle, incident timeline notes, or who
+is on-call for a schedule — not alert-rule authoring (`grafana-alerting`) and
+not Explore queries (`grafana-explore`).
+
+## MCP tool map
+
+Prefer a connected Grafana MCP. Never invent incident ids or schedule ids —
+resolve via list/get.
+
+### Incidents
+
+| Job | Tools |
+| --- | --- |
+| List | `list_incidents` (`status` `active`/`resolved`, optional `drill`, `limit`) |
+| Get | `get_incident` (`id`) |
+| Create | `create_incident` — title, severity, room prefix; optional status/labels/attachments/`isDrill`. Use sparingly; may notify many people |
+| Timeline note | `add_activity_to_incident` (`incidentId`, `body`; optional `eventTime`) |
+
+### OnCall (read)
+
+| Job | Tools |
+| --- | --- |
+| Schedules | `list_oncall_schedules` |
+| Teams / users | `list_oncall_teams`, `list_oncall_users` |
+| Current on-call | `get_current_oncall_users` |
+| Shift detail | `get_oncall_shift` (`shiftId`) |
+| Alert groups | `list_alert_groups`, `get_alert_group` |
+
+### Related evidence (optional)
+
+| Job | Tools |
+| --- | --- |
+| Link dashboards / Explore | `generate_deeplink` |
+| Firing context | `alerting_manage_rules` `list`/`get` with `states` |
+
+`create_incident` and `add_activity_to_incident` need an explicit verb — see
+`grafana-safety`.
+
+## Procedure
+
+1. **List / resolve** — `list_incidents` or user-supplied id verified with
+   `get_incident`. **Done when** incident id is from MCP, or none matches.
+2. **Read state** — status, severity, labels, timestamps. Optionally pull
+   OnCall (`get_current_oncall_users` / schedules) when the ask is who pages.
+   **Done when** current state is summarized from tool output.
+3. **Create only if asked** — confirm title + severity + that paging is
+   intended; prefer `isDrill` when the user said drill/practice.
+   **Done when** create returned an id, or you refused for lack of verb.
+4. **Activity** — factual, redacted notes; URLs in `body` become context
+   attachments. No secrets, tokens, or customer PII.
+   **Done when** note is posted or skipped.
+5. **Evidence** — incident id, status, severity, linked dashboard/Explore
+   deeplink when known. **Done when** reply cites MCP ids, not guesses.
+
 ## Defaults
 
-1. Create an incident only when the user asked to open one.
-2. Never invent incident ids — resolve from list/get.
-3. Activity notes stay factual and redacted (no secrets).
+1. Create an incident only when the user asked to open one this turn.
+2. Never invent incident or shift ids.
+3. Activity notes stay factual and redacted.
 4. Link related dashboards or alert groups when known.
+5. Bare "incident" without Grafana/Incident context is not enough — stay out
+   if the ask is a generic outage write-up with no Grafana surface.

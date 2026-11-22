@@ -1,17 +1,97 @@
 ---
 description: >-
-  Grafana Explore — logs / metrics / traces datasource queries via MCP.
-  Discover labels before complex queries.
+  Grafana Explore — Prometheus / Loki / Pyroscope queries, label discovery,
+  datasource health, Sift helpers, and Explore deeplinks via MCP.
 alwaysApply: false
 ---
 
 # Grafana Explore
 
+## When to use
+
+User asked to Explore metrics, logs, profiles, datasource health, error
+patterns, or to build an Explore deeplink — not dashboard JSON authoring
+(that is `grafana-dashboards`).
+
+## MCP tool map
+
+Prefer a connected Grafana MCP. Never invent datasource UIDs — resolve via
+`list_datasources` / `get_datasource`.
+
+### Datasource resolve
+
+| Job | Tools |
+| --- | --- |
+| List / filter datasources | `list_datasources` (optional `type` for PromQL / log / trace plugins) |
+| Detail | `get_datasource` (`uid` or `name`) |
+| Health | `check_datasources_health` (`type` and/or `uids`) |
+
+### Prometheus-compatible Explore
+
+| Job | Tools |
+| --- | --- |
+| Metric names | `list_prometheus_metric_names` |
+| Label names / values | `list_prometheus_label_names`, `list_prometheus_label_values` |
+| Metadata | `list_prometheus_metric_metadata` |
+| Instant / range | `query_prometheus` (`datasourceUid`, `expr`, `endTime`; range needs `startTime` + `stepSeconds`) |
+| Histograms | `query_prometheus_histogram` (discover `*_bucket` first) |
+
+Workflow: list metric names → label values → `query_prometheus`. Prefer
+`rate` then `sum` for counters; avoid high-cardinality dumps.
+
+### Loki / logs Explore
+
+| Job | Tools |
+| --- | --- |
+| Label names / values | `list_loki_label_names`, `list_loki_label_values` |
+| Cheap volume check | `query_loki_stats` before heavy log pulls |
+| Log / metric LogQL | `query_loki_logs` (`datasourceUid`, `logql`; short `limit`, prefer `backward`) |
+| Patterns | `query_loki_patterns` |
+| Label strategy audit | `analyze_loki_labels` |
+| Alloy label hint | `suggest_loki_alloy_label_config` |
+
+### Profiles (Pyroscope)
+
+| Job | Tools |
+| --- | --- |
+| Profile types / labels | `list_pyroscope_profile_types`, `list_pyroscope_label_names`, `list_pyroscope_label_values` |
+| Query | `query_pyroscope` |
+
+### Sift / Asserts helpers
+
+| Job | Tools |
+| --- | --- |
+| Error patterns | `find_error_pattern_logs` |
+| Slow requests | `find_slow_requests` |
+| Investigations | `list_sift_investigations`, `get_sift_investigation`, `get_sift_analysis` |
+| Assertions | `get_assertions` |
+
+### Navigation
+
+| Job | Tools |
+| --- | --- |
+| Explore deeplink | `generate_deeplink` type explore (`datasourceUid`, optional queries; `shorten` optional) |
+
+## Procedure
+
+1. **Resolve datasource** — `list_datasources` filtered by type, then
+   `get_datasource` / `check_datasources_health` if empty results are
+   surprising. **Done when** `datasourceUid` came from MCP.
+2. **Discover** — metric/label/profile names before a heavy query.
+   **Done when** names used in the expr exist (or you stopped instead of
+   guessing).
+3. **Query lean** — short time range first (`now-1h` style); widen only if
+   needed. Cite expr + short summary, not megabytes of series.
+   **Done when** one short evidence block answers the ask.
+4. **Link** — optional `generate_deeplink` for Explore so the operator can
+   reopen the same query. **Done when** reply has finding + link or a clear
+   reason the link was skipped.
+
 ## Defaults
 
-1. Discover metric/log/trace label names on the connected datasources before
-   writing heavy queries. Use the dialect those datasources speak.
-2. Start with a short time range; widen only if needed.
-3. Prefer `rate` then `sum` for counters; avoid high-cardinality dumps.
-4. Cite the query and a short result summary — not megabytes of raw series.
-5. Use datasource health / list tools when a query returns empty unexpectedly.
+1. Discover before complex PromQL/LogQL/profile queries.
+2. Prefer live MCP over remembered metric names.
+3. Timestamps without offset are UTC; prefer relative `now-1h` when unclear.
+4. Creating/updating datasources is a mutate — `grafana-safety`.
+5. Standalone metrics-server or log-platform craft outside Grafana Explore is
+   out of scope here.
