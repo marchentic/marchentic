@@ -1,0 +1,69 @@
+---
+description: >-
+  Harbor project inventory: list/resolve projects, visibility, and member
+  summary. Never invent project names; resolve base URL from config.
+alwaysApply: false
+---
+
+# Harbor projects
+
+## Gate
+
+Use when the user authorized Harbor work and the turn needs **project**
+inventory: list projects, pick a project for repos/artifacts, or audit
+visibility/members at a high level. Skip bare "registry" talk without
+Harbor. Load `harbor-safety` on every Harbor turn. Artifact/tag detail →
+`harbor-artifacts`. Robot accounts → robot section in `harbor-safety` /
+compound skills. Other OCI registry products are out of scope.
+
+## Prefer live surface
+
+No Harbor MCP was discovered in the live harness catalog. Prefer:
+
+1. Harbor **REST API** with a base URL from operator config / env
+2. Authenticated Harbor **UI** when API access is unavailable
+
+If an MCP appears later, discover tools from the live map — do not invent
+tool names. Never hardcode a host. Never invent project names/ids —
+list/resolve this turn or use exact names the user pasted.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List projects | API `/projects` (or UI Projects) |
+| One project | Resolve by name/id from list; report visibility + repo count when present |
+| Members / role summary | Read-only member list — no role widen without `harbor-safety` |
+| Public / private toggle | Explicit verb via `harbor-safety` |
+
+## Discover first
+
+1. Resolve **base URL** from config/env — refuse guessing.
+2. List projects before naming one for artifact or retention work.
+3. Report **name + id + visibility** — never paste admin passwords or
+   robot tokens.
+
+## Procedure (read paths)
+
+1. **Scope** — fleet list vs one named project. **Done when** clear.
+2. **List / resolve** — evidence from API/UI this turn.
+   **Done when** every project name you cite was listed or user-pasted.
+3. **Report** — short table (see shape). **Done when** no secrets appear.
+
+## Report shape
+
+- **name** / **id**
+- **visibility** — public / private (as Harbor reports)
+- **repos** — count when available
+- **base URL** — product host only; no credentials
+
+## Out of scope
+
+- Artifact/tag/scan detail → `harbor-artifacts`
+- Retention purge / robot create / project delete → `harbor-safety`
+- Other OCI registries
+
+## Related (this plugin)
+
+- `harbor-artifacts` — repositories, artifacts, tags, scans
+- `harbor-safety` — delete / retention / robot / member gates

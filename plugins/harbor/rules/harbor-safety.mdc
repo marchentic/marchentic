@@ -1,23 +1,79 @@
 ---
 description: >-
-  Harbor mutate gates — delete artifact/project, retention wipe, robot create,
-  and member ACL widen need an explicit verb naming the object.
+  Harbor mutate gates — artifact/project delete, retention purge, robot
+  create, and member ACL widen. Explicit verb naming the object; refuse
+  token dumps.
 alwaysApply: false
 ---
 
 # Harbor safety
 
+## Gate
+
+Load on every Harbor turn. Skip only when the turn never touches Harbor
+projects, artifacts, retention, or robots.
+
 ## Read-only default
 
-List projects, repos, and artifacts are fine when Harbor work is authorized.
-Do **not**:
+List projects, repos, and artifacts are fine when Harbor work is
+authorized. Do **not**:
 
 - delete an artifact, tag, repository, or project
-- run retention that purges tags the user did not name
-- create/reveal robot account tokens into chat
-- broaden project member roles or public visibility
+- run retention that purges tags the user did not name or authorize
+- create a robot account and paste its secret/token into chat
+- broaden project member roles or flip visibility to public
 
-…unless the user gave an explicit verb this turn naming the object.
+…unless the user gave an **explicit verb this turn naming the object**.
 
-Prefer artifact/tag delete over project wipe. Never paste robot secrets or
-admin passwords into chat.
+## Mutate gates
+
+| Action | Require |
+| --- | --- |
+| Delete tag / artifact | delete / remove + project + repo + tag/digest |
+| Delete repository | delete / remove + project + repo |
+| Delete project | delete / destroy + project (prefer narrower first) |
+| Retention policy run / purge | retention / purge / expire + project (+ policy name) |
+| Create robot | create robot + project + name; **never** paste the secret |
+| Member role widen / public | explicit ACL / public verb + project |
+
+Prefer the narrowest action:
+
+1. Tag/artifact delete over repo wipe
+2. Repo delete over project wipe
+3. Retention scoped to named tags/rules over "delete everything old"
+
+Ambiguous mass-delete or retention → **ask once** to scope before acting.
+
+## Refuse secrets
+
+Do **not** paste into chat:
+
+- Robot account tokens / secrets
+- Admin passwords, OIDC client secrets, or API tokens
+- Full vulnerability payloads that embed credentials
+
+Prefer: project/repo/tag **names**, digest prefixes, scan **severity
+counts**, and "robot secret was shown once in UI — store in a secret
+store" language. If a create-robot response includes a secret, tell the
+operator to copy it into a secret store and **do not** repeat it in chat.
+
+## No invented MCP tools
+
+No Harbor MCP was discovered in the live harness catalog. Do not invent
+MCP tool names for delete/retention/robot. Use API/UI paths the operator
+authorized. If an MCP appears later, use only tools on the live map and
+still apply these gates.
+
+## Operator receipt (mutate)
+
+Safe shape:
+
+- Base URL product host (no credentials)
+- Project (+ repository / tag when relevant)
+- Action taken
+- "No robot tokens or admin passwords shown"
+
+## Related (this plugin)
+
+- `harbor-projects` — project inventory
+- `harbor-artifacts` — repo / artifact / scan craft

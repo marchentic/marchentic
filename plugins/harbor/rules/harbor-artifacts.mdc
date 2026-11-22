@@ -1,0 +1,72 @@
+---
+description: >-
+  Harbor repository and artifact inventory: tags, digests, and scan
+  summaries. Never invent repo or digest names; prefer tag delete over wipe.
+alwaysApply: false
+---
+
+# Harbor artifacts
+
+## Gate
+
+Use when the user authorized Harbor work and the turn needs **repository /
+artifact** inventory: list repos under a project, list artifacts/tags,
+digests, or vulnerability scan summaries. Load `harbor-safety` always.
+Project fleet list → `harbor-projects` first when the project is ambiguous.
+Delete / retention → `harbor-safety` with an explicit verb.
+
+## Prefer live surface
+
+No Harbor MCP in the live harness catalog. Use Harbor REST API or
+authenticated UI. If an MCP appears later, discover tools from the live
+map — do not invent tool names.
+
+Resolve **project** then **repository** then **tag/digest** before mutate.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List repositories | API repos under resolved project, or UI |
+| List artifacts / tags | Artifacts API for project/repo; report tag + digest + push time |
+| Scan summary | Severity counts / status when Harbor scan data is present — no raw CVE dump unless asked |
+| Delete tag / artifact | Explicit delete verb + names (`harbor-safety`) |
+| Retention dry-run / run | Explicit retention verb (`harbor-safety`) |
+
+## Discover first
+
+1. Resolve project (`harbor-projects`) — never assume `library`.
+2. List repositories before naming one.
+3. List artifacts/tags before delete or retention.
+4. Prefer **tag** delete over repository or project wipe when that answers
+   the ask.
+
+## Procedure
+
+1. **Scope** — repos vs artifacts/tags vs scan summary.
+   **Done when** one surface is named.
+2. **Resolve** — project + repo (+ tag/digest) from list or user paste.
+   **Done when** every name used was proven this turn.
+3. **Report or gate** — inventory receipt, or hand off to `harbor-safety`
+   for delete/retention. **Done when** no unauthorized delete ran.
+4. **Receipt** — project + repo + tag/digest (+ scan headline).
+
+## Report shape
+
+- **project**
+- **repository**
+- **tag** / **digest** (short digest OK)
+- **scan** — one-line severity headline when available
+- **action** — only when a gated mutate ran
+
+## Out of scope
+
+- Project create/delete / visibility / members → `harbor-projects` +
+  `harbor-safety`
+- Robot account token reveal → refuse (`harbor-safety`)
+- Other OCI registries
+
+## Related (this plugin)
+
+- `harbor-projects` — project inventory
+- `harbor-safety` — delete / retention / robot gates
