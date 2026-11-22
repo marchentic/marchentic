@@ -442,7 +442,7 @@
     {
       "name": "nodadyoushutup-nginx-proxy-manager",
       "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/nginx-proxy-manager"
@@ -456,8 +456,8 @@
     },
     {
       "name": "nodadyoushutup-vaultwarden",
-      "description": "Agnostic Vaultwarden craft: admin/ops posture and Bitwarden-compatible API hygiene with hard refuse to dump vault contents or credentials into chat.",
-      "version": "0.11.0",
+      "description": "Agnostic Vaultwarden craft: admin/ops and user/org inventory with hard refuse to dump vault contents or credentials. Admin API/UI craft (no Vaultwarden MCP assumed).",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/vaultwarden"
@@ -591,7 +591,7 @@
     },
     {
       "name": "nodadyoushutup-zot",
-      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor \u2014 install what you run.",
+      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
       "version": "0.11.0",
       "source": {
         "source": "local",
@@ -606,7 +606,7 @@
     },
     {
       "name": "nodadyoushutup-harbor",
-      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot \u2014 install what you run.",
+      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot — install what you run.",
       "version": "0.12.0",
       "source": {
         "source": "local",

@@ -1,16 +1,97 @@
 ---
 description: >-
-  List and craft NPM proxy hosts, SSL certificates, and access lists. Never
-  invent host ids; resolve instance URL first.
+  List and craft NPM proxy hosts, redirections, and streams via product API
+  or UI. Discover-first; never invent host ids; resolve instance URL first.
 alwaysApply: false
 ---
 
 # Nginx Proxy Manager hosts
 
-List and craft proxy hosts, redirections, streams, SSL certificates, and access
-lists. Prefer MCP when connected; else the product API or
-authenticated UI.
+## Gate
 
-Never invent proxy-host / certificate / access-list ids — list/resolve first.
-Resolve the instance base URL from operator config — do not hardcode hosts.
-After changes, report domain + scheme + upstream + SSL state (no tokens).
+Use when the user authorized Nginx Proxy Manager (NPM) work and the turn
+needs **proxy hosts**, **redirection hosts**, or **streams** inventory/craft.
+SSL-only → `nginx-proxy-manager-ssl`. Access-list-only →
+`nginx-proxy-manager-access`. Delete/disable → also
+`nginx-proxy-manager-safety`.
+
+## Transport (no NPM MCP discovered)
+
+No Nginx Proxy Manager MCP was found for this harness. Prefer, in order:
+
+1. Checked-in export/backup JSON or IaC that names host ids/domains.
+2. Product **REST API** against an operator-resolved base URL (scheme + host
+   + port) with a short-lived Bearer token from `/api/tokens` — never hardcode
+   the instance URL; never paste tokens into chat.
+3. Authenticated admin UI when API access is unavailable.
+
+If an MCP appears later, use its list/get tools when ready — **do not invent
+MCP tool names**.
+
+## API inventory map (HTTP)
+
+Resolve `BASE` from operator config/env/ask this turn. Auth: `POST {BASE}/api/tokens`
+with identity the user authorized; use `Authorization: Bearer <token>` on
+subsequent calls; do not echo the token.
+
+| Need | Method + path |
+| --- | --- |
+| List proxy hosts | `GET /api/nginx/proxy-hosts` |
+| One proxy host | `GET /api/nginx/proxy-hosts/{id}` |
+| Create proxy host | `POST /api/nginx/proxy-hosts` |
+| Update proxy host | `PUT /api/nginx/proxy-hosts/{id}` |
+| Delete proxy host | `DELETE /api/nginx/proxy-hosts/{id}` (safety gate) |
+| List redirections | `GET /api/nginx/redirection-hosts` |
+| One / mutate redirection | `GET|POST|PUT|DELETE /api/nginx/redirection-hosts[/{id}]` |
+| List streams | `GET /api/nginx/streams` |
+| One / mutate stream | `GET|POST|PUT|DELETE /api/nginx/streams[/{id}]` |
+| Dead hosts (404) | `GET /api/nginx/dead-hosts` (+ mutate only with explicit verb) |
+
+Confirm path shapes against the running NPM version when a call 404s —
+minor releases can rename fields; prefer list-then-get evidence.
+
+## Discover first
+
+1. Never invent proxy-host, redirection, or stream **ids** — list this turn
+   or use exact ids/domains the user pasted.
+2. Resolve domain → id via list filter before update/delete.
+3. Before retargeting upstream, show current `forward_host` / `forward_port`
+   / scheme from get evidence.
+4. Cap large lists; summarize and offer domain or enabled filters.
+
+## Craft defaults
+
+1. Prefer **update-in-place** (`PUT` by id) over delete+recreate for domain
+   or upstream changes.
+2. State domain names, forward scheme (`http`/`https`), forward host + port,
+   and whether websockets / HTTP2 / HSTS flags were set — from ask or
+   existing object.
+3. Do not enable `allow_websocket_upgrade` or cache bypass flags unless asked
+   or copying an evidenced host.
+4. Certificate and access-list **ids** on a host must come from
+   `nginx-proxy-manager-ssl` / `nginx-proxy-manager-access` inventory — never
+   invent foreign keys.
+5. Apex and mail-adjacent hosts: call out blast radius (www, MX-adjacent
+   HTTP, API subdomains) before mutate.
+
+## Report shape
+
+- **id** + **domain_names**
+- **forward** — scheme://host:port
+- **enabled** / **ssl** summary (cert id or “none”)
+- **access_list_id** when set
+- **type** — proxy | redirection | stream
+
+## Out of scope
+
+- Certificate issue/renew details → `nginx-proxy-manager-ssl`
+- Access list CIDR craft → `nginx-proxy-manager-access`
+- Other reverse-proxy products’ APIs
+- DNS record edits
+
+## Related (this plugin)
+
+- `nginx-proxy-manager-ssl` — certificates
+- `nginx-proxy-manager-access` — access lists
+- `nginx-proxy-manager-safety` — destructive gates
+- Skills: `nginx-proxy-manager-host-inventory`, `nginx-proxy-manager-ssl-issue`

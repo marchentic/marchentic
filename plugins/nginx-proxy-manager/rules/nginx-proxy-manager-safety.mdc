@@ -1,23 +1,74 @@
 ---
 description: >-
-  NPM mutate gates — delete/disable proxy host, wipe certs, or broaden access
-  lists need an explicit verb naming the object.
+  NPM safety: read-only default, explicit verbs for delete/disable/cert wipe/
+  access widen, refuse tokens and private keys in chat.
 alwaysApply: false
 ---
 
 # Nginx Proxy Manager safety
 
+## Gate
+
+Load on every authorized NPM turn (inventory or mutate). Skip when the turn
+never touches Nginx Proxy Manager.
+
 ## Read-only default
 
-List proxy hosts, certificates, and access lists are fine when NPM work is
-authorized. Do **not**:
+These are fine without an extra destructive verb when NPM is authorized:
 
-- delete or disable a proxy host, redirection, or stream
-- delete SSL certificates or force-renew in bulk
-- widen an access list / remove IP restrictions
+- Listing proxy hosts, redirections, streams, certificates, access lists
+- Getting one object by id resolved this turn
+- Explaining domain → upstream mapping from evidence
 
-…unless the user gave an explicit verb this turn naming the object.
+Do **not** mutate unless the user gave an explicit verb **this turn** naming
+the target object (id and/or domain).
 
-Apex / mail-adjacent host changes: say what breaks if wrong. Prefer
-update-in-place over delete+recreate. Never paste admin passwords or API
-tokens into chat.
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn |
+| --- | --- |
+| Delete proxy host / redirection / stream / dead host | **delete** + id or domain |
+| Disable / enable host | **disable** / **enable** + id or domain |
+| Delete SSL certificate | **delete** + cert id (and note attached hosts) |
+| Bulk force-renew certs | **renew** / **force renew** + named cert ids (no “all”) |
+| Widen access list / remove IP auth restrictions | **widen** / **open** / **remove restriction** + list id |
+| Delete access list | **delete** + list id |
+| Point production domain at new upstream | **retarget** / **point** / **change upstream** + domain + new forward |
+
+Ambiguous scope (“clean up old hosts”) → ask once for ids/domains; do not
+mass-delete.
+
+## Prefer update-in-place
+
+Prefer `PUT` by id for domain, upstream, SSL attach, or access-list attach.
+Delete+recreate only when the user asked to replace or the API cannot patch
+the field — state why.
+
+## Apex / mail-adjacent
+
+Before mutating apex or mail-adjacent HTTP hosts, state what breaks if wrong
+(www redirect, API subdomain, admin UI host). Require the domain to be named.
+
+## Refuse
+
+- Pasting admin passwords, API tokens, DNS-challenge secrets, or TLS private
+  keys into chat
+- Inventing host, certificate, or access-list ids
+- Hardcoding an NPM base URL when config/env/ask did not supply one
+- Absorbing other reverse-proxy products into this surface
+- Inventing MCP tool names when no NPM MCP is connected
+
+## Receipt examples (safe)
+
+Inventory: proxy host id `12`, domains `app.example.com`, forward
+`http://10.0.0.5:8080`, ssl cert id `3`, access_list none — no mutate.
+
+Authorized retarget: domain `app.example.com` id `12`; forward →
+`http://10.0.0.8:8080`; cert id unchanged — no tokens.
+
+## Related (this plugin)
+
+- `nginx-proxy-manager-hosts` — host/redirection/stream craft
+- `nginx-proxy-manager-ssl` — certificates
+- `nginx-proxy-manager-access` — access lists
+- Skills: `nginx-proxy-manager-host-inventory`, `nginx-proxy-manager-ssl-issue`
