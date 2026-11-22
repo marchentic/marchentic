@@ -1,27 +1,69 @@
 ---
 description: >-
   Obsidian mutate gates — delete, move, rename, and bulk rewrite need an
-  explicit verb naming the note or folder.
+  explicit verb naming the note or folder. Refuse vault dumps.
 alwaysApply: false
 ---
 
 # Obsidian safety
 
+## Gate
+
+Load on every Obsidian turn that might mutate the vault, and whenever chat
+might paste note bodies. Read-only inventory and single-note create/edit of
+a named path are fine when Obsidian work is authorized — still refuse dumps.
+
 ## Read-only default
 
-List/search notes and create/edit a named note are fine when Obsidian work is
-authorized. Do **not**:
+List/search notes and create/edit a **named** note are allowed when the
+vault surface is in play. Do **not**:
 
 - delete notes or folders
 - move or rename notes (breaks wikilinks unless updated)
 - bulk-rewrite or mass-retag across folders the user did not name
 - wipe or rewrite `.obsidian/` app config
 - empty the vault trash / permanently purge
+- overwrite a note with unrelated content "from scratch" when an in-place
+  edit was enough
 
-…unless the user gave an explicit verb this turn naming the object(s).
+…unless the user gave an **explicit verb this turn** naming the
+object(s) (delete / move / rename / purge / retag-all / …).
 
-When renaming or moving with authorization, update inbound `[[wikilinks]]` in
-the same change when cheap to find; say what was left unresolved.
+## Destructive checklist
 
-Never paste credentials, tokens, or full private journal dumps into chat.
-Summarize; cite paths.
+When authorized:
+
+1. Confirm the relative path(s) from inventory — never invent targets.
+2. Prefer one note or one named folder; refuse vault-wide wipe.
+3. On rename/move: update inbound `[[wikilinks]]` in the same change when
+   cheap to find; report what was left unresolved.
+4. Receipt: old path → new path (or deleted path). No body dump.
+
+## Refuse dumps
+
+Do **not** paste into chat:
+
+- Full private journals, diaries, or therapy notes
+- Credentials, API tokens, or recovery phrases found in notes
+- Entire vault trees "for context"
+
+Prefer: titles, relative paths, short excerpts (a few lines), and
+summaries.
+
+## Bulk rewrite
+
+Mass frontmatter changes, retagging, or find-replace across many notes
+need an explicit bulk verb **and** a named scope (folder or search hit
+list). Otherwise edit one note at a time.
+
+## `.obsidian/` config
+
+Treat as sensitive app state. Read only when asked. Never rewrite
+`workspace.json`, plugin data, or community-plugin configs without an
+explicit verb naming the file.
+
+## Report shape
+
+- Relative path(s) + action taken or refused
+- Wikilink follow-ups left unresolved (if any)
+- Explicit "body not dumped" when the note was private-sensitive

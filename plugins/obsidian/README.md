@@ -15,11 +15,14 @@ otherwise the vault filesystem. Never invent note paths; refuse vault dumps.
 
 | Skill | Purpose |
 | --- | --- |
-| `obsidian` | Index / gate |
+| `obsidian` | Index / gate / procedure |
+| `obsidian-note-author` | Create/edit note checklist (frontmatter + wikilinks) |
+| `obsidian-vault-audit` | Inventory / orphans / broken-link health checklist |
 
 ## Commands
 
 - `/obsidian` → Obsidian vault inventory or gated note act
+- `/obsidian-audit` → Vault inventory and health (no auto-delete)
 
 ## Related capabilities
 
@@ -30,4 +33,4 @@ otherwise the vault filesystem. Never invent note paths; refuse vault dumps.
 
 ## Diagrams
 
-- [`docs/obsidian-workflow.drawio`](docs/obsidian-workflow.drawio) — gate → act → evidence
+- [`docs/obsidian-workflow.drawio`](docs/obsidian-workflow.drawio) — gate → route → author / audit / mutate

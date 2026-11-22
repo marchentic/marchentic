@@ -7,27 +7,86 @@ alwaysApply: false
 
 # Obsidian vault
 
+## Gate
+
+Use when the user asks to inventory, search, open, create, or edit notes in
+an Obsidian vault (wikilinks, frontmatter, embeds, callouts). Skip ordinary
+repo Markdown that is not under a resolved vault. Always load
+`obsidian-safety` when delete/move/rename/bulk rewrite might appear.
+
+Never invent a vault root, folder name, or note path. Resolve first.
+
 ## Resolve the vault
 
-Before read/write, resolve the vault root from (in order): the path the user
-named this turn, a workspace folder that contains `.obsidian/`, or a connected
-MCP that lists vaults. Do not guess a home-directory vault.
+Before read/write, resolve the vault root from (in order):
+
+1. Exact path the user named this turn
+2. Workspace folder that contains `.obsidian/`
+3. Connected MCP that lists vaults / notes (when ready)
+4. Stop and ask once — do not guess a home-directory vault
+
+Treat `.obsidian/` as app config: skip unless the user asked about
+settings, plugins, or workspace JSON.
+
+## Prefer MCP, else filesystem
+
+When an Obsidian MCP is ready, prefer its inventory / read / write tools
+over ad-hoc scans. If MCP is absent or incomplete, use the vault
+filesystem under the resolved root — still never invent paths.
+
+Do not invent MCP tool names. Discover the live tool list when connected;
+fall back to list/search/read/write of `.md` files under the root.
 
 ## Inventory
 
-List or search notes under the resolved root. Prefer title + relative path.
-Never invent note paths — search/list first. Skip `.obsidian/` internals unless
-the user asked about app/settings/plugins config.
+1. List or search notes under the resolved root (title + relative path).
+2. Prefer narrow search (folder, tag, filename substring) before dumping
+   the whole vault tree.
+3. Skip binary attachments unless the user asked about media embeds.
+4. Report a short table or bullet list — not every file body.
 
 ## Author / edit notes
 
-- Body: Obsidian-flavored Markdown (headings, lists, callouts when the vault
-  already uses them).
-- Links inside the vault: `[[Note]]`, `[[Note#Heading]]`, `[[Note|alias]]`.
-- Embeds: `![[Note]]` or `![[image.png]]`.
-- Frontmatter: valid YAML between `---` fences; preserve unknown keys; do not
-  invent Dataview / community-plugin fields unless already present in siblings.
+- **Body:** Obsidian-flavored Markdown (headings, lists, tables). Use
+  callouts (`> [!note]`, `> [!warning]`, …) only when sibling notes already
+  use them or the user asked.
+- **Links inside the vault:** `[[Note]]`, `[[Note#Heading]]`,
+  `[[Note|alias]]`, folder-qualified `[[folder/Note]]` when the vault uses
+  that style.
+- **Embeds:** `![[Note]]`, `![[image.png]]`, optional size
+  `![[image.png|400]]` when peers already do.
+- **Frontmatter:** valid YAML between `---` fences; preserve unknown keys;
+  do not invent Dataview / Tasks / community-plugin fields unless already
+  present in siblings or named by the user.
 - Prefer updating the existing note over creating a near-duplicate title.
+- Prefer edit-in-place; keep the user’s heading structure unless asked to
+  restructure.
 
-Report the relative path written. Do not dump large private note bodies into
-chat — quote only the changed excerpt when evidence is needed.
+## Create
+
+1. Confirm the target folder exists (or create only when the user asked).
+2. Choose a title that does not collide with an existing note (search
+   first).
+3. Seed frontmatter only with keys the vault already uses (or the user
+   named).
+4. Receipt: relative path written.
+
+## Tags and properties
+
+- Inline tags (`#tag`) and frontmatter `tags:` — match vault convention
+  (one style per vault; do not mix gratuitously).
+- Do not mass-retag across folders (`obsidian-safety`).
+
+## Report shape
+
+- Vault root (short) + relative note path(s)
+- What changed (created / edited / listed) — quote only a short excerpt
+  when evidence is needed
+- No full private journal dumps (`obsidian-safety`)
+
+## Out of scope
+
+- Memory-store export-to-Markdown tools (other products)
+- Sync/publish/community plugin authoring unless the user named that
+  surface and it lives in this vault’s `.obsidian/` with an explicit ask
+- Site-specific absolute paths — resolve from the opened workspace
