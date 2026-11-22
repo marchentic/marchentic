@@ -1,7 +1,7 @@
 ---
 description: >-
-  Destructive Compose gates: down -v, volume wipe, prune, and refuse to dump
-  secrets from env files into chat.
+  Destructive Compose gates: down -v, volume wipe, prune, force-recreate with
+  data loss, and refuse to dump secrets from env files into chat.
 alwaysApply: false
 ---
 
@@ -9,22 +9,60 @@ alwaysApply: false
 
 ## Explicit verb required
 
-Do **not** run without a clear user verb naming the risk:
+Do **not** run without a clear user verb naming the risk this turn:
 
-- `docker compose down -v` / removing named volumes
-- `docker volume rm` / `system prune` that deletes volumes
-- Force-recreate that drops local writable state the user cares about
-- Publishing host ports that collide with another live stack (call out first)
+| Risk | Examples of required wording |
+| --- | --- |
+| Volume wipe with stack | `down -v`, “delete volumes”, “wipe data”, “remove named volumes” |
+| Volume / system prune | `docker volume rm`, `system prune` that deletes volumes |
+| Destructive recreate | force-recreate that drops local writable state the user cares about |
+| Whole-host cleanup | prune unused images/networks/volumes across the Docker host |
+| Dangerous publish | binding host ports that collide with another live stack (call out first) |
 
-Read-only `ps` / `logs` / `config` do not need a destructive verb.
+Read-only `ps` / `logs` / `config` / `images` do **not** need a destructive
+verb. Ordinary `up -d` / restart of a named service is fine when the user
+asked to bring up or restart that stack — still avoid `-v` and prune.
+
+Ambiguity → **do not destroy**. Prefer stop/remove of the named service or
+stack without volume wipe.
+
+## Scope discipline
+
+- Prefer the **named** project / service the user pointed at.
+- Do not widen to whole-host Docker cleanup unless they asked for that.
+- Do not remove volumes “to be thorough” after a recreate ask.
+- When multiple projects share a host, confirm `-p` / `name:` before `down`.
 
 ## Secrets
 
-- Never paste access keys, tokens, or full `.env` contents into chat or commits.
+- Never paste access keys, tokens, passwords, or full `.env` / container
+  env contents into chat or commits.
 - Cite **key names** and whether a file exists — not values.
-- Prefer vault (or the project's secrets path) for durable credentials.
+- Prefer the project’s secret store for durable credentials; Compose is
+  injection, not the system of record.
+- Redact credentials that appear in logs before quoting them.
 
-## Scope
+## Port and data collision
 
-Prefer stopping/removing the named service or stack the user named. Do not
-widen to whole-host Docker cleanup unless they asked for that.
+Before `up` that publishes ports or attaches volumes:
+
+1. Note existing listeners / other Compose projects when collision is likely.
+2. Call out the conflict and wait for direction if overwrite would break
+   another stack.
+3. Never silently change another project’s published ports.
+
+## After a gated destructive action
+
+Report:
+
+- Project name and services affected
+- Whether volumes were removed (yes/no + names when known)
+- What was **not** done (e.g. skipped host prune)
+
+Do not claim data is recoverable unless a backup path was verified.
+
+## Out of scope
+
+- Orchestrator cluster deletes, registry GC, and remote secret-store wipes
+  are not Compose ops — stay on the Compose/Docker engine surface the user
+  named.

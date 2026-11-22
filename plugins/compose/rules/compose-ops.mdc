@@ -1,7 +1,7 @@
 ---
 description: >-
-  Day-to-day Docker Compose ops: config check, up, ps, logs, pull, and image
-  pin verification.
+  Day-to-day Docker Compose ops: config check, up, ps, logs, pull, restart,
+  exec, and image pin verification. Use when operating an existing stack.
 alwaysApply: false
 ---
 
@@ -9,22 +9,72 @@ alwaysApply: false
 
 ## Before mutate
 
-1. Confirm cwd / `--project-directory` and the active `COMPOSE_FILE` list.
+1. Confirm cwd / `--project-directory` and the active `COMPOSE_FILE` list
+   (shell env, sticky `.env`, or explicit `-f` flags).
 2. Run `docker compose config` (or host equivalent) when merge order is in
-   doubt — fix path errors before `up`.
-3. Prefer named project (`name:` / `-p`) when multiple stacks share a host.
+   doubt — fix path and interpolation errors before `up`.
+3. Prefer a named project (`name:` in Compose / `-p`) when multiple stacks
+   share a host so containers and networks do not collide under `default`.
+4. Scope the service list when the ask is narrow — do not restart the whole
+   stack to fix one sidecar.
 
-## Act
+## Read-only first
 
-- Bring-up: `docker compose up -d` (scoped service list when the ask is narrow).
-- Status: `ps` / healthchecks; read logs for the failing service only.
-- Images: pull when asked; verify Compose pins a concrete tag, not floating
-  `latest`, for anything operators expect to reproduce.
-- After change: report project name, services touched, and health evidence —
-  not raw env dumps.
+These do not need a destructive verb:
+
+| Action | Typical command | Report |
+| --- | --- | --- |
+| Merged config | `docker compose config` | paths + warnings only |
+| Status | `docker compose ps` / `ps -a` | project, service, state, ports |
+| Logs | `docker compose logs --tail=N <svc>` | failing service only; redact secrets |
+| Images / pins | inspect Compose `image:` lines | tag vs `latest` callout |
+
+Cap log tails. Never dump full `.env` or container env to chat.
+
+## Act (authorized bring-up / change)
+
+- Bring-up: `docker compose up -d` (optionally with service names).
+- Pull then recreate when the user asked for image refresh: `pull` then
+  `up -d` for the touched services.
+- Restart / force-recreate a single service when that is the ask — call out
+  if recreate will drop anonymous volume state.
+- `exec` / `run` for one-shot diagnostics only when the user asked; prefer
+  non-interactive commands and do not leave long-lived shells hanging.
+- After change: report **project name**, **services touched**, and **health
+  evidence** (`ps`, healthcheck status, or a short log excerpt) — not raw
+  env dumps.
+
+## Image pins
+
+- Verify Compose pins a concrete tag (or digest) for shared stacks.
+- Floating `latest` is a finding for anything operators expect to reproduce;
+  fix when authoring, call out when only operating.
+- This plugin owns the Compose pin and runtime. Image **build/publish**
+  pipelines are out of scope — stop at the pin and report.
+
+## Profiles and overlays in ops
+
+- Activate profiles the user named (`--profile`) or that the sticky env
+  already enables — do not invent profile names.
+- When `COMPOSE_FILE` is wrong, fix the env/docs rather than pasting a
+  one-off `-f` soup into tribal knowledge.
+
+## Failure triage order
+
+1. `config` — merge / path / interpolation.
+2. `ps` — exited / restarting / unhealthy.
+3. Events or short logs for that service only.
+4. Image pull / tag mismatch.
+5. Port bind / volume mount permission on the host.
+
+Stop when you have evidence. Do not widen into whole-host Docker cleanup
+unless the user asked (see `compose-safety`).
 
 ## Pairing
 
-- User-facing links → user-facing host URL posture (no `localhost` / `127.0.0.1` in chat).
-- Registry publish / SemVer of images → github Actions craft when that is the
-  ask; this plugin owns the Compose pin and runtime, not the publish pipeline.
+- User-facing links → machine-reachable host (no `localhost` / `127.0.0.1`
+  in chat URLs).
+- Registry publish / SemVer of images → out of scope here; own the Compose
+  pin and runtime only.
+- Secret material → cite key names; prefer the project’s secret store for
+  durable credentials.
