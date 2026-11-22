@@ -1,11 +1,14 @@
 ---
 name: graylog
 description: >-
-  Graylog search.
+  Graylog search, streams/fields discovery, or aggregate via MCP.
 ---
 
-# graylog
+# /graylog
 
-1. Load `graylog`. Prefer a ready MCP.
-2. Follow the skill gate and load map.
-3. Never invent ids; report evidence (names, status, links — no secrets).
+1. If the user did not authorize Graylog / log search work, say so and stop.
+2. Load `graylog` with rules `graylog-search` / `graylog-safety`.
+3. Prefer Graylog MCP. List streams/fields before inventing predicates;
+   never invent stream ids.
+4. Return query + time window + short finding (redacted). For incident
+   windows, prefer skill `graylog-incident-search` or `/graylog-incident`.

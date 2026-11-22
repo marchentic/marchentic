@@ -7,24 +7,65 @@ alwaysApply: false
 
 # Graylog ↔ Fluent Bit
 
-When the ask is log **shipping** into Graylog (Fluent Bit, Fluentd, or
-similar), keep craft light. Prefer Graylog MCP search (`graylog-search`) to
-prove ingestion. Do not invent a Fluent Bit marketplace plugin.
+## Gate
+
+Use when the ask is log **shipping** into Graylog (Fluent Bit, Fluentd, or
+similar): inputs, filters, parsers, or outputs that target a Graylog
+receiver. Skip pure search/incident turns (use `graylog-search` /
+skill `graylog-incident-search`). Do not invent a Fluent Bit marketplace
+plugin.
+
+Prefer Graylog MCP search to **prove ingestion** after a shipper change.
+Always load `graylog-safety` when pasting or summarizing log evidence.
 
 ## Defaults
 
 1. Match the project’s existing shipper packaging (DaemonSet, sidecar,
-   Compose service) — do not invent a fourth layout.
-2. Outputs target the Graylog input the operator already runs (GELF/HTTP/…
-   as configured). Never invent hostnames; resolve from config/env.
+   Compose service, host unit) — do not invent a fourth layout.
+2. Outputs target the Graylog input the operator already runs (GELF,
+   HTTP, Beats, Syslog, … as configured). Never invent hostnames or
+   ports; resolve from config/env the user pointed at.
 3. Filters: drop or redact obvious secrets before ship when the project
-   already does; never paste raw log lines with credentials into chat
-   (`graylog-safety`).
+   already does; never paste raw log lines with credentials into chat.
 4. Agent work is usually: confirm input → query Graylog for the stream —
    not rewrite the whole pipeline unless asked.
+5. Keep parsers aligned with existing `[PARSER]` / multiline rules; do
+   not invent a new parser family when a sibling config already works.
+
+## Change ladder
+
+1. **Read** the existing shipper config the user named (or that sits next
+   to the workload).
+2. **Minimal edit** — one input, filter, or output stanza; preserve
+   unrelated pipelines.
+3. **Evidence** — after deploy, `list_streams` → `search_logs` with a
+   narrow query that matches the new source tag / hostname / facility.
+4. **Stop** after a short receipt (path changed + Graylog hit or miss).
+   Do not open a second rewrite without a new ask.
+
+## Ingestion proof (via Graylog MCP)
+
+| Step | Tool |
+| --- | --- |
+| Resolve stream | `list_streams` |
+| Confirm fields | `list_fields` (source/tag fields) |
+| Prove messages | `search_logs` with short `range` |
+| Rate / volume | `aggregate_logs` `metrics=count` `group_by=source` |
+
+Empty search after a shipper change: check time window, stream id, and
+whether the output still points at the intended Graylog input — do not
+invent a new stream id.
+
+## Refuse
+
+- Hard-coding production shipper tokens or TLS material into chat
+- Inventing site hostnames, input tokens, or stream maps
+- Replacing the entire Fluent Bit tree when a one-stanza fix suffices
+- Claiming ingestion success without a search/aggregate receipt when MCP
+  is available
 
 ## Related (this plugin)
 
 - `graylog-search` / `graylog-safety` — evidence and redaction
-- Shipper workload manifests are out of scope here
-- Site overlays (private site repos) — where host paths and input tokens live
+- Shipper workload manifests and site overlays are out of scope here —
+  resolve paths from the repo the user opened

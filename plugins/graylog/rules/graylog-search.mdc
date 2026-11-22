@@ -1,12 +1,112 @@
 ---
 description: >-
-  Search logs via MCP with explicit query + time range. Prefer streams/fields discovery first.
+  Graylog log search via MCP: discover streams/fields, Lucene query with
+  bounded time, context around a hit, and aggregate. Never invent stream ids.
 alwaysApply: false
 ---
 
-# Graylog Search
+# Graylog search
 
-Search logs via MCP with explicit query + time range. Prefer streams/fields discovery first.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks to search logs, inspect a message, aggregate error
+rates, list streams/fields, or prove that a shipper is delivering into
+Graylog. Skip bare "Graylog" with no log/search ask. Always load
+`graylog-safety` with this rule.
+
+Never invent a stream id, index name, or message id. Resolve from MCP
+listing this turn or from an id the user pasted.
+
+## Prefer MCP
+
+When a Graylog MCP is ready, use these tools — do not invent a side CLI or
+raw HTTP client while MCP works:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List streams | `list_streams` | optional `title_filter` |
+| List fields | `list_fields` | optional `name_filter` |
+| Search messages | `search_logs` | Lucene `query` required |
+| Message context | `get_log_context` | needs `message_id` + `index` |
+| Aggregate / stats | `aggregate_logs` | `query` + `metrics` + `group_by` |
+
+## Discover first
+
+1. Prefer exact stream id / title the user named.
+2. Else `list_streams` (filter by title substring when known).
+3. `list_fields` before writing exotic field predicates — confirm the
+   field exists (case-insensitive name filter helps).
+4. If several streams match, list titles + ids and ask once; do not pick
+   a production stream by guess.
+
+## search_logs
+
+Required: `query` (Lucene). Prefer an explicit time window:
+
+- Relative: `range` in seconds (default often 300 — start narrow).
+- Absolute: `from` + `to` as ISO8601 (both required together).
+
+Useful options:
+
+- `stream_id` — restrict to a resolved stream
+- `limit` / `offset` — paginate; keep first pulls small (tens, not thousands)
+- `fields` — comma list to shrink payload (`timestamp,source,message,level`)
+- `sort` — e.g. `timestamp:desc`
+- `deduplicate` — collapse similar lines + counts
+- `extract_templates` — ULP templates; mutually exclusive with `deduplicate`
+
+Query craft:
+
+- Prefer fielded predicates: `level:ERROR AND service:auth`
+- Quote phrases; escape reserved Lucene chars when needed
+- Tighten with `source:`, `facility:`, or project-specific fields after
+  `list_fields` confirms them
+- Widen time or loosen query only after a narrow miss
+
+## get_log_context
+
+When a hit needs before/after lines:
+
+1. Take `message_id` and `index` from a prior `search_logs` result — never
+   invent them.
+2. Call `get_log_context` with modest `before` / `after` (defaults ~5).
+3. Optional `stream_id` and `fields` to bound the window.
+4. Summarize the narrative; do not paste long private payloads
+   (`graylog-safety`).
+
+## aggregate_logs
+
+For counts, error rates, top sources, percentiles:
+
+1. Required: `query`, `metrics`, `group_by`.
+2. Metrics examples: `count`, `avg:field`, `min:field`, `max:field`,
+   `sum:field`, `percentile:field:95`, `card:field`, `stddev:field`,
+   `variance:field`, `latest:field` (comma-separated).
+3. `group_by` is comma-separated fields (e.g. `source` or `source,level`).
+4. Bound with `range` or `from`/`to`; optional `stream_id`, `group_limit`,
+   `sort` (`asc`/`desc` on the first metric).
+5. Report the table shape (top N groups + metric) — not raw dumps.
+
+## Time and cardinality hygiene
+
+1. Start with a short relative window; expand only when empty or the user
+   named a wider incident window.
+2. Prefer `stream_id` when the surface is known.
+3. Cap `limit`; paginate with `offset` instead of one huge pull.
+4. Prefer `aggregate_logs` or `deduplicate` / `extract_templates` before
+   scrolling thousands of near-identical lines.
+
+## Report shape
+
+- Stream title/id (when used) + Lucene query + time window
+- Short finding (counts, sample messages, top groups)
+- Message id + index only when needed for a follow-up context call
+- Explicit note that secrets/PII were redacted when present
+- One recommended next check (narrower query, context, or aggregate)
+
+## Out of scope
+
+- Alert rule / dashboard authoring on other observability products
+- Rewriting the whole shipper pipeline (see `graylog-fluent-bit`)
+- Site-specific hostnames, tokens, or stream maps — resolve from config
+  or MCP, never invent

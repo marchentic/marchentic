@@ -1,24 +1,28 @@
 # graylog
 
-Agnostic Graylog craft: search logs, streams, and fields via MCP. Prefer Graylog MCP; never invent stream ids; keep secrets out of chat.
+Agnostic Graylog craft: search logs, streams, and fields via MCP with
+redaction. Prefer Graylog MCP; never invent stream ids; keep secrets out of
+chat.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `graylog-search` | Search logs via MCP with explicit query + time range |
+| `graylog-search` | MCP search / context / aggregate + streams/fields discovery |
 | `graylog-fluent-bit` | Fluent Bit / shipper → Graylog portable hygiene |
-| `graylog-safety` | Do not dump full private payloads or credentials into chat |
+| `graylog-safety` | Redact secrets; refuse full private payload dumps |
 
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
-| `graylog` | Index / gate |
+| `graylog` | Index / gate / procedure |
+| `graylog-incident-search` | Time-bounded incident log hunt checklist |
 
 ## Commands
 
-- `/graylog` → Graylog search
+- `/graylog` → Graylog search, discover, or aggregate
+- `/graylog-incident` → Incident-window search (narrow → aggregate → context)
 
 ## Related capabilities
 
@@ -27,4 +31,4 @@ Agnostic Graylog craft: search logs, streams, and fields via MCP. Prefer Graylog
 
 ## Diagrams
 
-- [`docs/graylog-workflow.drawio`](docs/graylog-workflow.drawio) — gate → act → evidence
+- [`docs/graylog-workflow.drawio`](docs/graylog-workflow.drawio) — gate → route → search / incident / shipper
