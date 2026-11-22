@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-harbor",
+  "name": "marchentic-harbor",
   "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot — install what you run.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

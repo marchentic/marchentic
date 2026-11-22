@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-business-analyst",
-  "version": "0.12.2",
+  "name": "marchentic-business-analyst",
+  "version": "1.0.0",
   "description": "Business analysis and planning: BA brief skill, planner for ambiguous multi-step work, and external researcher. Pair with global (posture) and code (implementation).",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

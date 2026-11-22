@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-prometheus",
+  "name": "marchentic-prometheus",
   "description": "Agnostic Prometheus craft: discover metrics/labels, PromQL instant/range queries, and targets health via MCP. Prefer Prometheus MCP; discover before guessing.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

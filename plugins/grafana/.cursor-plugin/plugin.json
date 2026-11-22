@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-grafana",
+  "name": "marchentic-grafana",
   "description": "Grafana craft: dashboards, Explore/Loki/Prometheus queries, incidents, and alerting via MCP. Prefer Grafana MCP; never invent datasource UIDs.",
-  "version": "0.11.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

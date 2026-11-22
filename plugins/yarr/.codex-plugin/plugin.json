@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-yarr",
+  "name": "marchentic-yarr",
   "description": "Agnostic *arr / Plex / qBittorrent / Seerr craft via the yarr MCP fleet: search, status, and gated mutations. Prefer yarr MCP; never invent instance ids.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

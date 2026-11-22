@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-victoriametrics",
+  "name": "marchentic-victoriametrics",
   "description": "Agnostic VictoriaMetrics craft: discover metrics/labels, MetricsQL/PromQL query and range, TSDB status, and alerts/rules via MCP. Prefer VictoriaMetrics MCP; discover before guessing.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

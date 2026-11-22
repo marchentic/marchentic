@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-git",
-  "version": "0.1.3",
+  "name": "marchentic-git",
+  "version": "1.0.0",
   "description": "Host-agnostic git craft: worktrees, merge conflicts, Conventional Commits, and safe local git operations. No GitHub hard-coded.",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

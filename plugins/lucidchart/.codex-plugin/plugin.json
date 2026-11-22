@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-lucidchart",
-  "version": "0.10.1",
+  "name": "marchentic-lucidchart",
+  "version": "1.0.0",
   "description": "Author and repair clean Lucidchart diagrams via Lucid Standard Import JSON (lanes, non-overlapping boxes, edge corridors) plus .lucid packaging.",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

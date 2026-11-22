@@ -93,7 +93,7 @@ def check_catalogs(errors: list[str]) -> set[str]:
 
 def check_plugin_folder_vs_catalog(catalog: set[str], errors: list[str]) -> None:
     dirs = {p.name for p in plugin_dirs()}
-    expected = {n.removeprefix("nodadyoushutup-") for n in catalog}
+    expected = {n.removeprefix("marchentic-") for n in catalog}
     if dirs != expected:
         errors.append(
             f"plugins/ folders vs catalogs: "
@@ -122,7 +122,7 @@ def _expected_asset_path(rel: str, asset: str) -> str:
 
 def check_manifests(short: str, errors: list[str]) -> str | None:
     """Validate host manifests. Return the shared version when consistent."""
-    expected_name = f"nodadyoushutup-{short}"
+    expected_name = f"marchentic-{short}"
     versions: dict[str, str | None] = {}
     root = PLUGINS / short
     required_assets = [
@@ -166,7 +166,7 @@ def check_manifests(short: str, errors: list[str]) -> str | None:
 
 def check_catalog_versions(short: str, version: str, errors: list[str]) -> None:
     """Require every catalog entry to match the plugin manifest version."""
-    name = f"nodadyoushutup-{short}"
+    name = f"marchentic-{short}"
     for host, path in CATALOGS.items():
         if not path.is_file():
             continue

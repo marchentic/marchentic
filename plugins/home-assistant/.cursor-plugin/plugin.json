@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-home-assistant",
+  "name": "marchentic-home-assistant",
   "description": "Agnostic Home Assistant craft: entity/state inventory, service calls, and automation hygiene with gated destructive actions. Prefer MCP when connected; otherwise API/UI.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

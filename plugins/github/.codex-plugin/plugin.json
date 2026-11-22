@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-github",
-  "version": "0.1.4",
+  "name": "marchentic-github",
+  "version": "1.0.0",
   "description": "GitHub craft: pull request checks and comments, Actions workflow YAML, and default-branch CI. No product pipelines hard-coded.",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

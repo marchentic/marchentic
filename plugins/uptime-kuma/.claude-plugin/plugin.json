@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-uptime-kuma",
+  "name": "marchentic-uptime-kuma",
   "description": "Agnostic Uptime Kuma craft: monitors, status pages, and notification channels with gated delete/pause. Prefer MCP when connected; otherwise API/UI. Never invent monitor ids.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

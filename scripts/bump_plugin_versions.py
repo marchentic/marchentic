@@ -176,7 +176,7 @@ def set_manifest_versions(short: str, version: str, *, dry_run: bool) -> list[st
 
 
 def set_catalog_versions(short: str, version: str, *, dry_run: bool) -> list[str]:
-    name = f"nodadyoushutup-{short}"
+    name = f"marchentic-{short}"
     touched: list[str] = []
     for path in CATALOGS:
         data = load_json(path)

@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-obsidian",
+  "name": "marchentic-obsidian",
   "description": "Agnostic Obsidian vault craft: note inventory, Markdown/wikilink/frontmatter authoring, and gated delete/move. Prefer MCP when connected; otherwise vault filesystem. Never invent note paths; refuse vault dumps.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

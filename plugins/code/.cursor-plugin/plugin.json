@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-code",
+  "name": "marchentic-code",
   "description": "Coding standards and workflow: always-on smallest-change ladder; language rules (Python, JavaScript, TypeScript, Go, Rust, C, C++, Swift, Kotlin, Dart, Java) (incl. YAML/Kubernetes); React/React Native/Next.js/Flask/FastAPI; refactor/debug/verify/audit/debt/safety skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-  "version": "0.18.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

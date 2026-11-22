@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-drawio",
-  "version": "0.1.2",
+  "name": "marchentic-drawio",
+  "version": "1.0.0",
   "description": "Diagram craft: author and repair .drawio files with lanes, gaps, and readable labels.",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

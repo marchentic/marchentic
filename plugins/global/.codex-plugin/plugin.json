@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-global",
-  "version": "0.14.3",
+  "name": "marchentic-global",
+  "version": "1.0.0",
   "description": "Core posture and writing/policy craft: execute-first, MCP-first, host URLs, STE/writing skills. Pair with business-analyst for planning and code for coding work.",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

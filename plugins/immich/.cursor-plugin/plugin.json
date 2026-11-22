@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-immich",
+  "name": "marchentic-immich",
   "description": "Agnostic Immich craft: library/album/asset inventory and gated delete/share changes. Prefer MCP when connected; otherwise API/UI. Never invent asset ids; refuse credential dumps.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

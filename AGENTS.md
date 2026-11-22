@@ -10,8 +10,8 @@ Root catalogs:
 
 Plugins live under `plugins/<short>/` (for example `plugins/jenkins/`).
 
-Marketplace / `plugin.json` **`name`** is `nodadyoushutup-<short>` (for example
-`nodadyoushutup-jenkins`). Catalog `source` shapes differ by host:
+Marketplace / `plugin.json` **`name`** is `marchentic-<short>` (for example
+`marchentic-jenkins`). Catalog `source` shapes differ by host:
 
 - **Cursor:** short folder name (`jenkins`)
 - **Claude:** `./<short>` (`./jenkins`)
@@ -40,47 +40,47 @@ plus the short slash aliases listed under Allowed basenames.
 
 | Short key | Marketplace id | Allowed basenames | Owns | Tier |
 | --- | --- | --- | --- | --- |
-| `global` | `nodadyoushutup-global` | `global` or `global-*` | Standing posture, host URLs, MCP-first, writing, and policy sync | core |
-| `code` | `nodadyoushutup-code` | `code` or `code-*`; commands also `deslop`, `refactor` | Language standards, smallest-change ladder, workflow, coding agents, and agent/workspace safety audit | core |
-| `business-analyst` | `nodadyoushutup-business-analyst` | `business-analyst` or `business-analyst-*` | Ambient briefs, scope pushback, product sequence, and external research | core |
-| `security` | `nodadyoushutup-security` | `security` or `security-*` | Secrets, auth, injection, crypto, transport, supply chain, and data exposure | core |
-| `git` | `nodadyoushutup-git` | `git` or `git-*` | Worktrees, merge conflicts, Conventional Commits, and safe local git | core |
-| `github` | `nodadyoushutup-github` | `github` or `github-*` | Pull request checks, comments, titles, and Actions workflow craft | core |
-| `atlassian` | `nodadyoushutup-atlassian` | `atlassian` or `atlassian-*`; commands also `jira`, `confluence` | Jira and Confluence create gates and page/issue shape | domain |
-| `drawio` | `nodadyoushutup-drawio` | `drawio` or `drawio-*` | `.drawio` author and repair | domain |
-| `jenkins` | `nodadyoushutup-jenkins` | `jenkins` or `jenkins-*` | Agnostic Jenkins builds + pipeline CI craft | domain |
-| `lucidchart` | `nodadyoushutup-lucidchart` | `lucidchart` or `lucidchart-*` | Lucidchart Standard Import author/repair + `.lucid` packaging | domain |
-| `google-workspace` | `nodadyoushutup-google-workspace` | `google-workspace` or `google-workspace-*` | Gmail + Drive + Calendar + Docs/Sheets | domain |
-| `google-cloud` | `nodadyoushutup-google-cloud` | `google-cloud` or `google-cloud-*` | GCP projects + Compute/GKE + GCS with safety gates | domain |
-| `freshservice` | `nodadyoushutup-freshservice` | `freshservice` or `freshservice-*` | Freshservice ITSM create gates + ticket shape | domain |
-| `vault` | `nodadyoushutup-vault` | `vault` or `vault-*` | Vault secrets/PKI + leak refuse | domain |
-| `grafana` | `nodadyoushutup-grafana` | `grafana` or `grafana-*` | Dashboards, Explore, incidents, alerting | domain |
-| `cloudflare` | `nodadyoushutup-cloudflare` | `cloudflare` or `cloudflare-*` | DNS record craft with destructive gates | domain |
-| `compose` | `nodadyoushutup-compose` | `compose` or `compose-*` | Docker Compose layout/ops with destructive gates | domain |
-| `kubernetes` | `nodadyoushutup-kubernetes` | `kubernetes` or `kubernetes-*` | Portable manifest craft + pod/event/log triage (site overlays stay in private `homelab`) | domain |
-| `proxmox` | `nodadyoushutup-proxmox` | `proxmox` or `proxmox-*` | Proxmox VE inventory + gated VM/LXC ops | domain |
-| `argocd` | `nodadyoushutup-argocd` | `argocd` or `argocd-*` | Argo CD app status + gated sync | domain |
-| `prometheus` | `nodadyoushutup-prometheus` | `prometheus` or `prometheus-*` | PromQL discover/query via MCP | domain |
-| `victoriametrics` | `nodadyoushutup-victoriametrics` | `victoriametrics` or `victoriametrics-*` | MetricsQL/PromQL discover/query via VictoriaMetrics MCP | domain |
-| `graylog` | `nodadyoushutup-graylog` | `graylog` or `graylog-*` | Log search via MCP with redaction | domain |
-| `minio` | `nodadyoushutup-minio` | `minio` or `minio-*` | MinIO/S3 buckets/objects with delete gates | domain |
-| `velero` | `nodadyoushutup-velero` | `velero` or `velero-*` | Velero backup/restore inventory + gated mutate | domain |
-| `fortigate` | `nodadyoushutup-fortigate` | `fortigate` or `fortigate-*` | FortiGate inventory + gated policy changes | domain |
-| `yarr` | `nodadyoushutup-yarr` | `yarr` or `yarr-*` | *arr / Plex / qBit / Seerr fleet via yarr MCP | domain |
-| `runpod` | `nodadyoushutup-runpod` | `runpod` or `runpod-*` | RunPod GPU cloud inventory + gated mutate | domain |
-| `uptime-kuma` | `nodadyoushutup-uptime-kuma` | `uptime-kuma` or `uptime-kuma-*` | Uptime Kuma monitors, status pages, and notification channels with gated delete/pause | domain |
-| `nginx-proxy-manager` | `nodadyoushutup-nginx-proxy-manager` | `nginx-proxy-manager` or `nginx-proxy-manager-*` | Nginx Proxy Manager hosts, SSL, and access lists with destructive gates | domain |
-| `vaultwarden` | `nodadyoushutup-vaultwarden` | `vaultwarden` or `vaultwarden-*` | Vaultwarden admin/ops posture; refuse vault/credential dumps | domain |
-| `kopia` | `nodadyoushutup-kopia` | `kopia` or `kopia-*` | Kopia repository/snapshot inventory + gated snapshot/restore/forget | domain |
-| `authentik` | `nodadyoushutup-authentik` | `authentik` or `authentik-*` | Authentik IdP apps/providers/flows with destructive gates | domain |
-| `traefik` | `nodadyoushutup-traefik` | `traefik` or `traefik-*` | Traefik routers/middlewares/IngressRoute with destructive gates | domain |
-| `tailscale` | `nodadyoushutup-tailscale` | `tailscale` or `tailscale-*` | Tailscale devices/ACLs with gated policy and key changes | domain |
-| `home-assistant` | `nodadyoushutup-home-assistant` | `home-assistant` or `home-assistant-*` | Home Assistant entities/service calls with destructive gates | domain |
-| `immich` | `nodadyoushutup-immich` | `immich` or `immich-*` | Immich library/album/asset inventory with gated delete/share | domain |
-| `obsidian` | `nodadyoushutup-obsidian` | `obsidian` or `obsidian-*` | Obsidian vault note inventory/authoring with gated delete/move | domain |
-| `portainer` | `nodadyoushutup-portainer` | `portainer` or `portainer-*` | Portainer endpoints/stacks/containers with gated mutate | domain |
-| `zot` | `nodadyoushutup-zot` | `zot` or `zot-*` | Zot OCI registry inventory + gated delete/GC | domain |
-| `harbor` | `nodadyoushutup-harbor` | `harbor` or `harbor-*` | Harbor projects/artifacts + gated delete/retention/robot | domain |
+| `global` | `marchentic-global` | `global` or `global-*` | Standing posture, host URLs, MCP-first, writing, and policy sync | core |
+| `code` | `marchentic-code` | `code` or `code-*`; commands also `deslop`, `refactor` | Language standards, smallest-change ladder, workflow, coding agents, and agent/workspace safety audit | core |
+| `business-analyst` | `marchentic-business-analyst` | `business-analyst` or `business-analyst-*` | Ambient briefs, scope pushback, product sequence, and external research | core |
+| `security` | `marchentic-security` | `security` or `security-*` | Secrets, auth, injection, crypto, transport, supply chain, and data exposure | core |
+| `git` | `marchentic-git` | `git` or `git-*` | Worktrees, merge conflicts, Conventional Commits, and safe local git | core |
+| `github` | `marchentic-github` | `github` or `github-*` | Pull request checks, comments, titles, and Actions workflow craft | core |
+| `atlassian` | `marchentic-atlassian` | `atlassian` or `atlassian-*`; commands also `jira`, `confluence` | Jira and Confluence create gates and page/issue shape | domain |
+| `drawio` | `marchentic-drawio` | `drawio` or `drawio-*` | `.drawio` author and repair | domain |
+| `jenkins` | `marchentic-jenkins` | `jenkins` or `jenkins-*` | Agnostic Jenkins builds + pipeline CI craft | domain |
+| `lucidchart` | `marchentic-lucidchart` | `lucidchart` or `lucidchart-*` | Lucidchart Standard Import author/repair + `.lucid` packaging | domain |
+| `google-workspace` | `marchentic-google-workspace` | `google-workspace` or `google-workspace-*` | Gmail + Drive + Calendar + Docs/Sheets | domain |
+| `google-cloud` | `marchentic-google-cloud` | `google-cloud` or `google-cloud-*` | GCP projects + Compute/GKE + GCS with safety gates | domain |
+| `freshservice` | `marchentic-freshservice` | `freshservice` or `freshservice-*` | Freshservice ITSM create gates + ticket shape | domain |
+| `vault` | `marchentic-vault` | `vault` or `vault-*` | Vault secrets/PKI + leak refuse | domain |
+| `grafana` | `marchentic-grafana` | `grafana` or `grafana-*` | Dashboards, Explore, incidents, alerting | domain |
+| `cloudflare` | `marchentic-cloudflare` | `cloudflare` or `cloudflare-*` | DNS record craft with destructive gates | domain |
+| `compose` | `marchentic-compose` | `compose` or `compose-*` | Docker Compose layout/ops with destructive gates | domain |
+| `kubernetes` | `marchentic-kubernetes` | `kubernetes` or `kubernetes-*` | Portable manifest craft + pod/event/log triage (site overlays stay in private `homelab`) | domain |
+| `proxmox` | `marchentic-proxmox` | `proxmox` or `proxmox-*` | Proxmox VE inventory + gated VM/LXC ops | domain |
+| `argocd` | `marchentic-argocd` | `argocd` or `argocd-*` | Argo CD app status + gated sync | domain |
+| `prometheus` | `marchentic-prometheus` | `prometheus` or `prometheus-*` | PromQL discover/query via MCP | domain |
+| `victoriametrics` | `marchentic-victoriametrics` | `victoriametrics` or `victoriametrics-*` | MetricsQL/PromQL discover/query via VictoriaMetrics MCP | domain |
+| `graylog` | `marchentic-graylog` | `graylog` or `graylog-*` | Log search via MCP with redaction | domain |
+| `minio` | `marchentic-minio` | `minio` or `minio-*` | MinIO/S3 buckets/objects with delete gates | domain |
+| `velero` | `marchentic-velero` | `velero` or `velero-*` | Velero backup/restore inventory + gated mutate | domain |
+| `fortigate` | `marchentic-fortigate` | `fortigate` or `fortigate-*` | FortiGate inventory + gated policy changes | domain |
+| `yarr` | `marchentic-yarr` | `yarr` or `yarr-*` | *arr / Plex / qBit / Seerr fleet via yarr MCP | domain |
+| `runpod` | `marchentic-runpod` | `runpod` or `runpod-*` | RunPod GPU cloud inventory + gated mutate | domain |
+| `uptime-kuma` | `marchentic-uptime-kuma` | `uptime-kuma` or `uptime-kuma-*` | Uptime Kuma monitors, status pages, and notification channels with gated delete/pause | domain |
+| `nginx-proxy-manager` | `marchentic-nginx-proxy-manager` | `nginx-proxy-manager` or `nginx-proxy-manager-*` | Nginx Proxy Manager hosts, SSL, and access lists with destructive gates | domain |
+| `vaultwarden` | `marchentic-vaultwarden` | `vaultwarden` or `vaultwarden-*` | Vaultwarden admin/ops posture; refuse vault/credential dumps | domain |
+| `kopia` | `marchentic-kopia` | `kopia` or `kopia-*` | Kopia repository/snapshot inventory + gated snapshot/restore/forget | domain |
+| `authentik` | `marchentic-authentik` | `authentik` or `authentik-*` | Authentik IdP apps/providers/flows with destructive gates | domain |
+| `traefik` | `marchentic-traefik` | `traefik` or `traefik-*` | Traefik routers/middlewares/IngressRoute with destructive gates | domain |
+| `tailscale` | `marchentic-tailscale` | `tailscale` or `tailscale-*` | Tailscale devices/ACLs with gated policy and key changes | domain |
+| `home-assistant` | `marchentic-home-assistant` | `home-assistant` or `home-assistant-*` | Home Assistant entities/service calls with destructive gates | domain |
+| `immich` | `marchentic-immich` | `immich` or `immich-*` | Immich library/album/asset inventory with gated delete/share | domain |
+| `obsidian` | `marchentic-obsidian` | `obsidian` or `obsidian-*` | Obsidian vault note inventory/authoring with gated delete/move | domain |
+| `portainer` | `marchentic-portainer` | `portainer` or `portainer-*` | Portainer endpoints/stacks/containers with gated mutate | domain |
+| `zot` | `marchentic-zot` | `zot` or `zot-*` | Zot OCI registry inventory + gated delete/GC | domain |
+| `harbor` | `marchentic-harbor` | `harbor` or `harbor-*` | Harbor projects/artifacts + gated delete/retention/robot | domain |
 
 ### Examples
 

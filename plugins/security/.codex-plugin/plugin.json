@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-security",
-  "version": "0.2.4",
+  "name": "marchentic-security",
+  "version": "1.0.0",
   "description": "Security practices: secrets, authentication, authorization, injection, cryptography, transport, supply chain, and data exposure. No product or vendor hard-coded.",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",

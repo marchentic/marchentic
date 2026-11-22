@@ -13,7 +13,7 @@ marketplace, then install what you actually need.
 
 ## Install
 
-Plugin ids are `nodadyoushutup-<short>`. The marketplace name in install
+Plugin ids are `marchentic-<short>`. The marketplace name in install
 selectors is `marchentic-marketplace`. Substitute `<plugin>` with any id
 from the tables below.
 
@@ -72,97 +72,97 @@ In an interactive Copilot CLI session the same steps are
 
 ## Plugins
 
-Marketplace ids are `nodadyoushutup-<short>`. On disk that is `plugins/<short>/`.
+Marketplace ids are `marchentic-<short>`. On disk that is `plugins/<short>/`.
 
 ### Core
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-global` | Default posture, MCP-first workflow, writing |
-| `nodadyoushutup-code` | Language standards, refactor/deslop, coding agents |
-| `nodadyoushutup-business-analyst` | Briefs, plans, external research |
-| `nodadyoushutup-security` | Secrets, auth, injection, crypto, supply chain |
-| `nodadyoushutup-git` | Worktrees, merge conflicts, Conventional Commits |
-| `nodadyoushutup-github` | PRs, review checks, Actions workflows |
+| `marchentic-global` | Default posture, MCP-first workflow, writing |
+| `marchentic-code` | Language standards, refactor/deslop, coding agents |
+| `marchentic-business-analyst` | Briefs, plans, external research |
+| `marchentic-security` | Secrets, auth, injection, crypto, supply chain |
+| `marchentic-git` | Worktrees, merge conflicts, Conventional Commits |
+| `marchentic-github` | PRs, review checks, Actions workflows |
 
 ### Collaboration
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-atlassian` | Jira and Confluence |
-| `nodadyoushutup-freshservice` | Freshservice ITSM |
-| `nodadyoushutup-google-workspace` | Gmail, Drive, Calendar, Docs, Sheets |
+| `marchentic-atlassian` | Jira and Confluence |
+| `marchentic-freshservice` | Freshservice ITSM |
+| `marchentic-google-workspace` | Gmail, Drive, Calendar, Docs, Sheets |
 
 ### Diagrams
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-drawio` | Author and repair `.drawio` diagrams |
-| `nodadyoushutup-lucidchart` | Lucidchart Standard Import |
+| `marchentic-drawio` | Author and repair `.drawio` diagrams |
+| `marchentic-lucidchart` | Lucidchart Standard Import |
 
 ### Cloud & CI
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-google-cloud` | GCP projects, Compute, GKE, GCS |
-| `nodadyoushutup-jenkins` | Jenkins builds and pipeline craft |
-| `nodadyoushutup-runpod` | RunPod GPU cloud inventory and gated mutate |
+| `marchentic-google-cloud` | GCP projects, Compute, GKE, GCS |
+| `marchentic-jenkins` | Jenkins builds and pipeline craft |
+| `marchentic-runpod` | RunPod GPU cloud inventory and gated mutate |
 
 ### Infrastructure
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-compose` | Docker Compose |
-| `nodadyoushutup-kubernetes` | Manifest craft, pods, events, logs |
-| `nodadyoushutup-argocd` | Argo CD apps and gated sync |
-| `nodadyoushutup-portainer` | Portainer endpoints, stacks, containers |
-| `nodadyoushutup-proxmox` | Proxmox VE inventory and gated VM ops |
+| `marchentic-compose` | Docker Compose |
+| `marchentic-kubernetes` | Manifest craft, pods, events, logs |
+| `marchentic-argocd` | Argo CD apps and gated sync |
+| `marchentic-portainer` | Portainer endpoints, stacks, containers |
+| `marchentic-proxmox` | Proxmox VE inventory and gated VM ops |
 
 ### Observability
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-grafana` | Dashboards, Explore, incidents, alerting |
-| `nodadyoushutup-prometheus` | PromQL discover and query |
-| `nodadyoushutup-victoriametrics` | MetricsQL / PromQL via VictoriaMetrics |
-| `nodadyoushutup-graylog` | Log search |
-| `nodadyoushutup-uptime-kuma` | Monitors, status pages, notifications |
+| `marchentic-grafana` | Dashboards, Explore, incidents, alerting |
+| `marchentic-prometheus` | PromQL discover and query |
+| `marchentic-victoriametrics` | MetricsQL / PromQL via VictoriaMetrics |
+| `marchentic-graylog` | Log search |
+| `marchentic-uptime-kuma` | Monitors, status pages, notifications |
 
 ### Networking & edge
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-cloudflare` | DNS records |
-| `nodadyoushutup-fortigate` | FortiGate inventory and gated policies |
-| `nodadyoushutup-nginx-proxy-manager` | Proxy hosts, SSL, access lists |
-| `nodadyoushutup-traefik` | Routers, middlewares, IngressRoute |
-| `nodadyoushutup-tailscale` | Devices and ACLs |
+| `marchentic-cloudflare` | DNS records |
+| `marchentic-fortigate` | FortiGate inventory and gated policies |
+| `marchentic-nginx-proxy-manager` | Proxy hosts, SSL, access lists |
+| `marchentic-traefik` | Routers, middlewares, IngressRoute |
+| `marchentic-tailscale` | Devices and ACLs |
 
 ### Secrets & identity
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-vault` | Vault secrets and PKI |
-| `nodadyoushutup-vaultwarden` | Vaultwarden admin / ops posture |
-| `nodadyoushutup-authentik` | Authentik IdP apps, providers, flows |
+| `marchentic-vault` | Vault secrets and PKI |
+| `marchentic-vaultwarden` | Vaultwarden admin / ops posture |
+| `marchentic-authentik` | Authentik IdP apps, providers, flows |
 
 ### Storage, backup & registries
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-minio` | MinIO / S3 buckets and objects |
-| `nodadyoushutup-velero` | Backup and restore |
-| `nodadyoushutup-kopia` | Repository and snapshot inventory |
-| `nodadyoushutup-zot` | Zot OCI registry inventory |
-| `nodadyoushutup-harbor` | Harbor projects and artifacts |
+| `marchentic-minio` | MinIO / S3 buckets and objects |
+| `marchentic-velero` | Backup and restore |
+| `marchentic-kopia` | Repository and snapshot inventory |
+| `marchentic-zot` | Zot OCI registry inventory |
+| `marchentic-harbor` | Harbor projects and artifacts |
 
 ### Media & home
 
 | Install id | Description |
 | --- | --- |
-| `nodadyoushutup-yarr` | *arr, Plex, qBittorrent, Seerr |
-| `nodadyoushutup-home-assistant` | Home Assistant entities and service calls |
-| `nodadyoushutup-immich` | Immich library, albums, assets |
+| `marchentic-yarr` | *arr, Plex, qBittorrent, Seerr |
+| `marchentic-home-assistant` | Home Assistant entities and service calls |
+| `marchentic-immich` | Immich library, albums, assets |
 
 Many plugins also expose slash commands named after the short key
 (`/global`, `/vault`, `/kubernetes`, …). See each plugin’s `README.md` for

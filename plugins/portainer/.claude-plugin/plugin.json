@@ -1,9 +1,9 @@
 {
-  "name": "nodadyoushutup-portainer",
+  "name": "marchentic-portainer",
   "description": "Agnostic Portainer craft: endpoint/stack/container inventory and gated stack/container mutations. Prefer MCP when connected; otherwise API/UI. Never invent endpoint ids.",
-  "version": "0.12.1",
+  "version": "1.0.0",
   "author": {
-    "name": "nodadyoushutup",
+    "name": "marchentic",
     "email": "admin@nodadyoushutup.com"
   },
   "homepage": "https://github.com/marchentic/marchentic",
