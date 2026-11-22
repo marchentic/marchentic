@@ -1,7 +1,8 @@
 ---
 description: >-
-  Watch Jenkins builds — status, console triage, queue, stop/retrigger. Never
-  invent job names. Prefer Jenkins MCP. Use when operating builds.
+  Watch Jenkins builds — status, console triage, queue, nodes, views,
+  trigger/stop. Never invent job names. Prefer Jenkins MCP. Use when
+  operating builds.
 alwaysApply: false
 ---
 
@@ -10,46 +11,109 @@ alwaysApply: false
 ## Gate
 
 Use when the user asks to check a build, watch a job, read console output,
-inspect the queue, stop a build, or trigger a named job.
+inspect the queue or nodes, stop a build, or trigger a named job. Skip bare
+"Jenkins" with no job, build, or ops ask.
 
-Never invent a job fullname, build number, node, or view. Resolve from the
-chat, a URL, or a listing the operator already pointed at.
+Never invent a job fullname, build number, node, view path, or queue id.
+Resolve from the chat, a URL the operator pasted, or a listing they already
+pointed at.
 
 ## Prefer MCP
 
-When a Jenkins MCP is ready:
+When a Jenkins MCP is ready, use these tools — do not invent a side REST
+client while MCP works:
 
-| Need | Tools (typical) |
+| Need | Tools |
 | --- | --- |
-| Find job | `query_items` / `get_item` / `get_all_items` |
+| Find / list jobs | `query_items` / `get_item` / `get_all_items` |
+| Views | `get_all_views` / `get_view` (`view_path`, optional `depth`) |
 | Status | `get_build` / `get_running_builds` |
-| Console | `get_build_console_output` (pattern filter when large) |
-| Tests | `get_build_test_report` when available |
+| Console | `get_build_console_output` (`pattern`, `offset`, `limit`) |
+| Scripts used | `get_build_scripts` |
+| Tests | `get_build_test_report` when the job publishes them |
+| Parameters (job) | `get_item_parameters` |
+| Parameters (build) | `get_build_parameters` |
 | Queue | `get_all_queue_items` / `get_queue_item` / `cancel_queue_item` |
+| Nodes | `get_all_nodes` / `get_node` / `get_node_config` |
 | Trigger | `build_item` — only when the user asked |
 | Stop | `stop_build` — only when the user asked |
+| Job config XML | `get_item_config` / `set_item_config` — destructive write needs explicit ask |
+| Node config XML | `get_node_config` / `set_node_config` — same explicit-ask gate |
 
-Do not invent a side REST client while MCP works.
+## Resolve the job
+
+1. Prefer an exact fullname the user named (folder paths included).
+2. Else search with `query_items` (`fullname_pattern` / `color_pattern` /
+   `class_pattern`) or drill a view with `get_view`.
+3. Confirm with `get_item` before triggering, stopping, or claiming status.
+4. If several jobs match, list candidates and ask once — do not pick prod
+   by vibes.
+
+## Status and wait
+
+1. Call `get_build` (optional `number`; omit for last build) or
+   `get_running_builds` for in-flight work.
+2. Report result honestly: SUCCESS / FAILURE / ABORTED / UNSTABLE /
+   building / queued. Building or pending is **not** success.
+3. When waiting, re-read status; do not invent progress percentages.
+4. If the item is queued, use queue tools and report position / why blocked
+   when the payload exposes it (offline node, quiet period, concurrent
+   limits).
+
+## Console triage
+
+1. Prefer a filtered console read: pass `pattern` for FAILURE, ERROR,
+   Exception, or a stage name; use `offset` / `limit` so excerpts stay short.
+2. Quote a **short** failure slice — never dump the entire log into chat.
+3. Redact tokens, passwords, API keys, and private host URLs in excerpts.
+4. When tests exist, prefer `get_build_test_report` over raw console for
+   assertion failures.
+5. Map common signals: missing credential id, agent offline, SCM checkout
+   failure, compile/test fail, timeout, OOM on the agent.
+6. For deeper failure walkthroughs, follow skill `jenkins-console-triage`.
+
+## Trigger and stop
+
+- **Trigger** (`build_item`): only on an explicit ask. Use
+  `buildWithParameters` when the job defines parameters; read
+  `get_item_parameters` first. Never guess required params.
+- **Stop** (`stop_build`): only on an explicit ask with a known fullname +
+  number.
+- **Cancel queue** (`cancel_queue_item`): only when the user names the queue
+  item or asks to cancel a specific queued build.
+- After trigger, return the queue id / build number from the tool — do not
+  claim SUCCESS until a later `get_build` says so.
+
+## Config and nodes
+
+- Read `get_item_config` / `get_node_config` for diagnosis when the user
+  asks why a job or agent misbehaves.
+- `set_item_config` / `set_node_config` rewrite live controller XML — treat
+  as destructive. Require an explicit write/mutate verb this turn; show a
+  short diff of intent before applying when practical.
+- Do not disable security realms, spray credentials into config, or widen
+  agent labels without being asked.
 
 ## Honesty
 
-- Do **not** claim SUCCESS without a fresh build read.
-- Building / pending ≠ success. Report queue position when relevant.
-- Quote a **short** console failure slice — not the entire log.
-- Redact tokens, passwords, and private URLs in excerpts.
+- Do **not** claim SUCCESS without a fresh build read this turn.
+- Do not imply a pipeline file edit is live until a build that checked out
+  that commit finished (see `jenkins-ci-from-main`).
+- Distinguish job color / lastCompletedBuild from the build the user named.
 
 ## Report shape
 
-1. Job fullname + build number
-2. Result (SUCCESS / FAILURE / ABORTED / UNSTABLE / building)
-3. Failing stage or signal when cheap
-4. Next action (fix product, re-run, or wait) — product fixes need an
-   explicit implement verb
+1. Job fullname + build number (or queue id if not started)
+2. Result (SUCCESS / FAILURE / ABORTED / UNSTABLE / building / queued)
+3. Failing stage, test, or signal when cheap
+4. Short redacted console or test excerpt when failure
+5. Next action (fix product, re-run, wait, or pipeline edit) — product
+   code fixes need an explicit implement verb
 
 ## Refuse
 
-- Do not delete jobs or rewrite `config.xml` unless the user explicitly
-  asked for that destructive change.
-- Do not disable security realms or spray credentials into job config.
-- Do not trigger parameterized builds with guessed parameters — read
-  `get_item_parameters` / ask once if required params are unknown.
+- Do not delete jobs, wipe workspaces across agents, or mass-cancel the
+  queue unless the user explicitly asked for that destructive change.
+- Do not trigger parameterized builds with invented parameter values.
+- Do not paste secrets from console or config into the reply — redact and
+  say rotate if a secret leaked into the log.

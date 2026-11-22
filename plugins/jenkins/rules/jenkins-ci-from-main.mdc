@@ -13,21 +13,55 @@ Many Jenkins multibranch / Pipeline-from-SCM setups load the `Jenkinsfile`
 from the branch under build only after it is pushed. Working-tree-only edits
 have **no effect** until SCM has the commit the job checks out.
 
+## Why
+
+SCM-driven Jenkins checks out a specific ref. A pipeline change is “live”
+only for builds that check out a commit containing it. Folder jobs that
+point at a fixed branch (often `main`) ignore feature-branch Jenkinsfiles
+entirely. Multibranch / PR jobs run the Jenkinsfile from the head under
+test — but only after push (or the SCM polling / webhook that creates the
+run).
+
 ## Rule
 
 When you change a `Jenkinsfile` or pipeline entrypoint:
 
-1. Follow `jenkins-pipeline` (YAML entrypoints: 2-space indent, quote
-   ambiguous scalars, no secret values in the file).
+1. Follow `jenkins-pipeline` (and skill `jenkins-pipeline-author` when
+   authoring or reviewing). YAML entrypoints: 2-space indent, quote
+   ambiguous scalars, no secret values in the file.
 2. Commit related files together (pipeline plus scripts it calls) when the
    user asks to commit.
 3. Remind the user that the job must see the commit on the branch it builds
    (often default for some folder jobs; head branch for multibranch PR jobs).
 4. Do **not** commit or push automatically unless the consuming project has
-   an explicit preference for that.
+   an explicit preference for that this turn.
+5. After a run that could see the new file, verify with `jenkins-builds`
+   (fresh `get_build` / console). Do not claim “pipeline fixed” from the
+   editor alone.
 
-## Why
+## Branch matrix (say which applies)
 
-SCM-driven Jenkins checks out a specific ref. A pipeline change is “live”
-only for builds that check out a commit containing it. Verify with
-`jenkins-builds` after a run that could see the new file.
+| Setup | What must hold the edit |
+| --- | --- |
+| Pipeline job → fixed branch | That branch (often `main` / `master`) |
+| Multibranch / org folder | The branch or PR head under build |
+| Lightweight checkout / Script Path | The SCM path + ref the job config names |
+| Replay / inline script in UI | Out of band — prefer SCM; say so if UI-only |
+
+If you cannot tell which setup the job uses, say so and suggest reading the
+job config (`get_item_config`) or the job’s SCM section — do not invent the
+tracked branch.
+
+## Pairing with builds
+
+1. Edit pipeline files → remind about SCM pickup.
+2. User merges / pushes → trigger or wait for the job they named.
+3. Read build result + short console evidence.
+4. Only then call the pipeline change verified.
+
+## Refuse
+
+- Do not silently amend history or force-push to make CI pick up an edit.
+- Do not rewrite job config to point at a different branch unless the user
+  explicitly asked for that config change.
+- Do not claim a local unsaved buffer is what Jenkins executed.
