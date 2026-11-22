@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-global",
   "description": "Core posture and writing/policy craft: execute-first, MCP-first, host URLs, STE/writing skills. Pair with business-analyst for planning and code for coding work.",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "workflow",

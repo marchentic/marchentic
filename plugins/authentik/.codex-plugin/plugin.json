@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-authentik",
   "description": "Agnostic Authentik IdP craft: applications, providers, flows, and gated destructive changes. REST API craft (no Authentik MCP assumed). Never invent object ids or paste secrets.",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "authentik",
@@ -26,7 +26,7 @@
     "shortDescription": "Agnostic Authentik IdP craft: applications, providers, flows, and gated destructive changes. REST API craft (no Authentik MCP assumed). Neve",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }

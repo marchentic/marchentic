@@ -25,8 +25,8 @@ from pathlib import Path
 from typing import Callable
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_NAME = "nodadyoushutup-marketplace"
-DEFAULT_URL = "https://github.com/nodadyoushutup/marketplace"
+DEFAULT_NAME = "marchentic-marketplace"
+DEFAULT_URL = "https://github.com/marchentic/marchentic"
 DEFAULT_GIT_REF = "main"
 
 
@@ -137,7 +137,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Bump plugin versions that still need it, then refresh "
-            "nodadyoushutup-marketplace on every agent harness CLI on PATH."
+            "marchentic-marketplace on every agent harness CLI on PATH."
         )
     )
     parser.add_argument(

@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-zot",
-  "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor \u2014 install what you run.",
-  "version": "0.12.0",
+  "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
+  "version": "0.12.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "zot",

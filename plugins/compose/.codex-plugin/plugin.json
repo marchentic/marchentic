@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-compose",
   "description": "Agnostic Docker Compose craft: multi-file COMPOSE_FILE layout, project-directory anchors, overlays/profiles, ops, and hard gates on destructive downs/volume wipes.",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "compose",
@@ -25,7 +25,7 @@
     "shortDescription": "Agnostic Docker Compose craft: multi-file COMPOSE_FILE layout, project-directory anchors, overlays/profiles, ops, and hard gates on destruct",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }

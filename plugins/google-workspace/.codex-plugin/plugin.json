@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-google-workspace",
   "description": "Google Workspace craft: Gmail, Drive, Calendar, Docs, and Sheets via MCP. Prefer connected Google Workspace MCP; never invent accounts or share links.",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "google",
@@ -27,7 +27,7 @@
     "shortDescription": "Google Workspace craft: Gmail, Drive, Calendar, Docs, and Sheets via MCP.",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }

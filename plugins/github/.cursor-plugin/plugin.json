@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-github",
   "description": "GitHub craft: pull request checks and comments, Actions workflow YAML, and default-branch CI. No product pipelines hard-coded.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "logo": "assets/avatar.png",
   "keywords": [

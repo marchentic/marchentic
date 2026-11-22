@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-proxmox",
   "description": "Agnostic Proxmox VE craft: list nodes/VMs, status, and gated power/clone/migrate via MCP. Prefer Proxmox MCP; never invent VMID or touch sacred hosts.",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "proxmox",
@@ -25,7 +25,7 @@
     "shortDescription": "Agnostic Proxmox VE craft: list nodes/VMs, status, and gated power/clone/migrate via MCP. Prefer Proxmox MCP; never invent VMID or touch sac",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }

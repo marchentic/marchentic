@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-atlassian",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Atlassian craft: Jira and Confluence create gates, issue and page shape, and status. No project or space ids hard-coded.",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "atlassian",
@@ -25,7 +25,7 @@
     "shortDescription": "Jira and Confluence filing, issue shape, and wiki pages.",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }

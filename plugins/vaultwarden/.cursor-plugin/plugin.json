@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-vaultwarden",
   "description": "Agnostic Vaultwarden craft: admin/ops and user/org inventory with hard refuse to dump vault contents or credentials. Admin API/UI craft (no Vaultwarden MCP assumed).",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "vaultwarden",

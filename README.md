@@ -14,7 +14,7 @@ marketplace, then install what you actually need.
 ## Install
 
 Plugin ids are `nodadyoushutup-<short>`. The marketplace name in install
-selectors is `nodadyoushutup-marketplace`. Substitute `<plugin>` with any id
+selectors is `marchentic-marketplace`. Substitute `<plugin>` with any id
 from the tables below.
 
 ### Claude Code
@@ -22,8 +22,8 @@ from the tables below.
 In a Claude Code session (slash commands):
 
 ```text
-/plugin marketplace add nodadyoushutup/marketplace
-/plugin install <plugin>@nodadyoushutup-marketplace
+/plugin marketplace add marchentic/marchentic
+/plugin install <plugin>@marchentic-marketplace
 ```
 
 `/plugin install` opens the plugin panel so you can pick a scope. Closing the
@@ -32,8 +32,8 @@ panel applies pending changes.
 From your shell (no session required):
 
 ```shell
-claude plugin marketplace add nodadyoushutup/marketplace
-claude plugin install <plugin>@nodadyoushutup-marketplace
+claude plugin marketplace add marchentic/marchentic
+claude plugin install <plugin>@marchentic-marketplace
 ```
 
 If a session is already running when you install from the shell, apply the
@@ -43,7 +43,7 @@ that the reload would invalidate the prompt cache.
 ### Cursor
 
 1. Open **Dashboard → Settings → Plugins**
-2. Import `https://github.com/nodadyoushutup/marketplace`
+2. Import `https://github.com/marchentic/marchentic`
 3. Install plugins from the catalog
 
 ### OpenAI Codex
@@ -51,8 +51,8 @@ that the reload would invalidate the prompt cache.
 From your shell:
 
 ```shell
-codex plugin marketplace add nodadyoushutup/marketplace
-codex plugin add <plugin>@nodadyoushutup-marketplace
+codex plugin marketplace add marchentic/marchentic
+codex plugin add <plugin>@marchentic-marketplace
 ```
 
 Or open `/plugins` in Codex CLI, add the marketplace, and install from there.
@@ -63,8 +63,8 @@ Start a new Codex session after install so skills and tools load.
 From your shell:
 
 ```shell
-copilot plugin marketplace add nodadyoushutup/marketplace
-copilot plugin install <plugin>@nodadyoushutup-marketplace
+copilot plugin marketplace add marchentic/marchentic
+copilot plugin install <plugin>@marchentic-marketplace
 ```
 
 In an interactive Copilot CLI session the same steps are

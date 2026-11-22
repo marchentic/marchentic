@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-nginx-proxy-manager",
   "description": "Agnostic Nginx Proxy Manager craft: proxy hosts, SSL certificates, and access lists with destructive gates. Prefer MCP when connected; otherwise API/UI. Never invent host ids.",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "nginx-proxy-manager",

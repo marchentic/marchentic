@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-business-analyst",
   "description": "Business analysis and planning: BA brief skill, planner for ambiguous multi-step work, and external researcher. Pair with global (posture) and code (implementation).",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "logo": "assets/avatar.png",
   "keywords": [

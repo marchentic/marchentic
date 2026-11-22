@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-drawio",
   "description": "Diagram craft: author and repair .drawio files with lanes, gaps, and readable labels.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "drawio",

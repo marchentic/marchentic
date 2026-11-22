@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-velero",
   "description": "Agnostic Velero craft: backup/restore inventory, status, and gated create/delete via MCP. Prefer Velero MCP; discover-first; restores are overwrite-shaped without explicit ask.",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "velero",

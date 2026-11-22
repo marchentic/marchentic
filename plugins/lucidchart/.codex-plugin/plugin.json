@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-lucidchart",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Author and repair clean Lucidchart diagrams via Lucid Standard Import JSON (lanes, non-overlapping boxes, edge corridors) plus .lucid packaging.",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "lucidchart",
@@ -25,7 +25,7 @@
     "shortDescription": "Author and repair clean Lucidchart diagrams via Lucid Standard Import JSON (lanes, non-overlapping boxes, edge corridors) plus .lucid packaging.",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }

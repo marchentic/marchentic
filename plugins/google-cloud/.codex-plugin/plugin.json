@@ -1,13 +1,13 @@
 {
   "name": "nodadyoushutup-google-cloud",
   "description": "Agnostic Google Cloud craft: project inventory, Compute/GKE, Cloud Storage, IAM/network, and hard gates on delete/IAM/public ACL. Uses gcloud; prefer Cloud MCP when ready.",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
   },
-  "homepage": "https://github.com/nodadyoushutup/marketplace",
-  "repository": "https://github.com/nodadyoushutup/marketplace",
+  "homepage": "https://github.com/marchentic/marchentic",
+  "repository": "https://github.com/marchentic/marchentic",
   "license": "MIT",
   "keywords": [
     "google",
@@ -26,7 +26,7 @@
     "shortDescription": "Agnostic Google Cloud craft: projects, Compute/GKE, GCS, safety gates.",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
-    "websiteURL": "https://github.com/nodadyoushutup/marketplace",
+    "websiteURL": "https://github.com/marchentic/marchentic",
     "logo": "./assets/avatar.png"
   }
 }
