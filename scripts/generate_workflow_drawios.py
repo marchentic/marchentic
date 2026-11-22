@@ -142,19 +142,6 @@ SPECS: dict[str, dict[str, str]] = {
         "act": "author / repair SI&#10;then package_lucid.py;&#10;create new Lucid doc",
         "end_ok": "END — .lucid +&#10;import evidence",
     },
-    "agentmemory": {
-        "title": "AgentMemory Workflow",
-        "ambient": (
-            "AMBIENT — memory MCP&#10;&#10;"
-            "Gate: skip if disconnected&#10;&#10;"
-            "Everyday&#10;lesson_recall · smart_search&#10;lesson_save · memory_save&#10;&#10;"
-            "No secrets in memory"
-        ),
-        "gate": "gate · memory connected?&#10;and task needs recall/save",
-        "skip": "skip — disconnected&#10;or routine rename/typo&#10;with no architecture risk",
-        "act": "recall → verify → act&#10;capture only durable&#10;verified insights",
-        "end_ok": "END — used leads&#10;and/or saved entry",
-    },
     "proxmox": {
         "title": "Proxmox Workflow",
         "ambient": (

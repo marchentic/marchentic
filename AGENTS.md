@@ -48,7 +48,6 @@ plus the short slash aliases listed under Allowed basenames.
 | `github` | `nodadyoushutup-github` | `github` or `github-*` | Pull request checks, comments, titles, and Actions workflow craft | core |
 | `atlassian` | `nodadyoushutup-atlassian` | `atlassian` or `atlassian-*`; commands also `jira`, `confluence` | Jira and Confluence create gates and page/issue shape | domain |
 | `drawio` | `nodadyoushutup-drawio` | `drawio` or `drawio-*` | `.drawio` author and repair | domain |
-| `agentmemory` | `nodadyoushutup-agentmemory` | `agentmemory` or `agentmemory-*` | AgentMemory MCP recall/capture + on-demand ops | domain |
 | `jenkins` | `nodadyoushutup-jenkins` | `jenkins` or `jenkins-*` | Agnostic Jenkins builds + pipeline CI craft | domain |
 | `lucidchart` | `nodadyoushutup-lucidchart` | `lucidchart` or `lucidchart-*` | Lucidchart Standard Import author/repair + `.lucid` packaging | domain |
 | `google-workspace` | `nodadyoushutup-google-workspace` | `google-workspace` or `google-workspace-*` | Gmail + Drive + Calendar + Docs/Sheets | domain |
@@ -155,8 +154,6 @@ validator).
   for that surface.
 - **Posture / authoring** (`global`, `code`, `drawio`, `lucidchart`): their own
   shapes (standing orders, tier workflow, When to use + Procedure).
-- **`agentmemory`:** Gate + Scope + Session defaults (recall/capture always-on
-  lean path; ops on demand).
 
 ## Adding a plugin
 

@@ -7,13 +7,13 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.10"
+    "version": "0.12.11"
   },
   "plugins": [
     {
       "name": "nodadyoushutup-global",
       "description": "Core posture and writing/policy craft: execute-first, MCP-first, host URLs, STE/writing skills. Pair with business-analyst for planning and code for coding work.",
-      "version": "0.14.0",
+      "version": "0.14.1",
       "source": "./plugins/global",
       "author": {
         "name": "nodadyoushutup",
@@ -37,7 +37,7 @@
     {
       "name": "nodadyoushutup-code",
       "description": "Coding standards and workflow: language rules (Python/JS/TS/Go/Rust/C/C++/Swift/Kotlin/Dart/Java); React/RN/Next/Flask/FastAPI; refactor/debug/verify skills; coding agents. Pair with git for worktrees and Conventional Commits.",
-      "version": "0.17.0",
+      "version": "0.17.1",
       "source": "./plugins/code",
       "author": {
         "name": "nodadyoushutup",
@@ -236,30 +236,6 @@
       "category": "productivity",
       "tags": [
         "security",
-        "optional"
-      ],
-      "logo": "assets/avatar.png"
-    },
-    {
-      "name": "nodadyoushutup-agentmemory",
-      "description": "Gated AgentMemory MCP craft: lean always-on recall/capture rules, on-demand tool routing, and ops skill for slots/actions/mesh.",
-      "version": "0.11.1",
-      "source": "./plugins/agentmemory",
-      "author": {
-        "name": "nodadyoushutup",
-        "email": "admin@nodadyoushutup.com"
-      },
-      "homepage": "https://github.com/nodadyoushutup/marketplace",
-      "repository": "https://github.com/nodadyoushutup/marketplace",
-      "license": "MIT",
-      "keywords": [
-        "agentmemory",
-        "memory",
-        "mcp"
-      ],
-      "category": "productivity",
-      "tags": [
-        "memory",
         "optional"
       ],
       "logo": "assets/avatar.png"

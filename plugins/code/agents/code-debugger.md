@@ -33,9 +33,6 @@ addresses the cause.
 6. **Verify** — re-run the failing check
 7. **Prevent** — cheap regression test only when app/library code warrants it
 
-Also recall AgentMemory / lessons for familiar failure signatures before a
-deep dive when that MCP is connected.
-
 ## Output shape
 
 1. Symptom

@@ -25,13 +25,9 @@ aims at a different project or stack.
 ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}'
 ```
 
-3. Else, if AgentMemory is connected/ready, recall preference (`user-facing
-   host URL` / `dev host address`) and use it only if non-loopback.
-4. On new detect or user correction: if AgentMemory is available, `memory_save`
-   type `preference`, concepts `host-url`, `user-facing-host`. Never write that
+3. Else ask once for a non-loopback address, then reuse for the session.
+4. On new detect or user correction: reuse for the session. Never write that
    IP into tracked files.
-5. If detect and memory both fail: ask once, then save via memory when
-   available.
 
 Use the port that matches the app you are actually verifying.
 

@@ -164,12 +164,6 @@ Marketplace ids are `nodadyoushutup-<short>`. On disk that is `plugins/<short>/`
 | `nodadyoushutup-home-assistant` | Home Assistant entities and service calls |
 | `nodadyoushutup-immich` | Immich library, albums, assets |
 
-### Memory
-
-| Install id | Description |
-| --- | --- |
-| `nodadyoushutup-agentmemory` | AgentMemory recall / capture |
-
 Many plugins also expose slash commands named after the short key
 (`/global`, `/vault`, `/kubernetes`, …). See each plugin’s `README.md` for
 details.
