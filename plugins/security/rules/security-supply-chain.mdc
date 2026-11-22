@@ -33,5 +33,8 @@ and pin floor below when a diff touches workflow YAML.
   secrets unless that job's purpose is that action. Prefer least-privilege
   job defaults (`permissions:` minimal, pin action tags) when editing
   workflow YAML
+- Jobs that run an AI agent or other automation on untrusted input (issues,
+  PR comments, fork PRs) must not receive deploy/production secrets or
+  write access beyond the minimum needed to post a comment
 - Do not claim a vulnerability scan passed unless this turn ran the scanner
   and read its result

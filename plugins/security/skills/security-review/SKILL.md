@@ -73,9 +73,12 @@ diff adds a sink, require a regression test that covers the control.
    **Done when** a second tenant cannot read the new data through the diff.
 7. **Supply chain.** A new dependency has a lockfile update. Production images
    pin a non-`latest` tag. Remote `curl|sh` is refused. CI does not print
-   secrets.
-   **Done when** the manifest change includes the lockfile, or there is no
-   dependency change.
+   secrets. Automation or AI-agent jobs do not receive deploy/production
+   secrets or broad write tokens. Committed key files, private keys, or
+   live payment credentials remain must-fix.
+   **Done when** the manifest change includes the lockfile (or there is no
+   dependency change), and any new agent/automation job is least-privilege
+   without deploy secrets.
 8. **Tests.** Each new sink added by the diff has a regression test, or an
    existing test is extended to cover the control.
    **Done when** the test path is named, or the item is listed as a must-fix

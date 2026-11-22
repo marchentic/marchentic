@@ -15,6 +15,10 @@ breaks. Order of importance: correct, safe, holds under load, tested, fast,
 lean. One-shot report — change no code unless the user explicitly asks to
 apply fixes after the report.
 
+Agent / workspace blast radius (remote DBs in tests, unbounded deletes,
+infra destroy flags, harness bypass) is a different job — use `code-safety`
+/ `/code-safety` for that.
+
 ## 1. Map first
 
 - Audit what the user names: a folder, a package, or the whole repo.

@@ -4,9 +4,9 @@ Coding standards and coding workflow for Claude Code, Cursor, GitHub Copilot,
 and OpenAI Codex.
 
 This plugin owns file-type conventions, the always-on smallest-complete-change
-ladder, refactor / debug / verify / audit / debt skills, and coding agents.
-Tracker filing, git-host craft, product briefs, and a full security checklist
-are out of scope. Stack rules keep one-line trust-boundary controls;
+ladder, refactor / debug / verify / audit / debt / safety skills, and coding
+agents. Tracker filing, git-host craft, product briefs, and a full security
+checklist are out of scope. Stack rules keep one-line trust-boundary controls;
 `code-workflow` Finish runs a security checklist when available on
 trust-boundary diffs, otherwise stops on the local trust-boundary list.
 
@@ -36,7 +36,8 @@ trust-boundary diffs, otherwise stops on the local trust-boundary list.
 | `code-markdown` | Markdown structure, clarity, safety |
 | `code-terraform` | HCL layout, locals SSoT, validation, templates, safety |
 | `code-comments` | Sparse durable comments; allows `shortcut:` debt markers |
-| `code-unit-testing` | Lasting unit-test philosophy (core contracts, no AI scratch theater) |
+| `code-unit-testing` | Lasting unit-test philosophy (core contracts, no AI scratch theater); local DB only |
+| `code-shell-safety` | Fail-fast shell/Make deletes, rooted refuse, dry-run, WARNING lines |
 
 ## Skills (both)
 
@@ -45,6 +46,7 @@ trust-boundary diffs, otherwise stops on the local trust-boundary list.
 | `code-workflow` | Intake → execute → verify (ceremony tiers) |
 | `code-lean` | Session lean intensity (`lite` / `full` / `ultra`) + command help |
 | `code-audit` | Whole-repo / folder quality audit (read-only) |
+| `code-safety` | Agent/workspace blast-radius audit (read-only; names/paths only) |
 | `code-debt` | Harvest `shortcut:` comments into a ledger |
 | `code-investigation` | Evidence-driven codebase investigation |
 | `code-systematic-debugging` | Diagnose before fixing |
@@ -71,6 +73,7 @@ Primary slash UX (run the matching skill immediately):
 - `/refactor` → `code-refactor`
 - `/code-review` → launch `code-reviewer`
 - `/code-audit` → `code-audit`
+- `/code-safety` → `code-safety`
 - `/code-debt` → `code-debt`
 
 Also:

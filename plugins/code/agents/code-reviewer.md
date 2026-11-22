@@ -69,6 +69,12 @@ This is a report the user asked for — give it in full.
 7. **Isolation:** when the host repo has package boundaries — wrong import
    direction, product names leaking into shared substrate, tests that only
    greenlight a private feature from a shared tree.
+8. **Blast radius (when the diff touches it):** unbounded recursive deletes
+   from variables/globs without a rooted refuse; test/dev DB config aimed at
+   a remote or production host (especially drop/truncate/migrate); terraform
+   or infra scripts missing deletion protection / `prevent_destroy`, or
+   shipping `auto-approve` / `--force` on destroy/apply; destructive
+   entrypoints with no runtime WARNING naming hazard + consequence.
 
 ## 3. Check before you report
 

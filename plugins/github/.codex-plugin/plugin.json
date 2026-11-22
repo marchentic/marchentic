@@ -1,6 +1,6 @@
 {
   "name": "nodadyoushutup-github",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "GitHub craft: pull request checks and comments, Actions workflow YAML, and default-branch CI. No product pipelines hard-coded.",
   "author": {
     "name": "nodadyoushutup",

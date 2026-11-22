@@ -1,0 +1,74 @@
+---
+description: >-
+  Shell and Makefile safety — fail-fast unset guards, bounded deletes,
+  realpath refuse outside the repo, dry-run, and WARNING lines on destructive
+  entrypoints. Use when authoring or editing shell scripts or Make recipes.
+globs: "**/*.{sh,bash,zsh,bats};**/Makefile;**/makefile;**/GNUmakefile;**/scripts/**/*"
+alwaysApply: false
+---
+
+# Shell safety
+
+Write scripts an agent can run without wiping the wrong tree. Put the guard
+**in the script**. Do not rely on interactive shell aliases as the control.
+
+## Fail-fast
+
+- Prefer `set -euo pipefail` at the top of bash/zsh scripts (or the
+  language-equivalent fail-fast). Refuse silent unset expansion on paths that
+  feed deletes or cleans.
+- Required path inputs use `${VAR:?VAR is required}` (or equivalent) before
+  any recursive delete or wipe.
+
+## Bounded deletes
+
+When the delete/clean target comes from a variable, argument, glob, or link:
+
+1. Resolve with `realpath` (or equivalent).
+2. Refuse if the resolved path is outside the repository root (or an
+   explicitly documented allowlisted root for that tool).
+3. Refuse if the path is empty, `/`, `$HOME`, or a cloud-sync stub you cannot
+   verify.
+4. Prefer a **dry-run** mode that prints the resolved target and file count
+   (or a sample of paths) before destroying.
+
+```bash
+# ✅ GOOD — required, resolved, rooted
+repo_root="$(realpath "${REPO_ROOT:?}")"
+target="$(realpath "${TARGET:?}")"
+case "$target" in
+  "$repo_root"|"$repo_root"/*) ;;
+  *) echo "refuse: $target outside $repo_root" >&2; exit 1 ;;
+esac
+```
+
+```bash
+# ❌ BAD — unbound recursive delete
+rm -rf "$OUT_DIR"
+```
+
+Same idea for Python `shutil.rmtree`, Node `rimraf`, and Make `rm -rf`
+recipes: resolve, bound, then delete.
+
+## WARNING on destructive entrypoints
+
+Any script or Make target that drops databases, truncates volumes, force-resets
+state, or recursively deletes must print a **WARNING** line to stderr (or the
+tool's normal log stream) **before** the destructive step. Name the hazard and
+the consequence:
+
+```text
+WARNING: DATABASE_URL host is production; this DROPS tables
+WARNING: deleting /path/to/build (1842 files) permanently
+```
+
+Restating a rule in a comment is not enough — the running command must say it.
+
+## Anti-patterns
+
+- `rm -rf` / `rmtree` / `rimraf` on an unchecked variable or glob
+- Cleaning a directory that may contain symlinks/junctions without resolving
+  the real target
+- Tests that rewrite `HOME` or point cleans at `$HOME`
+- `set +u` around path construction that later feeds a delete
+- Documenting "be careful" in a README while the script still has no guard

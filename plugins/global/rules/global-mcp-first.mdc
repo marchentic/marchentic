@@ -61,3 +61,20 @@ Applies to **operator / agent interaction** with external systems in this
 session. It does not change application code, Compose wiring, or which MCP
 servers a project ships. Local repo work (git, tests, file edits, Docker on
 this host) stays on normal tools unless an MCP is clearly the right surface.
+
+## Harness and MCP config craft
+
+When authoring or editing MCP server configs, agent hooks, or harness
+launch flags for this project:
+
+- **Pin** server package versions. Refuse floating `@latest` / `npx -y`
+  without a pinned version for anything that runs in a shared or CI agent
+- Prefer **read-only** tokens when the server only needs to read
+- Treat permission-bypass flags (`--dangerously-skip-permissions`,
+  `--yolo`, and equivalents) as refuse-by-default — do not add or recommend
+  them unless the user explicitly asked this turn and accepts the blast
+  radius
+- Do not install unknown `SessionStart` (or equivalent) hooks or skills
+  without reading them first
+- When editing rule/skill markdown, strip hidden Unicode (zero-width,
+  bidi overrides) that could smuggle instructions

@@ -9,7 +9,7 @@ or diagrams.
 | Rule | Purpose |
 | --- | --- |
 | `global-execute-first` | Do the work; scope-grill only when blocked |
-| `global-mcp-first` | Prefer a ready connected tool over a side-path CLI |
+| `global-mcp-first` | Prefer a ready connected tool over a side-path CLI; pin MCP/harness configs |
 | `global-host-url` | Never give the user a localhost URL |
 | `global-failed-command` | Do not rerun a shell command that just failed |
 | `global-pasted-secrets` | Do not copy a credential the user pasted |

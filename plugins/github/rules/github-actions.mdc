@@ -51,6 +51,19 @@ jobs:
 - Keep job and step names stable when other dashboards or required checks
   key on them
 
+## AI agents in CI
+
+Do not run an AI coding agent on untrusted input (`issues`, issue/PR
+comments, `pull_request_target`, or a fork PR with write secrets) while that
+job can read deploy/production secrets or has write permissions beyond what
+the agent needs to comment.
+
+- Prefer `pull_request` over `pull_request_target` for agent jobs
+- Keep agent job `permissions:` minimal (often `contents: read` +
+  `pull-requests: write` or `issues: write` only)
+- Do not share caches between untrusted agent jobs and release/deploy jobs
+- Secrets the agent does not need stay out of that job's env entirely
+
 ## Skipped jobs and names
 
 If a job can be skipped via job-level `if:`, avoid `${{ }}` expressions in

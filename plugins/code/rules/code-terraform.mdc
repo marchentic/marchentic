@@ -118,6 +118,19 @@ locals {
 - Call out destructive changes (replace, destroy, force-new) before applying
 - Scope IAM / security groups narrowly; avoid `*` unless required and
   documented
+- On stateful data resources (databases, storage buckets that hold durable
+  data, critical IAM), set provider `deletion_protection` and/or Terraform
+  `lifecycle { prevent_destroy = true }` unless the user explicitly asked
+  for a disposable stack this turn
+- Do not commit `*.tfstate` / `*.tfstate.*` — use remote state; add ignore
+  rules if a stray file appeared
+- Agent-reachable scripts and Make targets must not pass `auto-approve` /
+  `-auto-approve` / `--force` for destroy or apply. Require an explicit
+  human confirmation path
+- If the same token can delete backups, call that blast radius out before
+  apply and prefer a store the agent token cannot wipe
+- Destructive wrappers (destroy scripts, reset targets) print a WARNING
+  line naming the hazard and consequence before running
 
 ## Anti-patterns
 

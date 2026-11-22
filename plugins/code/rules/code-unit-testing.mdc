@@ -38,6 +38,22 @@ Do not leave session scaffolding in the suite.
 - Live credentials, real provider calls, or production runtime state as
   “unit” tests
 
+## Local data only
+
+Test, preview, and local-dev configs must not point at a non-local or
+production database (or other stateful store that tests drop, truncate,
+reset, or migrate).
+
+- Point suites at a local or container host. Prefer ephemeral fixtures over
+  a shared remote.
+- In test setup, **abort** when the DB (or equivalent) host is not
+  local/container — do not proceed with drop/truncate/migrate against a
+  remote host.
+- Ship `.env*` examples and compose overrides with local placeholders, never
+  a production connection string.
+- Integration suites that must touch a real service use an isolated
+  non-production resource with the same abort guard.
+
 ## Design bar
 
 Match the repository’s runners, layouts, fixtures, and naming. Style and
