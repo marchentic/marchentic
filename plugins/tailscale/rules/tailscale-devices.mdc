@@ -1,12 +1,90 @@
 ---
 description: >-
-  List Tailscale devices, status, and netmap. Never invent device ids.
+  Tailscale devices and netmap inventory — list/status via tailscale CLI or
+  Admin API (no Tailscale MCP discovered). Never invent device ids; never
+  paste auth keys.
 alwaysApply: false
 ---
 
 # Tailscale devices
 
-List devices, online status, tags, and routes. Prefer MCP when connected; else Tailscale API or `tailscale status` / admin API.
+## Gate
 
-Never invent device ids or names — list/resolve first. Report hostname +
-Tailscale IP + tags + online state — never paste auth keys.
+Use when the user asks which devices are on the tailnet, online status,
+tags, IPs, advertised routes, exit nodes, or netmap shape. Skip ACL-policy
+authoring (use `tailscale-acls`) unless a device tag must be resolved.
+
+## Transport
+
+No Tailscale MCP was discovered for this harness. Prefer:
+
+1. Local `tailscale` CLI when the agent host is on the tailnet.
+2. Else Tailscale Admin API (`api.tailscale.com`) with a resolved tailnet
+   id and API access token from the operator’s secret store / env —
+   never hardcode hosts or paste tokens into chat.
+
+If a Tailscale MCP appears later, use its list/describe tools when ready
+— **do not invent MCP tool names**.
+
+## Resolve ids
+
+Never invent device id, hostname, MagicDNS name, or Tailscale IP. Resolve
+from the user, a prior list this turn, or:
+
+| Need | CLI / API |
+| --- | --- |
+| Local status | `tailscale status` · `tailscale status --json` |
+| Self IPs | `tailscale ip -4` · `tailscale ip -6` |
+| Netcheck | `tailscale netcheck` |
+| Ping peer | `tailscale ping HOSTNAME` (connectivity probe only) |
+| Tailnet devices | `GET /api/v2/tailnet/{tailnet}/devices` |
+| One device | `GET /api/v2/device/{deviceId}` |
+
+Resolve `{tailnet}` from operator config / env (for example
+`TAILSCALE_TAILNET`) — often an org domain or tailnet name — never invent
+it.
+
+If several devices match a short name, list candidates (hostname + IP +
+online) and ask once.
+
+## Receipt shape
+
+Report: **hostname**, **Tailscale IP(s)**, **online/offline**, **tags**,
+**OS**, advertised/exit routes when relevant. Never paste auth keys, API
+tokens, or OAuth client secrets.
+
+## Routes / exit nodes (read)
+
+| Need | Source |
+| --- | --- |
+| Advertised routes | device `AllowedIPs` / `PrimaryRoutes` from status JSON or API |
+| Exit node candidates | devices advertising `0.0.0.0/0` / `::/0` or exit-node flag |
+| Local exit use | `tailscale status` exit-node field |
+
+Advertising new subnet/exit routes is a mutate → `tailscale-safety` plus
+an explicit verb naming the device and prefixes.
+
+## Mutate (gated)
+
+| Action | Shape |
+| --- | --- |
+| Delete / expire device | Admin API `DELETE /api/v2/device/{deviceId}` |
+| Enable/disable key expiry | API device update fields the operator named |
+| Approve routes | API route approval when the tailnet requires it |
+
+All need an **explicit verb this turn naming the device**. Prefer disable
+/ expire over delete when the user did not say delete.
+
+## Defaults
+
+1. Read-only status/list is the default.
+2. Cap large device lists; filter by tag or online state when possible.
+3. Headscale / plain WireGuard meshes are out of scope unless the user
+   named Tailscale.
+4. After an authorized mutate, re-list/status and report the new state.
+
+## Refuse
+
+- Inventing device ids, tags, or route prefixes.
+- Pasting auth keys or API tokens into chat.
+- Claiming a device exists without status/list this turn.

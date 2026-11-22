@@ -1,7 +1,8 @@
 ---
 description: >-
-  Tailscale mutate gates — ACL rewrites, key create/revoke, device delete, and
-  route advertise need an explicit verb naming the object.
+  Tailscale mutate gates — ACL rewrites, auth key create/revoke, device
+  delete, and route advertise need an explicit verb naming the object.
+  Never paste auth keys or API tokens into chat.
 alwaysApply: false
 ---
 
@@ -9,13 +10,67 @@ alwaysApply: false
 
 ## Read-only default
 
-List devices and status are fine when Tailscale work is authorized. Do **not**:
+List devices, status, netcheck, and ACL **GET**/review are fine when
+Tailscale work is authorized. Do **not** do any of the following unless
+the user gave an **explicit verb this turn naming the object**:
 
-- replace or broaden the ACL policy without naming the change
-- create, reveal, or revoke auth keys into chat
-- delete/disable a device or force-expire nodes
-- advertise/exit routes the user did not name
+| Class | Examples |
+| --- | --- |
+| ACL | replace policy, broaden grants, open `*:*`, change tagOwners/SSH |
+| Keys | create, reveal, or revoke auth keys / OAuth client secrets |
+| Devices | delete, force-expire, disable key expiry on prod nodes |
+| Routes | advertise/approve subnet or exit routes the user did not name |
+| Irreversible | wipe ACL tests, grant world→admin, share nodes publicly |
 
-…unless the user gave an explicit verb this turn naming the object.
+Bare “fix access” / “open the tailnet” / “clean up devices” without
+naming targets is **not** authorization.
 
-Prefer minimal ACL diffs. Never paste auth keys or API tokens into chat.
+## Authorization checklist
+
+Before a gated mutate:
+
+1. Tailnet id resolved from operator config (not guessed).
+2. Device id / tag / ACL stanza sourced from list/GET this turn (or
+   user paste).
+3. Explicit verb matches the action (delete ≠ expire; broaden ≠ tighten).
+4. One-sentence blast radius for ACL widens or exit-route ads.
+5. Prefer the smallest diff (one grant, one device).
+
+If any step fails → refuse, say what is missing, and stop.
+
+## Auth keys and tokens
+
+Never paste into chat, commits, tickets, or diagrams:
+
+- Auth keys (`tskey-auth-…`)
+- API access tokens / OAuth client secrets
+- Node keys or lock signatures beyond short status
+
+When creating an auth key under authorization: confirm **created** with
+key id / expiry / tags only. If the API returns the secret once, tell the
+operator to land it in their secret store — **do not quote the key**.
+If they already pasted a key in chat, treat it as exposed and recommend
+revoke/rotate — do not repeat it.
+
+## ACL widenings
+
+Opening `autogroup:member` → sensitive ports, removing tests, or adding
+`*:*` requires naming the grant and stating risk. Prefer tag-scoped
+grants. Follow `tailscale-acls` minimal-diff procedure.
+
+## Device and route risk
+
+Production device delete and advertising `0.0.0.0/0` exit routes: state
+risk in one sentence; only proceed when clearly authorized this turn.
+
+## Aftercare
+
+After an authorized mutate, re-GET ACL or re-run `tailscale status` /
+devices list and report the new state (or the error). Do not claim
+success from the write response alone when a follow-up read is cheap.
+
+## Neighbor surfaces
+
+Headscale, plain WireGuard, and non-Tailscale VPN products are out of
+scope. Cloud firewall / IdP wiring stays with those products — stop or
+report only Tailscale ids the operator needs.

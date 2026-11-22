@@ -1,0 +1,96 @@
+---
+description: >-
+  Tailscale ACL / grants / tag policy craft via Admin API huJSON (no
+  Tailscale MCP discovered). Prefer minimal diffs; never invent tags or
+  paste auth keys.
+alwaysApply: false
+---
+
+# Tailscale ACLs
+
+## Gate
+
+Use when the user asks to read, review, tighten, or change Tailscale
+**ACL policy**, grants, tagOwners, autogroups, SSH ACL, or tests. Skip
+pure device inventory (use `tailscale-devices`).
+
+## Transport
+
+No Tailscale MCP discovered. Use Tailscale Admin API with resolved
+`{tailnet}` + API token (never echo the token):
+
+| Need | API |
+| --- | --- |
+| Get ACL | `GET /api/v2/tailnet/{tailnet}/acl` |
+| Preview / validate | `POST /api/v2/tailnet/{tailnet}/acl/preview` (when available) |
+| Put ACL | `POST /api/v2/tailnet/{tailnet}/acl` (full policy body) |
+
+Prefer huJSON (JSON with comments) as Tailscale documents. Local CLI does
+not replace ACL admin — do not invent a `tailscale acl` subcommand that
+the installed CLI lacks; check `tailscale --help` if unsure.
+
+## Resolve policy objects
+
+Never invent tag names (`tag:ci`), group names, or host aliases. Resolve
+from:
+
+1. Current ACL `GET` this turn.
+2. Device tags from `tailscale-devices` list/status.
+3. Exact names the user pasted.
+
+If the user said “let CI reach prod:443” without tags, list existing
+`tagOwners` / tags and propose a **minimal** grant — do not rewrite the
+whole policy.
+
+## Read / review
+
+1. `GET` the ACL.
+2. Summarize: acls/grants count, tagOwners, SSH rules, tests present?
+3. Call out overly broad rules (`*:*`, `autogroup:member` → sensitive
+   ports) in one short finding each.
+4. Do not dump the entire ACL into chat when a focused excerpt works —
+   quote only the stanzas you change or critique.
+
+## Craft (gated)
+
+Replacing or broadening ACL needs an **explicit verb** this turn naming
+the change (or “replace ACL with …”). Follow `tailscale-safety`.
+
+Minimal-diff procedure:
+
+1. GET current policy.
+2. Edit the smallest stanza set (prefer `grants` when the tailnet uses
+   them; else classic `acls`).
+3. Keep or add `tests` that prove the intended allow/deny.
+4. Preview when the API supports it; otherwise state residual risk.
+5. POST only under authorization.
+6. Re-GET and report the diff summary (paths/ports/tags) — not a secret
+   dump.
+
+| Prefer | Avoid |
+| --- | --- |
+| One new grant for named src → dst:ports | Replacing entire ACL for a one-line allow |
+| Existing tags | Inventing `tag:temp` without tagOwners |
+| `autogroup:admin` for break-glass | Opening `*:*` to `autogroup:member` |
+| Tests for the change | Silent policy PUT with no proof |
+
+## SSH ACL
+
+Tailscale SSH rules (`ssh` section) are high risk. Require an explicit
+verb naming users/principals and destinations. Prefer check mode /
+record when the operator asked for that posture — do not enable
+`agent` forwarding or root grants casually.
+
+## Defaults
+
+1. Read/review is the default; PUT is gated.
+2. Prefer grants/tags over IP literals when tags already exist.
+3. State blast radius in one sentence before broadening access.
+4. Auth key create/revoke is not ACL — still `tailscale-safety`.
+
+## Refuse
+
+- Inventing tags, groups, or host aliases not in the current policy or
+  device list.
+- Pasting API tokens or auth keys.
+- Broad `*:*` allows without an explicit named ask and risk statement.
