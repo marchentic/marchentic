@@ -1,0 +1,96 @@
+---
+description: >-
+  Authentik flows and stages inventory/craft via Authentik REST API (no
+  Authentik MCP discovered). Resolve flow slugs/pks; never weaken MFA or
+  recovery without an explicit verb naming the flow.
+alwaysApply: false
+---
+
+# Authentik flows
+
+## Gate
+
+Use when the user asks about Authentik **flows**, **stages**, bindings,
+enrollment, authentication, recovery, or invalidation flows. Skip
+app/provider-only asks unless a flow pk must be resolved for binding.
+
+## Transport
+
+No Authentik MCP discovered. Use Authentik REST API with resolved base
+URL + Bearer token (never echo the token). Prefer a real Authentik MCP
+later without inventing tool names.
+
+## Resolve ids
+
+Never invent flow `pk`, `slug`, or stage UUIDs. Resolve via:
+
+| Need | API |
+| --- | --- |
+| List flows | `GET /api/v3/flows/instances/` |
+| Get flow | `GET /api/v3/flows/instances/{slug}/` |
+| Search flows | `GET /api/v3/flows/instances/?search=TERM` |
+| Stages (all) | `GET /api/v3/flows/stages/all/` |
+| Bindings on flow | inspect flow detail / stage bindings endpoints the instance exposes |
+
+Designations that matter for providers: authentication, authorization,
+invalidation, enrollment, recovery, unenrollment — report the
+`designation` field when present.
+
+## Receipt shape
+
+Report: **name**, **slug**, **designation**, stage count / stage class
+names when useful. Do not dump stage configuration secrets (SMTP
+passwords, webhook tokens, CAPTCHA keys).
+
+## Craft (gated)
+
+Create / reorder / rebind stages need an **explicit verb** naming the
+flow (or create intent). Prefer cloning a known-good flow over building
+a blank enrollment chain from scratch unless the user asked for that.
+
+| Action | API shape |
+| --- | --- |
+| Create flow | `POST /api/v3/flows/instances/` |
+| Patch flow | `PATCH /api/v3/flows/instances/{slug}/` |
+| Stage bindings | use the instance’s stage-binding endpoints after listing stages |
+
+When attaching a flow to a provider, pass the resolved flow pk into
+`authentik-providers` — do not leave providers on default flows unless
+the user asked for defaults.
+
+## MFA / recovery / enrollment risk
+
+Changes that **weaken** MFA, skip identification, open public enrollment,
+or alter recovery/unenrollment are high risk. Require:
+
+1. Explicit verb this turn naming the **flow slug**.
+2. One-sentence risk (what control is removed).
+3. `authentik-safety` compliance.
+
+Bare “simplify login” / “fix SSO” without naming the flow is **not**
+authorization to drop MFA stages.
+
+## Defaults
+
+1. Read-only list/get is the default.
+2. Prefer listing existing flows before creating parallel ones with
+   similar names.
+3. Cap stage dumps — summarize class names; open one stage detail when
+   debugging a named failure.
+4. Branding / CSS themes are out of scope unless the user named a flow
+   presentation change.
+
+## Symptom hints
+
+| Signal | Likely check |
+| --- | --- |
+| Redirect loop after login | authorization vs authentication flow on the provider |
+| MFA not prompted | identification / authenticator validation stages on the auth flow |
+| Cannot enroll | enrollment flow designation + invitation/policy bindings |
+| Logout leaves session | invalidation flow bound on the provider |
+
+## Refuse
+
+- Inventing flow slugs or stage UUIDs.
+- Weakening MFA/recovery without an explicit named-flow verb.
+- Pasting SMTP / webhook / CAPTCHA secrets from stage config into chat.

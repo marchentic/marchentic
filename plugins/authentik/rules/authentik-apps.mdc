@@ -1,17 +1,103 @@
 ---
 description: >-
-  List and craft Authentik applications, providers, flows, and groups. Never
-  invent object ids; resolve instance URL first.
+  Authentik applications inventory and craft — list/resolve apps, slugs,
+  launch URLs, and provider bindings via Authentik REST API (no Authentik
+  MCP discovered). Never invent app pks or slugs; never paste client secrets.
 alwaysApply: false
 ---
 
-# Authentik apps
+# Authentik applications
 
-List and craft applications, providers (OIDC/SAML/proxy), flows, stages, and
-groups/users inventory. Prefer MCP when connected; else
-API or authenticated UI.
+## Gate
 
-Never invent application / provider / flow / group ids — list/resolve first.
-Resolve the instance base URL from operator config — do not hardcode hosts.
-After changes, report name + type + slug/client-id **name** only (never paste
-client secrets).
+Use when the user asks to list, inspect, create, update, or bind Authentik
+**applications** (SSO app entries, launch URLs, icons, provider links). Skip
+provider-only or flow-only asks (use those rules). Skip non-Authentik IdPs.
+
+## Transport
+
+No Authentik MCP was discovered for this harness. Prefer the Authentik
+REST API with a resolved base URL and a short-lived API token from the
+operator’s secret store / env (never hardcode hosts or paste tokens into
+chat). If an Authentik MCP appears later, use its list/describe tools when
+ready — **do not invent MCP tool names**.
+
+Resolve base URL from operator config / env (for example
+`AUTHENTIK_URL`) — never invent an internal hostname.
+
+Auth header shape (token value never echoed):
+
+```text
+Authorization: Bearer <token>
+Accept: application/json
+```
+
+## Resolve ids
+
+Never invent application `pk`, `slug`, or `name`. Resolve from the user,
+a prior list this turn, or:
+
+| Need | API (relative to base) |
+| --- | --- |
+| List apps | `GET /api/v3/core/applications/` |
+| Get by slug | `GET /api/v3/core/applications/{slug}/` |
+| Search | `GET /api/v3/core/applications/?search=TERM` |
+| Bound provider | read `provider` / `provider_obj` on the app detail |
+
+If several match, list candidates (name + slug + provider name) and ask
+once — do not pick the production app by vibes.
+
+## Receipt shape
+
+Report: **name**, **slug**, **provider name/type** (when bound), launch
+URL host path only when useful. Never paste client secrets, API tokens,
+or session cookies.
+
+## Craft (gated create/update)
+
+Create / update / rebind provider need an **explicit verb** this turn
+naming the application (or create intent). Prefer update-in-place over
+delete+recreate.
+
+| Action | API shape |
+| --- | --- |
+| Create app | `POST /api/v3/core/applications/` with name, slug, provider pk |
+| Patch app | `PATCH /api/v3/core/applications/{slug}/` |
+| Bind provider | set `provider` to a pk resolved via `authentik-providers` |
+
+Slug rules: lowercase, stable, no spaces. Do not rotate slug casually —
+downstream bookmarks and reverse-proxy paths may depend on it.
+
+Delete / disable → `authentik-safety` plus an explicit delete/disable
+verb naming the slug.
+
+## Groups / users (inventory only)
+
+When the ask is “who can access this app,” list groups bound via policy /
+group membership using:
+
+| Need | API |
+| --- | --- |
+| List groups | `GET /api/v3/core/groups/` |
+| Group detail | `GET /api/v3/core/groups/{group_uuid}/` |
+| Users (metadata) | `GET /api/v3/core/users/?search=TERM` |
+
+Report group **name** + member **count** (or usernames when asked). Never
+dump passwords, TOTP, or recovery codes. Broadening membership is a
+mutate — follow `authentik-safety`.
+
+## Defaults
+
+1. Read-only list/get is the default.
+2. Resolve provider pk from `authentik-providers` before binding.
+3. Cap paginated lists; summarize and offer a tighter `search=`.
+4. Edge reverse-proxy / ingress wiring is out of scope — own the IdP app
+   object only.
+5. After an authorized mutate, re-GET the slug and report the new binding.
+
+## Refuse
+
+- Inventing application pks, slugs, or provider foreign keys.
+- Pasting client secrets, tokens, or user passwords into chat.
+- Claiming an app exists without a list/get this turn.
+- Absorbing Keycloak / Authelia / generic OIDC products here.

@@ -1,7 +1,8 @@
 ---
 description: >-
-  Authentik mutate gates — delete/disable apps, providers, flows, or widen
-  group membership need an explicit verb naming the object.
+  Authentik mutate gates — delete/disable apps, providers, flows, sources;
+  secret rotation; broad group/admin privilege changes need an explicit verb
+  naming the object. Never paste client secrets or tokens into chat.
 alwaysApply: false
 ---
 
@@ -9,14 +10,70 @@ alwaysApply: false
 
 ## Read-only default
 
-List apps, providers, flows, and groups are fine when Authentik work is
-authorized. Do **not**:
+List / get applications, providers, flows, groups, and users are fine when
+Authentik work is authorized. Do **not** do any of the following unless
+the user gave an **explicit verb this turn naming the object**:
 
-- delete or disable an application, provider, flow, or source
-- rotate/reveal client secrets into chat
-- broaden group membership or admin privileges
-- change recovery/enrollment flows that weaken MFA
+| Class | Examples |
+| --- | --- |
+| Delete / disable | application, provider, flow, source, outpost, property mapping |
+| Secrets | rotate/reveal OAuth client_secret; paste API tokens; dump signing keys |
+| Privilege | broaden group membership, grant superuser, widen admin roles |
+| Auth strength | remove MFA stages, open public enrollment, weaken recovery |
+| Irreversible | wipe blueprints that recreate prod SSO; mass user delete |
 
-…unless the user gave an explicit verb this turn naming the object.
+Bare “fix SSO” / “clean up” / “harden” without naming the object is
+**not** authorization.
 
-Never paste client secrets, API tokens, or user passwords into chat.
+## Authorization checklist
+
+Before a gated mutate:
+
+1. Base URL resolved from operator config (not guessed).
+2. Object pk/slug listed or GET this turn (or pasted by the user).
+3. Explicit verb matches the action (disable ≠ delete; rotate ≠ reveal).
+4. One-sentence risk when dropping MFA, deleting a prod provider, or
+   broadening admin groups.
+5. Prefer the smallest blast radius (one app/provider over blueprints).
+
+If any step fails → refuse, say what is missing, and stop.
+
+## Secrets and tokens
+
+Never paste into chat, commits, tickets, or diagrams:
+
+- OAuth/OIDC `client_secret`
+- Authentik API tokens / session cookies
+- SAML signing/encryption private keys
+- Outpost tokens, SCIM tokens, LDAP bind passwords
+- User passwords, TOTP seeds, recovery codes
+
+When a create/rotate API returns a secret: confirm **issued** / **rotated**
+and tell the operator to land it in their secret store. Do **not** quote
+the value. If the user already pasted a secret in chat, treat it as
+exposed for that channel and recommend rotate — do not repeat it.
+
+## Group / admin privilege
+
+Adding users to admin / superuser-equivalent groups, or attaching
+policies that grant broad access, needs an explicit verb naming the
+**group** (and preferably the user). Prefer least-privilege group grants
+over Authentik superuser flags.
+
+## Irreversible
+
+Production provider delete, authentication-flow MFA removal, and
+recovery-flow weakening: state the risk in one sentence and only proceed
+when clearly authorized this turn.
+
+## Aftercare
+
+After an authorized mutate, re-GET the object and report name + slug/pk
++ what changed (no secrets). Do not claim success from a write status
+code alone when a follow-up GET is cheap.
+
+## Neighbor surfaces
+
+Reverse-proxy / ingress / certificate wiring and non-Authentik IdPs are
+out of scope. Stop or report only the Authentik object ids the operator
+needs.

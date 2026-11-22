@@ -598,8 +598,8 @@
     {
       "name": "nodadyoushutup-authentik",
       "source": "./plugins/authentik",
-      "description": "Agnostic Authentik IdP craft: applications, providers, flows, and groups with gated destructive changes. Prefer MCP when connected; otherwise API/UI. Never invent object ids.",
-      "version": "0.11.0",
+      "description": "Agnostic Authentik IdP craft: applications, providers, flows, and gated destructive changes. REST API craft (no Authentik MCP assumed). Never invent object ids or paste secrets.",
+      "version": "0.12.0",
       "logo": "assets/avatar.png"
     },
     {

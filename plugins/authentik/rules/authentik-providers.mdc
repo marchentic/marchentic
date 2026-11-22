@@ -1,0 +1,108 @@
+---
+description: >-
+  Authentik providers craft — OIDC, SAML, and proxy providers via Authentik
+  REST API (no Authentik MCP discovered). Resolve provider pks; never paste
+  client secrets or signing keys into chat.
+alwaysApply: false
+---
+
+# Authentik providers
+
+## Gate
+
+Use when the user asks to list, inspect, create, or update Authentik
+**providers** (OAuth2/OIDC, SAML, proxy/forward-auth, LDAP, SCIM as
+exposed by the instance). Skip app-only or flow-only asks.
+
+## Transport
+
+No Authentik MCP discovered. Use Authentik REST API with resolved base
+URL + Bearer token (never echo the token). Prefer a real Authentik MCP
+later without inventing tool names.
+
+## Resolve ids
+
+Never invent provider `pk`, `name`, or client id. Resolve via:
+
+| Need | API |
+| --- | --- |
+| All providers | `GET /api/v3/providers/all/` |
+| OAuth2/OIDC | `GET /api/v3/providers/oauth2/` · `GET /api/v3/providers/oauth2/{id}/` |
+| SAML | `GET /api/v3/providers/saml/` · `GET /api/v3/providers/saml/{id}/` |
+| Proxy | `GET /api/v3/providers/proxy/` · `GET /api/v3/providers/proxy/{id}/` |
+| Search | `?search=TERM` on the matching collection |
+
+If the user named only a client id, search OAuth2 providers and match
+`client_id` — do not guess.
+
+## Receipt shape
+
+Report: **name**, **type** (oauth2 / saml / proxy / …), **pk**, and for
+OIDC the **client_id name only**. For SAML: ACS URL host + entity id
+**names**. Never paste:
+
+- `client_secret` / rotated secrets
+- SAML signing/encryption private keys or keystores
+- Proxy outpost tokens
+
+## OIDC / OAuth2 craft (gated)
+
+Explicit create/update verb required. Typical fields to set from the
+user’s app docs (do not invent redirect URIs):
+
+| Field | Notes |
+| --- | --- |
+| `name` | Human label; unique enough to find later |
+| `client_type` | confidential vs public — match the app |
+| `redirect_uris` | Exact URIs from the RP; no wildcard guesses |
+| `authorization_flow` / `invalidation_flow` | Flow pks from `authentik-flows` |
+| `property_mappings` | Prefer listed mappings; do not invent UUIDs |
+| `sub_mode` | Prefer stable subject modes the operator named |
+
+| Action | API |
+| --- | --- |
+| Create | `POST /api/v3/providers/oauth2/` |
+| Patch | `PATCH /api/v3/providers/oauth2/{id}/` |
+
+After create, report client_id + redirect URIs. If the API returns a
+client_secret, tell the operator it was issued and must land in their
+secret store — **do not paste the secret into chat**. Prefer regenerating
+into a store over re-display.
+
+## SAML craft (gated)
+
+| Action | API |
+| --- | --- |
+| Create | `POST /api/v3/providers/saml/` |
+| Patch | `PATCH /api/v3/providers/saml/{id}/` |
+
+Require ACS URL + audience/entity id from the SP. Do not invent NameID
+maps. Never dump IdP private key PEM into chat — point at Authentik’s
+download/metadata endpoints for the operator’s browser session.
+
+## Proxy / forward-auth craft (gated)
+
+| Action | API |
+| --- | --- |
+| Create | `POST /api/v3/providers/proxy/` |
+| Patch | `PATCH /api/v3/providers/proxy/{id}/` |
+
+Require external host / mode the user named. Outpost assignment and
+reverse-proxy snippets are operator follow-ups — do not invent outpost
+ids; list outposts when the API exposes them (`/api/v3/outposts/…`)
+before binding.
+
+## Defaults
+
+1. List/get before mutate; prefer patch over delete+recreate.
+2. Bind providers to apps via `authentik-apps` after the provider pk is
+   known (see skill `authentik-sso-onboard`).
+3. Authorization / invalidation flows come from `authentik-flows` — never
+   invent flow pks.
+4. Secret rotation and provider delete → `authentik-safety`.
+
+## Refuse
+
+- Inventing redirect URIs, ACS URLs, or client ids.
+- Pasting client secrets, signing keys, or outpost tokens.
+- Claiming a provider exists without list/get this turn.
