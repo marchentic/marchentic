@@ -8,7 +8,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.36",
+    "version": "0.12.37",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -628,7 +628,7 @@
       "name": "nodadyoushutup-velero",
       "source": "./velero",
       "description": "Agnostic Velero craft: list backups/schedules/restores and gated create/delete via MCP. Prefer Velero MCP; restores are irreversible without explicit ask.",
-      "version": "0.12.1",
+      "version": "0.12.2",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"

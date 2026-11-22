@@ -70,6 +70,15 @@ Do not "dry run" mutate tools — inventory tools are the dry-run path.
 Schedules created only through MCP may disappear when GitOps prunes untracked
 resources. Warn when the user expects a persistent schedule.
 
+## Receipt examples (safe)
+
+Inventory turn: backup `kube-system-daily`, phase `Completed`, namespaces
+`kube-system`, `monitoring` — no mutate.
+
+Restore turn (authorized): stated overwrite risk; backup `app-2025-11-01`
+Completed; `velero_restore_create` with `confirm=true`; restore
+`app-rollback-1` phase `InProgress` from `velero_restore_get` — no secrets.
+
 ## Related (this plugin)
 
 - `velero-inventory` — discover-first list/get
