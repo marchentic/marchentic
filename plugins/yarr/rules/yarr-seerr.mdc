@@ -1,0 +1,67 @@
+---
+description: >-
+  Seerr / Overseerr request craft via yarr MCP seerr tool. Resolve request
+  and media ids — never invent. Mutates need yarr-safety.
+alwaysApply: false
+---
+
+# Yarr Seerr
+
+## Gate
+
+Use when the user asks about Seerr / Overseerr requests, approvals, or
+request status via yarr MCP. Skip pure Sonarr/Radarr library edits and
+qBit queue work unless the ask chains after a request. Always load
+`yarr-safety` for approve/deny/delete writes.
+
+Never invent request id, media id, or user id. Resolve from MCP reads or
+user paste.
+
+## Prefer MCP
+
+When a yarr MCP is ready (`user-mcp_yarr`), use tool `seerr` with
+actions:
+
+`service_status`, `api_get`, `api_post`, `api_put`, `api_delete`, `help`,
+`codemode`, `op`, `snippet_list`, `snippet_save`, `snippet_run`,
+`snippet_delete`.
+
+## Read / search
+
+1. `service_status` first when reachability is unclear.
+2. Prefer `api_get` / `op` for listing pending or named requests — use
+   paths/ops confirmed by `help` or the user; do not invent routes.
+3. Report request id, media title, status, requesting user (display name
+   only when needed).
+4. Paginate with `page` / `page_size` when listing.
+
+## Mutates
+
+Require an explicit verb this turn (`yarr-safety`) for:
+
+- Approving / declining / deleting requests (`api_post` / `api_put` /
+  `api_delete` / mutating `op`)
+- Creating new requests on someone else's behalf
+- Snippet save/run/delete that changes request state
+
+Prefer: confirm media title + request id before approve/deny. Refuse
+mass-deny of all pending requests unless the user named that bulk intent.
+
+## Handoff
+
+After approve, downstream *arr/qBit work is a separate surface — only
+continue into `yarr-arr` / `yarr-qbit` when the user also asked for grab
+or queue follow-up this turn.
+
+## Report shape
+
+- Tool `seerr` + action
+- Request id + title + new status
+- Note when mutate refused or when follow-up *arr/qBit was skipped
+
+## Out of scope
+
+- Direct Sonarr/Radarr quality profile edits (see `yarr-arr`)
+- Plex playback (see `yarr-plex`)
+- Hard-coded requester ACLs — resolve from Seerr, not invent
+

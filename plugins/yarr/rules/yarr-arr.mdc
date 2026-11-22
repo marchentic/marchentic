@@ -1,0 +1,75 @@
+---
+description: >-
+  Sonarr / Radarr / Prowlarr craft via yarr MCP tools. Resolve series/movie
+  ids — never invent. Mutates need yarr-safety.
+alwaysApply: false
+---
+
+# Yarr *arr
+
+## Gate
+
+Use when the user asks about Sonarr, Radarr (incl. 4K), or Prowlarr
+library/search/indexers via yarr MCP. Skip Plex-only, Seerr-only, or
+qBit-queue-only asks. Always load `yarr-safety` for writes/deletes.
+
+Never invent series id, movie id, episode id, or indexer id. Resolve via
+read actions or ids the user pasted.
+
+## Prefer MCP
+
+When a yarr MCP is ready (`user-mcp_yarr`), use these tools with an
+`action` enum:
+
+| Tool | Product |
+| --- | --- |
+| `sonarr` | TV library / series |
+| `radarr` | Movies |
+| `radarr_4k` | 4K movie instance |
+| `prowlarr` | Indexers / search aggregation |
+
+Shared actions (all four): `service_status`, `api_get`, `api_post`,
+`api_put`, `api_delete`, `help`, `codemode`, `op`, `snippet_list`,
+`snippet_save`, `snippet_run`, `snippet_delete`.
+
+## Read / search
+
+1. Prefer `service_status` then targeted `api_get` with a path the user
+   named or that `help` / prior docs on the tool confirm — do not invent
+   undocumented routes.
+2. Prefer `op` / snippets only when the user named them or
+   `snippet_list` showed them.
+3. Paginate with `page` / `page_size` when listing; keep first pulls
+   small.
+4. Report title + id; never paste API keys from responses.
+
+## Writes
+
+1. `api_post` / `api_put` / `api_delete` and mutating `op` / snippet runs
+   need an explicit verb this turn (`yarr-safety`) naming the title or id.
+2. Prefer the smallest write (one series/movie) over bulk profile changes.
+3. Quality profile / root folder changes are high blast radius — state
+   risk, then act only if still authorized.
+4. `delete_files` (when the action supports it) is destructive — require
+   an explicit verb that covers file deletion, not just library unlink.
+
+## Prowlarr
+
+1. Prefer status + read of indexers before any indexer create/delete.
+2. Do not disable all indexers or rotate API keys unless explicitly
+   asked.
+
+## Report shape
+
+- Tool (`sonarr` / `radarr` / `radarr_4k` / `prowlarr`)
+- Action used
+- Title/id (or indexer name) + short finding
+- Note when mutate refused for lack of verb
+
+## Out of scope
+
+- Seerr request workflow (see `yarr-seerr`)
+- qBit download queue (see `yarr-qbit`)
+- Plex library playback (see `yarr-plex`)
+- Hard-coded site root folders — resolve from the instance or user
+

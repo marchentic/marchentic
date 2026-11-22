@@ -1,0 +1,92 @@
+---
+description: >-
+  qBittorrent fleet craft via yarr MCP qbit_* tools. Resolve torrent hash
+  and instance tool — never invent. Mutates need yarr-safety.
+alwaysApply: false
+---
+
+# Yarr qBit
+
+## Gate
+
+Use when the user asks about qBittorrent queues, torrents, pause/resume,
+add, or remove via yarr MCP. Skip pure *arr metadata or Plex session
+asks. Always load `yarr-safety` for add/pause/resume/remove/deletes.
+
+Never invent a torrent `hash` or qBit instance tool name. Resolve from
+`download_queue` / list reads or hashes the user pasted.
+
+## Prefer MCP
+
+When a yarr MCP is ready (`user-mcp_yarr`), each qBit instance is a
+separate tool. Discover names from the live tool list — common patterns:
+
+- `qbit_movie_0` … `qbit_movie_10`, `qbit_movie_4k`
+- `qbit_television_0` … `qbit_television_2`
+- `qbit_books`, `qbit_upload`, `qbit_freeleech`, `qbit_xxx`
+- `qbit_cross_seed_*` (tracker-specific cross-seed clients)
+
+Do **not** invent a `qbit_*` name that is not on the live MCP.
+
+### Actions (qBit tools)
+
+Shared: `service_status`, `api_get`, `api_post`, `api_put`, `api_delete`,
+`help`, `codemode`, `op`, `snippet_list`, `snippet_save`, `snippet_run`,
+`snippet_delete`.
+
+Download helpers:
+
+| Action | Use |
+| --- | --- |
+| `download_queue` | List torrents / queue state |
+| `download_add` | Add torrent/magnet — mutate |
+| `download_pause` | Pause by hash — mutate |
+| `download_resume` | Resume by hash — mutate |
+| `download_remove` | Remove torrent — mutate; `delete_files` extra risk |
+
+Params often used: `hash`, `id`, `url`, `path`, `delete_files`, `page`,
+`page_size`, `name`.
+
+## Discover first
+
+1. Resolve the instance tool from the user's category (movies / TV /
+   books / cross-seed) via live tool names — ask once if ambiguous.
+2. `service_status` then `download_queue` before pause/resume/remove.
+3. Match torrents by name substring → take `hash` from the queue result;
+   never guess hashes.
+
+## Read
+
+1. Prefer `download_queue` over raw `api_get` for queue questions.
+2. Summarize: name, state, progress, hash (short), ratio when present.
+3. Keep page size modest on first pulls.
+
+## Mutates
+
+Require an explicit verb this turn naming the torrent or add intent
+(`yarr-safety`):
+
+| Verb class | Actions |
+| --- | --- |
+| Add | `download_add` (and adding via `api_post` / `op`) |
+| Pause / resume | `download_pause`, `download_resume` |
+| Remove | `download_remove`; if `delete_files` is true, verb must cover file deletion |
+| Bulk purge / force-recheck | Explicit bulk language; prefer one hash unless user named a set |
+
+State blast radius for remove-with-files (data loss on disk). Prefer
+remove-without-files when that satisfies the ask.
+
+## Report shape
+
+- qBit tool name
+- Action + torrent name/hash (or "added" with identifier returned)
+- Whether files were deleted
+- Note when mutate refused
+
+## Out of scope
+
+- *arr monitored-item deletes (see `yarr-arr`)
+- Seerr request reject (see `yarr-seerr`)
+- Site category → instance maps in private `homelab` — do not hard-code
+  paths here
+

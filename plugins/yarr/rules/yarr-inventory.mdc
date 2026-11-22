@@ -1,12 +1,70 @@
 ---
 description: >-
-  List/search library and download state via yarr MCP tools. Resolve instance/service names — never invent.
+  Yarr fleet inventory via MCP: service_status across *arr, Plex, qBit, Seerr,
+  Tautulli. Resolve service tool names — never invent instance ids.
 alwaysApply: false
 ---
 
-# Yarr Inventory
+# Yarr inventory
 
-List/search library and download state via yarr MCP tools. Resolve instance/service names — never invent.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks for media-fleet status, which services are up, or a
+broad inventory of *arr / Plex / qBit / Seerr / Tautulli via yarr MCP. Skip
+bare "media" with no fleet product named. Always load `yarr-safety` when a
+mutate might follow.
+
+Never invent Sonarr/Radarr/Plex ids, qBit torrent hashes, or instance tool
+names. Resolve from the live yarr MCP tool list or from names the user
+pasted.
+
+## Prefer MCP
+
+When a yarr MCP is ready (`user-mcp_yarr` in Cursor), each configured
+service is its **own tool**. Pass `action` plus action-specific params.
+For inventory, prefer:
+
+| Need | Action | Typical tools |
+| --- | --- | --- |
+| Reachability | `service_status` | `sonarr`, `radarr`, `radarr_4k`, `prowlarr`, `plex`, `seerr`, `tautulli`, any `qbit_*` |
+| Help / schema | `help` | same tools — list supported actions when unsure |
+| Snippets (read) | `snippet_list` | optional saved ops; do not invent snippet names |
+
+Do not invent tool names beyond those discovered on the live MCP. Common
+fleet tools include: `sonarr`, `radarr`, `radarr_4k`, `prowlarr`, `plex`,
+`seerr`, `tautulli`, and qBit instances such as `qbit_movie_*`,
+`qbit_television_*`, `qbit_books`, `qbit_upload`, `qbit_freeleech`,
+`qbit_cross_seed_*`, `qbit_xxx`.
+
+## Discover first
+
+1. Prefer the exact service tool the user named (`sonarr`, `plex`, a
+   specific `qbit_*`).
+2. Else call `service_status` on the small set of tools that match the ask
+   (TV → `sonarr` / TV qBit; movies → `radarr` / `radarr_4k`; requests →
+   `seerr`; playback → `plex` / `tautulli`).
+3. If several qBit instances could apply, list matching tool names and ask
+   once — do not pick a production downloader by guess.
+4. Use `help` on a tool when action params are unclear; do not invent
+   REST paths while MCP works.
+
+## Status craft
+
+1. `service_status` first — report up/down and any version/health fields
+   returned.
+2. Keep the first pass small (one service or a short named set).
+3. Summarize; do not dump API keys, cookies, or full config blobs from
+   tool output.
+
+## Report shape
+
+- Service tool name(s) checked
+- Status summary (up/down + notable fields)
+- One recommended next check (library search, queue triage, or gated mutate)
+
+## Out of scope
+
+- Site library path / classification overlays (private `homelab`)
+- Neighbor download clients not exposed on this yarr MCP
+- Mutates (see surface rules + `yarr-safety`)
+

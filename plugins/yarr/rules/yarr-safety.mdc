@@ -1,7 +1,8 @@
 ---
 description: >-
-  Media-fleet mutate gates — delete media, purge download queue, or change
-  quality profiles need an explicit verb. Prefer read/search.
+  Yarr media-fleet destructive gates — delete media, purge download queue,
+  change profiles, or approve/deny requests need an explicit verb. Prefer
+  read/search.
 alwaysApply: false
 ---
 
@@ -9,16 +10,65 @@ alwaysApply: false
 
 ## Read-only default
 
-Search, status, sessions, and queue inspection via yarr MCP are fine when media
-work is authorized. Do **not**:
+When media-fleet craft is authorized, these are fine without a mutate verb:
 
-- delete movie/series files or library items
-- purge / force-recheck torrents in bulk
-- change quality profiles or root folders
+| Surface | Safe actions / tools |
+| --- | --- |
+| Any service | `service_status`, `help`, `api_get`, `snippet_list`, read-only `op` when the op is clearly get/list |
+| Tautulli | `stats_activity`, `stats_history`, `stats_users`, `stats_libraries` |
+| qBit | `download_queue` |
 
-…unless the user gave an explicit verb this turn naming the title or id.
+Do **not** do the following unless the user gave an explicit verb this turn
+naming the title, id, hash, request, or clear create/approve intent:
 
-## Site overlays
+| Mutate class | Examples |
+| --- | --- |
+| HTTP writes | `api_post`, `api_put`, `api_delete` on any yarr tool |
+| Snippet mutates | `snippet_save`, `snippet_run`, `snippet_delete` |
+| qBit download mutates | `download_add`, `download_pause`, `download_resume`, `download_remove` |
+| File delete | any call with `delete_files=true` / media file purge |
+| Tautulli cache | `stats_refresh_libraries`, `stats_refresh_users`, `stats_delete_image_cache` |
+| Seerr decisions | approve / decline / delete request |
+| *arr destructive | delete series/movie, wipe files, change quality profile / root folder |
 
-Library classification and path overlays stay in private `homelab` — do not
-hard-code site paths in this portable plugin.
+Bare product name ("Sonarr", "Plex", "yarr") alone is **not** mutate
+authorization.
+
+## Irreversible — confirm blast radius
+
+Before proceeding when clearly authorized:
+
+| Action | State risk |
+| --- | --- |
+| Library item delete + files | Permanent media loss on disk |
+| `download_remove` + `delete_files` | Removes torrent data |
+| Bulk queue purge | Many downloads lost at once |
+| Quality profile / root folder change | Affects future grabs fleet-wide |
+| Mass Seerr deny | Blocks many user requests |
+| `stats_delete_image_cache` | Clears Tautulli image cache |
+
+State the object (title/id/hash) and consequence in one sentence, then act
+only if authorization already covers that loss.
+
+## Defaults
+
+1. Prefer read/search (`service_status`, `api_get`, `download_queue`,
+   Tautulli stats) over writes.
+2. Prefer one named item over bulk; require bulk language for bulk acts.
+3. Prefer remove-without-files when unlinking a torrent is enough.
+4. Prefer MCP tools discovered on the live yarr MCP (`user-mcp_yarr`); do
+   not invent tool or action names.
+5. Never invent series/movie/request ids or torrent hashes.
+6. Site library classification overlays stay in private `homelab` — do not
+   hard-code site paths in this portable plugin.
+7. Do not paste API keys, cookies, or credentials from tool output into
+   chat.
+
+## Related (this plugin)
+
+- `yarr-inventory` — fleet status
+- `yarr-arr` — Sonarr / Radarr / Prowlarr
+- `yarr-plex` — Plex / Tautulli
+- `yarr-qbit` — qBittorrent instances
+- `yarr-seerr` — Seerr / Overseerr requests
+

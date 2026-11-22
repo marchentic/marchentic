@@ -1,0 +1,76 @@
+---
+description: >-
+  Plex and Tautulli craft via yarr MCP. Resolve library/user/session ids —
+  never invent. Mutates need yarr-safety.
+alwaysApply: false
+---
+
+# Yarr Plex / Tautulli
+
+## Gate
+
+Use when the user asks about Plex libraries/sessions or Tautulli
+activity/history/stats via yarr MCP. Skip *arr library adds and qBit
+queue work. Always load `yarr-safety` for writes/deletes.
+
+Never invent Plex rating keys, library section ids, or Tautulli user ids.
+Resolve from MCP reads or user paste.
+
+## Prefer MCP
+
+When a yarr MCP is ready (`user-mcp_yarr`):
+
+### `plex`
+
+Actions: `service_status`, `api_get`, `api_post`, `api_put`, `api_delete`,
+`help`, `codemode`, `op`, `snippet_list`, `snippet_save`, `snippet_run`,
+`snippet_delete`.
+
+### `tautulli`
+
+Same shared actions, plus stats helpers:
+
+| Action | Use |
+| --- | --- |
+| `stats_activity` | Current activity / sessions |
+| `stats_history` | Watch history |
+| `stats_users` | User stats |
+| `stats_libraries` | Library stats |
+| `stats_refresh_libraries` | Refresh library cache — mutate gate |
+| `stats_refresh_users` | Refresh user cache — mutate gate |
+| `stats_delete_image_cache` | Destructive cache clear — explicit verb |
+
+Useful params when the schema exposes them: `user`, `page`, `page_size`,
+`period`, `start`, `length`, `timezone`.
+
+## Read defaults
+
+1. `service_status` on `plex` / `tautulli` before deep API calls.
+2. Prefer Tautulli `stats_*` read actions for "who's watching" /
+   history over raw Plex API dumps.
+3. Prefer `api_get` with a resolved path over guessing Plex XML endpoints.
+4. Summarize sessions (user, title, player) — do not paste tokens or full
+   device identifiers when a short summary answers the ask.
+
+## Mutates
+
+Require an explicit verb this turn (`yarr-safety`) for:
+
+- Plex `api_post` / `api_put` / `api_delete` (library edits, item delete)
+- Tautulli `stats_refresh_*` and `stats_delete_image_cache`
+- Mutating `op` / `snippet_run` / `snippet_delete` / `snippet_save`
+
+Prefer read/search. Refuse bulk library wipes without a named target.
+
+## Report shape
+
+- Tool (`plex` / `tautulli`) + action
+- Session/library/user summary (ids only when needed)
+- Explicit note when mutate refused
+
+## Out of scope
+
+- *arr grab/search (see `yarr-arr`)
+- Seerr approvals (see `yarr-seerr`)
+- qBit torrent ops (see `yarr-qbit`)
+
