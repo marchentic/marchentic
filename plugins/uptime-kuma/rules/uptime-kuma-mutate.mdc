@@ -1,0 +1,58 @@
+---
+description: >-
+  Gated Uptime Kuma mutate via API/UI: delete monitor/status page/notification,
+  pause/resume, bulk pause. Inventory-before-mutate; explicit verb required.
+alwaysApply: false
+---
+
+# Uptime Kuma mutate
+
+## Gate
+
+Load only when the user authorized Uptime Kuma **and** used an explicit
+mutate verb this turn (**delete**, **pause**, **resume**, **create**,
+**update**) naming the object(s). Otherwise stay on `uptime-kuma-monitors`.
+Always pair with `uptime-kuma-safety` before any mutate call.
+
+No Uptime Kuma MCP discovered — use API/UI only. **Do not invent MCP tool
+names.**
+
+## Inventory before mutate
+
+1. Resolve monitor/page/channel ids from list this turn
+   (`uptime-kuma-monitors`).
+2. Prefer **pause** over **delete** when the user only wants quiet.
+3. State planned action + ids in one line; then call.
+
+## Live mutate map
+
+| Action | Approach | Notes |
+| --- | --- | --- |
+| Create monitor | API/UI create | type + target required; explicit **create** |
+| Update monitor | update by id | only fields user named |
+| Pause / resume | pause/resume by id | prefer over delete |
+| Delete monitor | delete by id | explicit **delete** |
+| Status page create/update/delete | page endpoints/UI | delete needs explicit verb |
+| Notification channel create/update/delete | channel endpoints/UI | never echo webhook secrets |
+| Bulk pause | only listed ids | no "pause everything" without list |
+
+Confirm exact calls against the instance version.
+
+## Defaults
+
+- Prefer pause over delete when silence is enough.
+- Create: require name + type + target from the user; do not invent targets.
+- Bulk: only ids listed this turn.
+- State which fields you changed in the receipt.
+
+## Operator receipt (mutate)
+
+- action (create/update/pause/resume/delete)
+- id(s) + name
+- type + target (no secrets)
+- resulting status
+
+## Related (this plugin)
+
+- `uptime-kuma-monitors` — list/get before mutate
+- `uptime-kuma-safety` — gates and refuse

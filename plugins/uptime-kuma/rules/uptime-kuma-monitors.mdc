@@ -1,15 +1,87 @@
 ---
 description: >-
-  List and craft Uptime Kuma monitors, status pages, and notification channels.
-  Never invent monitor ids; resolve instance URL first.
+  List and craft Uptime Kuma monitors, status pages, and notification channels
+  via API/UI. No Uptime Kuma MCP discovered — do not invent tools. Never invent
+  monitor ids; resolve instance URL first.
 alwaysApply: false
 ---
 
 # Uptime Kuma monitors
 
-List and craft monitors, status pages, and notification channels. Prefer MCP
-when connected; else the product API or authenticated UI.
+## Gate
 
-Never invent monitor / tag / status-page ids — list/resolve first. Resolve the
-instance base URL from operator config — do not hardcode hosts. After create or
-update, report name + type + target + status (no tokens).
+Use when the user authorized Uptime Kuma work and the turn needs **read**
+inventory or non-destructive craft of monitors, status pages, tags, or
+notification channels. Skip bare "uptime" talk without Uptime Kuma. Load
+`uptime-kuma-safety` on every turn; load `uptime-kuma-mutate` only when the
+user also authorized delete/pause/bulk risk. Out of scope: Prometheus/Grafana
+alerting fleets as a substitute.
+
+## Transport
+
+No Uptime Kuma MCP was discovered for this harness. Prefer the product's
+Socket.IO/API or authenticated UI with a resolved base URL — **never paste
+API keys or notification webhook secrets into chat**. If an Uptime Kuma MCP
+appears later, use its list/get tools when ready — **do not invent MCP tool
+names**.
+
+## Resolve instance first
+
+1. Prefer an exact base URL the user named this turn.
+2. Else use operator config/env — never hardcode a host.
+3. Confirm login/API reachability before claiming inventory.
+4. Fail closed on auth errors.
+
+## Live inventory / craft map
+
+| Need | Approach |
+| --- | --- |
+| List monitors | API/UI monitor list |
+| One monitor | get by id from list |
+| Heartbeats / status | recent heartbeat for resolved monitor |
+| Status pages | list/get status pages |
+| Notification channels | list channels (names/types only — no webhook secrets) |
+| Tags | list tags / membership |
+| Create / update monitor | only with explicit create/update verb — else `uptime-kuma-mutate` |
+
+Exact API shapes vary by Uptime Kuma version — confirm against the instance
+docs for the resolved version.
+
+## Discover first
+
+1. Never invent monitor, tag, or status-page ids — list/resolve this turn or
+   take exact paste.
+2. Before update/get, prove the id exists in a list (same turn).
+3. Resolve the instance base URL from operator config — do not hardcode hosts.
+4. After create or update, report name + type + target + status (no tokens).
+
+## Procedure (read paths)
+
+1. **Scope** — monitors vs status pages vs notifications vs tags.
+   **Done when** one read surface is named.
+2. **Connect** — resolve base URL; cheap auth/list check.
+   **Done when** instance is evidence-backed, or auth failed.
+3. **List** — monitors/pages/channels with filters from the ask.
+   **Done when** rows come from API/UI, not guesses.
+4. **Report** — id + name + type + target + status. No secrets.
+   **Done when** receipt is evidence-backed.
+
+## Report shape
+
+- **id** — monitor / page / channel id
+- **name** — display name
+- **type** — http, ping, dns, docker, … / page / notification type
+- **target** — URL/host (not credentials)
+- **status** — up/down/pending/pause when present
+
+## Out of scope
+
+- Delete, bulk pause, credential wipe → `uptime-kuma-mutate` +
+  `uptime-kuma-safety`
+- Prometheus/Grafana rule fleets as a substitute for this product
+- Pasting API keys or webhook URLs with secrets
+
+## Related (this plugin)
+
+- `uptime-kuma-mutate` — gated delete/pause/bulk
+- `uptime-kuma-safety` — prefer pause over delete, secret refuse

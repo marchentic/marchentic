@@ -1,22 +1,62 @@
 ---
 description: >-
-  Uptime Kuma mutate gates — delete monitor/status page/notification and bulk
-  pause need an explicit verb naming the object.
+  Uptime Kuma safety: read-only default, prefer pause over delete, bulk-pause
+  gates, refuse API keys and notification webhook secret dumps.
 alwaysApply: false
 ---
 
 # Uptime Kuma safety
 
+## Gate
+
+Load on every authorized Uptime Kuma turn (inventory or mutate). Skip when
+the turn never touches Uptime Kuma.
+
 ## Read-only default
 
-List monitors, heartbeats, status pages, and notification channels are fine when
-Uptime Kuma work is authorized. Do **not**:
+These are fine without an extra destructive verb when Uptime Kuma is
+authorized:
 
-- delete a monitor, status page, or notification channel
-- pause/resume in bulk across unrelated monitors
-- change notification credentials or wipe tags
+- list monitors, heartbeats, status pages, tags
+- list notification channels (names/types only)
+- read one monitor's status
 
-…unless the user gave an explicit verb this turn naming the object(s).
+Do **not** delete, bulk-pause, or change notification credentials unless the
+user gave an explicit verb **this turn** naming the object(s).
 
-Prefer pause over delete when silence is enough. Never paste API keys or
-notification webhook secrets into chat.
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn |
+| --- | --- |
+| Create / update monitor or page | **create**/**update** + fields |
+| Pause / resume | **pause**/**resume** + id(s) |
+| Delete monitor / page / channel | **delete** + id |
+| Bulk pause | **pause** + listed ids (not "all") |
+| Notification credential change | **update** + channel id (no secret echo) |
+
+Ambiguous "clean up old monitors" → ask for ids; do not mass-delete.
+
+## Prefer pause
+
+Prefer pause over delete when the user only wants quiet. Delete is
+permanent for that monitor's history on many setups — say so.
+
+## Refuse
+
+- Pasting API keys or notification webhook secrets into chat
+- Inventing monitor / tag / status-page ids
+- Absorbing Prometheus/Grafana alerting fleets into this surface
+- Bulk-acting without listed ids
+
+## Receipt examples (safe)
+
+Inventory turn: monitor `api-prod` id `12` type `http` status `up` — no
+mutate.
+
+Pause turn (authorized): paused monitor `12` — no webhook secrets.
+
+## Related (this plugin)
+
+- `uptime-kuma-monitors` — discover-first list/craft
+- `uptime-kuma-mutate` — mutate map
+- Skills: `uptime-kuma-fleet-status`, `uptime-kuma-pause-or-delete`
