@@ -1,22 +1,59 @@
 ---
 description: >-
   Hard refuse leaking Vault secrets into chat, commits, tickets, or logs.
-  Apply whenever Vault secret material is in play.
+  Apply whenever Vault secret or PKI private material is in play.
 alwaysApply: false
 ---
 
 # Vault refuse leak
 
+Load with every Vault secrets, PKI, external-sync, auth, or policy turn.
+
 ## Never
 
-- Paste tokens, passwords, private keys, or unredacted production payloads
-  into chat, commits, Jira/Freshservice, or screenshots.
-- Write secrets into tracked repo files.
-- Log full secret bodies in CI console excerpts.
+- Paste tokens, passwords, API keys, private keys, unredacted production
+  payloads, or full certificate PEMs with private key material into chat,
+  commits, issue trackers, docs, or screenshots.
+- Write secrets into tracked repo files (`.env`, tfvars, CI YAML,
+  checked-in kube Secrets with data).
+- Log full secret bodies in CI console excerpts or agent transcripts.
+- "Confirm" a write by repeating the value the user just pasted.
+- Store Vault secret values in memory tools, tickets, or pastebins.
 
 ## Instead
 
-- Store in Vault; reference by path.
-- Redact to last-4 or key names only when proving a write succeeded.
-- If a secret was already exposed in chat, rotate via Vault and say so —
-  do not repeat the value.
+- Store in Vault; reference by **mount + path + key name**.
+- Redact to last-4, key names only, or "set / not set" when proving a
+  write or read succeeded.
+- For PKI: report CN, serial, expiry, role — not the private key.
+- If a secret was already exposed in chat or a log, **rotate** via Vault
+  (see skill `vault-secret-rotation`) and say so — do **not** repeat the
+  value.
+- Prefer generating a new value directly into `write_secret` over asking
+  the user to paste it back into chat.
+
+## Chat hygiene
+
+1. Treat any credential the user pasted as already compromised for that
+   channel — recommend rotate when it was production material.
+2. When summarizing MCP `read_secret` output, strip values before quoting.
+3. Do not include secret values in commit messages, PR bodies, or diagram
+   text.
+
+## Commits and CI
+
+- Refuse commits that add secret files or inline credentials.
+- If a diff already contains a secret, stop; tell the operator to rotate
+  and purge from history — do not amplify by reprinting it.
+- CI should use OIDC / short-lived tokens / Vault agents — not long-lived
+  tokens in workflow YAML.
+
+## After a leak
+
+1. Name what was exposed (type + where), not the value.
+2. Rotate the credential in Vault.
+3. Invalidate the old version / token / cert when applicable.
+4. Confirm consumers point at the same path/key names (or the new names
+   the user chose).
+5. Done when the old material is rotated and the reply still has **zero**
+   secret bytes.

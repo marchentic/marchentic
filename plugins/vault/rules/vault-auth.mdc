@@ -1,0 +1,73 @@
+---
+description: >-
+  Vault auth method craft — method selection, identity binding, token
+  hygiene. Prefer MCP for secret/PKI ops; auth admin APIs may be CLI/API.
+  Use when configuring or reviewing Vault authentication.
+alwaysApply: false
+---
+
+# Vault auth
+
+## Gate
+
+Use when the user asks to enable, tune, or review a Vault auth method
+(AppRole, Kubernetes, JWT/OIDC, userpass, token, cloud IAM, etc.), or
+when a sync agent / workload cannot authenticate. Skip pure KV read/write
+with no auth ask. Always load `vault-refuse-leak`.
+
+Never invent auth mount paths, role ids, role names, or issuer URLs.
+Resolve from the user or live Vault config they pointed at.
+
+## MCP coverage
+
+Current Vault MCP tools cover mounts, KV, and PKI — **not** auth method
+enable/tune. For auth admin: use the operator’s approved Vault CLI or API
+only when they asked; still never invent paths or paste tokens. Prefer
+MCP for any KV/PKI verification that follows.
+
+## Defaults
+
+1. Prefer short-lived, workload-identity auth (Kubernetes, JWT/OIDC, cloud
+   IAM) over long-lived static tokens for apps.
+2. AppRole: treat `role_id` as identifier and `secret_id` as secret —
+   never commit either; rotate `secret_id` on leak.
+3. Token auth: orphan/periodic tokens need explicit TTL/renewability
+   choices; refuse minting root or unbounded tokens unless explicitly
+   asked and justified.
+4. One auth role per consumer when practical — do not share a broad role
+   across unrelated apps.
+5. Auth mount path should be descriptive (e.g. kubernetes/, jwt-ci/, …) —
+   avoid reusing a catch-all for new trust domains.
+
+## Binding honesty
+
+1. Bind roles to the narrowest subject claims available (namespace +
+   service account, `sub` / audience, IAM principal).
+2. Do not widen `bound_service_account_names` / audiences "so it works"
+   without an explicit ask.
+3. After auth changes, verify the **caller identity** the user named can
+   obtain a token — then check ACL with `vault-policy`. Do not paste the
+   token.
+
+## Token hygiene
+
+- Report auth success as method + role name + TTL metadata — never the
+  client token string.
+- If a token appeared in chat or logs, revoke/rotate and say so without
+  repeating it.
+- Human operator login: prefer OIDC/userpass over sharing root tokens.
+
+## Report shape
+
+1. Auth method + mount path (as named)
+2. Role / binding identifiers (names, not secrets)
+3. TTL / bound constraints when relevant
+4. Next check (policy path capability) without token material
+
+## Refuse
+
+- Do not paste root tokens, wrapping tokens, or `secret_id` values.
+- Do not disable auth methods or delete roles without an explicit
+  destructive verb.
+- Do not fall back to embedding Vault tokens in cluster Secrets as the
+  default design when workload identity is available and asked for.

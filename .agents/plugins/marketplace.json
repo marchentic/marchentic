@@ -202,7 +202,7 @@
     {
       "name": "nodadyoushutup-vault",
       "description": "HashiCorp Vault craft: KV read/write/delete, PKI issue, auth/policy hygiene, and hard refuse to leak credentials. Prefer Vault MCP.",
-      "version": "0.10.1",
+      "version": "0.11.0",
       "source": {
         "source": "local",
         "path": "./plugins/vault"

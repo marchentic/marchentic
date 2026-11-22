@@ -1,7 +1,7 @@
 {
   "name": "nodadyoushutup-vault",
-  "description": "HashiCorp Vault craft: secret read/write posture, mount hygiene, and hard refuse to leak credentials into chat or commits. Prefer Vault MCP.",
-  "version": "0.10.1",
+  "description": "HashiCorp Vault craft: KV read/write/delete, PKI issue, auth/policy hygiene, and hard refuse to leak credentials. Prefer Vault MCP.",
+  "version": "0.11.0",
   "author": {
     "name": "nodadyoushutup",
     "email": "admin@nodadyoushutup.com"
@@ -21,7 +21,7 @@
   "commands": "./commands/",
   "interface": {
     "displayName": "Vault",
-    "shortDescription": "HashiCorp Vault craft: secret read/write posture, mount hygiene, and hard refuse to leak credentials into chat or commits. Prefer Vault MCP.",
+    "shortDescription": "HashiCorp Vault craft: KV read/write/delete, PKI issue, auth/policy hygiene, and hard refuse to leak credentials. Prefer Vault MCP.",
     "developerName": "nodadyoushutup",
     "category": "Productivity",
     "websiteURL": "https://github.com/nodadyoushutup/marketplace",

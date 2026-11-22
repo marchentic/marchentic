@@ -1,16 +1,92 @@
 ---
 description: >-
-  Vault PKI mounts, roles, issuers, and certificate issue craft. Use when
-  working with Vault PKI.
+  Vault PKI mounts, issuers, roles, and certificate issue craft via MCP.
+  Use when enabling PKI or issuing TLS certificates.
 alwaysApply: false
 ---
 
 # Vault PKI
 
-## Defaults
+## Gate
 
-1. Never invent role, issuer, or mount names.
-2. Issue certificates only when the user asked; report serial/CN, not the
-   private key, in chat.
-3. Enabling mounts or deleting roles needs an explicit verb.
-4. Prefer MCP PKI helpers over raw HTTP.
+Use when the user asks to enable PKI, create/list/read issuers or roles,
+issue a certificate, or delete a PKI role. Skip unrelated KV-only work
+(use `vault-secrets`). Always load `vault-refuse-leak` with this rule.
+
+Never invent a PKI mount, issuer name, role name, or common name. Resolve
+from the user or MCP listings this turn.
+
+## Prefer MCP
+
+When a Vault MCP is ready, use these tools — do not invent raw HTTP while
+MCP works:
+
+| Need | Tools |
+| --- | --- |
+| Enable PKI mount | `enable_pki` (`path`, optional `max_ttl`, `description`) |
+| Create issuer | `create_pki_issuer` (`type`: `internal`, `common_name`, `issuer_name`, …) |
+| List / read issuers | `list_pki_issuers` / `read_pki_issuer` |
+| Create role | `create_pki_role` (`role_name`, domains/TTL flags, …) |
+| List / read roles | `list_pki_roles` / `read_pki_role` |
+| Issue certificate | `issue_pki_certificate` (`role_name`, `common_name`, optional `ttl`) |
+| Delete role | `delete_pki_role` — needs explicit verb |
+
+Default mount is often `pki` when the user did not name one — still confirm
+with `list_mounts` / `list_pki_roles` before mutating.
+
+## Setup order
+
+**Root CA (high level)**
+
+1. `enable_pki` with a descriptive path (prefer names that include the
+   domain purpose — avoid generic `demo` / `test` / `example` in prod).
+2. `create_pki_issuer` for the root (`type`: `internal`).
+3. `create_pki_role` with domain constraints that match the ask.
+
+**Intermediate CA**
+
+1. Root must already exist.
+2. `enable_pki` for the intermediate path; link via `root_mount` /
+   `root_issuer` when the tool supports it.
+3. Issuer + role on the intermediate mount; prefer issuing leaf certs from
+   the intermediate, not the root.
+
+## Roles
+
+1. Prefer `allow_any_name=false` with an explicit `allowed_domains` list
+   unless the user asked for unrestricted CN.
+2. Set `allow_glob_domains` / `allow_ip_sans` only when the ask needs them.
+3. Keep `max_ttl` / issue `ttl` as short as the use case allows.
+4. Role names must be unique per mount and descriptive of the consumer.
+
+## Issue certificates
+
+1. Only when the user asked to issue / mint / generate a cert.
+2. Resolve `role_name` via `list_pki_roles` / `read_pki_role` first.
+3. Pass the requested `common_name` (and `ttl` when they named one).
+4. Report **CN, serial, expiry, mount, role** — never paste the private
+   key, CA bundle chain secrets, or full PEM into chat.
+5. Tell the operator where the material landed (Vault response / local
+   handoff they requested) without dumping key material.
+
+## Delete and enable
+
+- `enable_pki` and `create_pki_issuer` / `create_pki_role` need an explicit
+  create/enable verb.
+- `delete_pki_role` needs an explicit delete verb and a named role.
+- Do not delete or recreate root issuers casually — say so and wait for a
+  clear destructive ask.
+
+## Report shape
+
+1. Mount + issuer and/or role name
+2. Action (enabled / created / listed / issued / deleted)
+3. For issue: CN + serial + TTL/expiry when available
+4. No private keys or full cert PEMs in chat
+
+## Refuse
+
+- Do not invent role domain allow-lists that open `*` for convenience.
+- Do not paste private keys into tickets, commits, or chat.
+- Do not use placeholder names like `example` / `demo` / `test` as
+  production issuer or role names when the user gave a real domain.

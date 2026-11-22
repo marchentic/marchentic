@@ -1,0 +1,71 @@
+---
+description: >-
+  Vault ACL policy craft — least privilege, path honesty, no capability
+  sprawl. Use when writing or reviewing Vault policies.
+alwaysApply: false
+---
+
+# Vault policy
+
+## Gate
+
+Use when the user asks to author, review, or tighten a Vault ACL policy
+(HCL/JSON policy document or capability list on a path). Skip when the
+ask is only a KV/PKI data operation with no policy change. Always load
+`vault-refuse-leak`.
+
+Never invent policy names or path prefixes. Tie capabilities to mounts
+and paths the user named or that MCP listed this turn.
+
+## MCP coverage
+
+Vault MCP does not currently expose policy write/read tools. Author
+policy documents in-repo or via the operator’s approved Vault CLI/API
+when asked. Use MCP `list_mounts` / `list_secrets` to **verify path
+prefixes** exist before granting capabilities on them.
+
+## Defaults
+
+1. Least privilege: grant only the capabilities required (`read`, `list`,
+   `create`, `update`, `delete`, `sudo` sparingly).
+2. Prefer exact path prefixes under a known mount — avoid `*` at the
+   mount root unless the user explicitly wants a broad admin policy.
+3. Separate policies for humans, CI, and workloads when trust differs.
+4. KV v2: remember data lives under `…/data/…` and metadata under
+   `…/metadata/…` — grant only the segments the consumer needs.
+5. PKI: issue/sign capabilities are powerful — scope to the specific
+   role path when possible (`pki/issue/<role>`), not the whole mount.
+6. Policy name should describe the consumer (`app-foo-read`,
+   `ci-pki-issue`) — not `admin` or `all` unless it truly is.
+
+## Capability guide
+
+| Intent | Typical capabilities | Notes |
+| --- | --- | --- |
+| Sync agent read | `read` (+ `list` if browsing) | No `create`/`update`/`delete` |
+| App rotate own secret | `read` + `update` on one path | Avoid mount-wide `delete` |
+| PKI issue | `create`/`update` on issue path | Not root CA generate |
+| Mount admin | `sudo` + broad paths | Explicit admin ask only |
+
+## Review checklist
+
+1. Every path prefix maps to a real mount/path the user owns.
+2. No accidental `sudo` or `+` capability grab.
+3. No `secret/*` style grant when a single app path was requested.
+4. Deny-by-omission: capabilities not listed are denied — do not add
+   "just in case" verbs.
+5. Document which auth role attaches this policy (name only).
+
+## Report shape
+
+1. Policy name
+2. Path → capability summary (no secret values)
+3. Attached auth role name when known
+4. Residual risks (broad globs, sudo) called out plainly
+
+## Refuse
+
+- Do not grant root-equivalent policy to apps or CI "temporarily".
+- Do not paste live Vault tokens used to apply the policy.
+- Do not delete or overwrite production policies without an explicit
+  verb and named policy.
