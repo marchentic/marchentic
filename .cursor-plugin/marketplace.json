@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.37",
+    "version": "0.12.38",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -830,7 +830,7 @@
       "name": "nodadyoushutup-kopia",
       "source": "kopia",
       "description": "Agnostic Kopia craft: repository and snapshot inventory plus gated snapshot/restore/forget. Prefer MCP when connected; otherwise kopia CLI. Complements Velero for non-K8s backups.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -881,7 +881,7 @@
       "name": "nodadyoushutup-traefik",
       "source": "traefik",
       "description": "Agnostic Traefik craft: routers, services, middlewares, and IngressRoute shape with destructive gates. Prefer MCP when connected; otherwise API/manifests. Never invent router names.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -1010,7 +1010,7 @@
       "name": "nodadyoushutup-portainer",
       "source": "portainer",
       "description": "Agnostic Portainer craft: endpoint/stack/container inventory and gated stack/container mutations. Prefer MCP when connected; otherwise API/UI. Never invent endpoint ids.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"

@@ -1,26 +1,75 @@
 ---
 description: >-
-  Kopia mutate gates — snapshot create, restore, forget/delete, and
-  maintenance that drops data need an explicit verb naming the object.
+  Kopia safety: read-only default, explicit mutate verbs, restore overwrite
+  risk, refuse repository passwords and key material in chat.
 alwaysApply: false
 ---
 
 # Kopia safety
 
+## Gate
+
+Load on every authorized Kopia turn (inventory or mutate). Skip when the
+turn never touches Kopia.
+
 ## Read-only default
 
-List snapshots, policies, and repo status are fine when Kopia work is
-authorized. Do **not**:
+These are fine without an extra destructive verb when Kopia is authorized:
 
-- create a snapshot against a path the user did not name
-- restore (overwrite live files)
-- `forget` / delete snapshots or wipe a repository
-- run maintenance that expires data beyond a named policy
+- `kopia repository status`
+- `kopia snapshot list` / describe
+- `kopia policy list` / `kopia policy show`
+- `kopia content stats` / `kopia blob stats` (capped)
+- `kopia maintenance info`
+- `kopia diff` between resolved snapshot ids
 
-…unless the user gave an explicit verb this turn naming the object/path.
+Do **not** run mutate commands unless the user gave an explicit verb **this
+turn** naming the target path, snapshot id, or policy scope.
+
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn |
+| --- | --- |
+| Create snapshot | **snapshot** / **backup** + source PATH |
+| Restore | **restore** + snapshot id + DEST |
+| Forget / delete snapshot | **forget** / **delete** + snapshot id |
+| Policy change that shortens retention | **policy** / **set** + PATH + fields |
+| Maintenance that expires data | **maintain** / **expire** / **gc** + scope |
+
+Ambiguous scope (e.g. "clean up old snapshots") → ask once for ids or a
+named retention policy; do not mass-forget without listed targets.
 
 ## Restore risk
 
-Before restore: state destination path impact and that restore can overwrite
-live files. Prefer inventory evidence (snapshot exists) first. Never paste
-repository passwords or key material into chat.
+Restores can **overwrite live files** at the destination.
+
+1. Prefer inventory proof: snapshot id from `kopia snapshot list`.
+2. State destination path impact before running restore.
+3. Use skill `kopia-restore-run` for the full checklist when the user asked
+   to run a restore.
+
+Irreversible or production-shaped restore → prefer staging DEST; confirm
+in-place overwrite when that is what they asked.
+
+## Refuse
+
+- Pasting repository passwords, encryption keys, or provider credentials
+  into chat
+- Inventing snapshot ids, repo paths, or policy paths
+- Absorbing other backup products into this surface
+- Running `kopia repository create` / `connect` with invented secrets
+
+## Receipt examples (safe)
+
+Inventory turn: repo connected (filesystem backend); snapshot `ab12cd` for
+`/data/app` at 2025-11-01 — no mutate.
+
+Restore turn (authorized): stated overwrite risk for `/tmp/restore-app`;
+snapshot `ab12cd` listed; `kopia restore` completed; DEST file count
+reported — no passwords.
+
+## Related (this plugin)
+
+- `kopia-inventory` — discover-first list/status
+- `kopia-mutate` — CLI mutate map and sequence
+- Skills: `kopia-repo-status`, `kopia-restore-run`

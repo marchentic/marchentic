@@ -1,14 +1,97 @@
 ---
 description: >-
-  List Kopia repositories, snapshots, and policies. Never invent snapshot ids
-  or repository paths.
+  List Kopia repositories, snapshots, policies, and maintenance status via
+  authenticated kopia CLI. No Kopia MCP discovered — do not invent tool names.
+  Never invent snapshot ids or repository paths.
 alwaysApply: false
 ---
 
-# Kopia Inventory
+# Kopia inventory
 
-List repositories, snapshots, policies, and maintenance status. Prefer MCP when
-connected; else `kopia` CLI with the resolved repo config.
+## Gate
 
-Never invent repository path / snapshot id / policy path — list/resolve first.
-Report ids, paths, and sizes — never paste repository passwords or key files.
+Use when the user authorized Kopia work and the turn needs **read**
+inventory: repository status, snapshots, policies, content stats, or
+maintenance status. Skip bare "back up" talk without Kopia. Load
+`kopia-safety` on every Kopia turn; load `kopia-mutate` only when the user
+also authorized snapshot/restore/forget. Out of scope: cluster-backup
+controllers and other backup products.
+
+## Transport
+
+No Kopia MCP was discovered for this harness. Prefer authenticated
+`kopia` CLI against a resolved repository config (env/`KOPIA_*`,
+`--config-file`, or operator-documented path). If a Kopia MCP appears
+later, use its list/get tools when ready — **do not invent MCP tool names**.
+
+## Resolve repository first
+
+1. Prefer an exact config path or repo URL the user named this turn.
+2. Else use the operator's documented config (`KOPIA_CONFIG_PATH`,
+   `--config-file`, or default `~/.config/kopia/repository.config` when that
+   is the known local path — confirm with `kopia repository status` before
+   claiming it is connected).
+3. Never invent repository passwords, key files, or S3/B2 credentials.
+4. Fail closed: if status fails, stop and report auth/config error — do not
+   guess a different backend.
+
+## Live CLI read map
+
+| Need | Command |
+| --- | --- |
+| Repo connected? | `kopia repository status` |
+| List snapshots | `kopia snapshot list` (optional `--all`, path filter) |
+| One snapshot | `kopia snapshot list` then match id; `kopia snapshot describe SNAPSHOT_ID` when available |
+| List policies | `kopia policy list` |
+| One policy | `kopia policy show PATH` (PATH from list or user paste) |
+| Content / blob stats | `kopia content stats` / `kopia blob stats` (cap output) |
+| Maintenance status | `kopia maintenance info` |
+| Diff two snapshots | `kopia diff SNAPSHOT_A SNAPSHOT_B` when both ids resolved |
+
+Pass `--json` when the operator wants machine-parseable receipts; still
+summarize — never dump passwords or key material from config.
+
+## Discover first
+
+1. Never invent repository path, snapshot id, or policy path — list/resolve
+   this turn or take exact paste from the user.
+2. Before describing a snapshot, prove the id appears in `kopia snapshot list`
+   (same turn).
+3. Scope by source path when the user named one (`kopia snapshot list PATH`).
+4. Cap large listings: show recent snapshots first; summarize older counts.
+
+## Procedure (read paths)
+
+1. **Scope** — repo status vs snapshots vs policies vs maintenance.
+   **Done when** one read surface is named.
+2. **Connect** — `kopia repository status` with resolved config.
+   **Done when** repo identity (storage type / hash) is evidence-backed, or
+   you stopped on auth error.
+3. **List** — run the matching list command with path filters.
+   **Done when** rows come from CLI, not guesses.
+4. **Report** — short table (see shape). No secret dumps.
+   **Done when** receipt is evidence-backed.
+
+## Report shape
+
+For each snapshot in focus:
+
+- **id** — snapshot id (short form ok if unambiguous)
+- **source** — host + path
+- **time** — snapshot start/complete time
+- **size** — when present
+
+For repo status: storage type + config path used (not credentials) +
+whether connected.
+
+## Out of scope
+
+- Creating snapshots, restore, forget, maintenance that expires data →
+  `kopia-mutate` + `kopia-safety`
+- Other backup products (cluster backup controllers, cloud-native backup)
+- Pasting repository passwords or encryption keys into chat
+
+## Related (this plugin)
+
+- `kopia-mutate` — gated snapshot / restore / forget
+- `kopia-safety` — explicit-verb gates, restore risk, credential refuse

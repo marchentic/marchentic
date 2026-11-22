@@ -472,7 +472,7 @@
     {
       "name": "nodadyoushutup-kopia",
       "description": "Agnostic Kopia craft: repository and snapshot inventory plus gated snapshot/restore/forget. Prefer MCP when connected; otherwise kopia CLI. Complements Velero for non-K8s backups.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/kopia"
@@ -502,7 +502,7 @@
     {
       "name": "nodadyoushutup-traefik",
       "description": "Agnostic Traefik craft: routers, services, middlewares, and IngressRoute shape with destructive gates. Prefer MCP when connected; otherwise API/manifests. Never invent router names.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/traefik"
@@ -577,7 +577,7 @@
     {
       "name": "nodadyoushutup-portainer",
       "description": "Agnostic Portainer craft: endpoint/stack/container inventory and gated stack/container mutations. Prefer MCP when connected; otherwise API/UI. Never invent endpoint ids.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/portainer"

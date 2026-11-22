@@ -1,0 +1,83 @@
+---
+description: >-
+  Gated Kopia mutate via CLI: create snapshot, restore, forget/delete, and
+  maintenance that expires data. Inventory-before-mutate; explicit verb required.
+alwaysApply: false
+---
+
+# Kopia mutate
+
+## Gate
+
+Load only when the user authorized Kopia **and** used an explicit mutate
+verb this turn (**snapshot**, **backup**, **restore**, **forget**,
+**delete**, **maintain** / **expire**) naming the path, snapshot id, or
+policy scope. Otherwise stay on `kopia-inventory`. Always pair with
+`kopia-safety` before any mutate command.
+
+No Kopia MCP discovered — use `kopia` CLI only. **Do not invent MCP tool
+names.**
+
+## Inventory before mutate
+
+1. `kopia repository status` this turn (`kopia-inventory`).
+2. Resolve every path and snapshot id from `kopia snapshot list` or user
+   paste — never guess.
+3. For restore: prove snapshot exists (`kopia snapshot list` / describe)
+   before writing files.
+4. State planned action + path/destination in one line; then run the command.
+
+## Live CLI mutate map
+
+| Action | Command | Notes |
+| --- | --- | --- |
+| Create snapshot | `kopia snapshot create PATH` | PATH must be named this turn |
+| Restore | `kopia restore SNAPSHOT_ID DEST` (or equivalent restore subcommand for the installed CLI) | overwrite-shaped — warn first |
+| Forget snapshot | `kopia snapshot delete SNAPSHOT_ID` / `kopia snapshot forget` per installed CLI | explicit **forget**/**delete** + id |
+| Policy set | `kopia policy set PATH …` | only fields the user named |
+| Maintenance run | `kopia maintenance run` | only when user asked; can expire data |
+
+Confirm the exact subcommand spelling against `kopia --help` / `kopia COMMAND
+--help` on the installed binary — flag names vary by version. Prefer
+`--json` for receipts when available.
+
+## Defaults
+
+- Snapshot source: only paths the user named — never walk the whole disk.
+- Restore destination: require an explicit DEST; refuse silent overwrite of
+  home or system roots without naming them.
+- Retention / forget: prefer policy-driven expiry the user already set over
+  ad-hoc mass forget.
+- State which flags you relied on in the receipt.
+
+## Restore warning
+
+Restore can **overwrite live files** at DEST.
+
+1. Warn destination impact in plain language.
+2. Prove snapshot id from inventory.
+3. Prefer a non-live staging DEST when the user did not insist on in-place
+   overwrite.
+
+After restore: list DEST or re-run a narrow inventory check; report paths
+touched (counts ok).
+
+## Forget / maintenance discipline
+
+- Forget: explicit verb + snapshot id(s) listed this turn — no "clean up
+  old" mass delete without named ids or a named retention policy action.
+- Maintenance: say whether full or quick; warn that expired content may be
+  removed permanently.
+
+## Operator receipt (mutate)
+
+- action (snapshot / restore / forget / policy / maintenance)
+- path or snapshot id(s)
+- destination (restore)
+- outcome (ok / error summary)
+- no passwords, keys, or connection strings
+
+## Related (this plugin)
+
+- `kopia-inventory` — status / list before mutate
+- `kopia-safety` — gates, restore risk, credential refuse
