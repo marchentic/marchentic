@@ -1,0 +1,72 @@
+---
+description: >-
+  Always-on smallest complete change: solve the whole task with the least new
+  code; never cut validation, security, accessibility, or data-loss handling
+alwaysApply: true
+---
+
+# Smallest complete change
+
+Write only what the task needs. The best code is the code never written.
+Lean about the solution, never about reading or finishing the change.
+
+Ceremony tiers (Direct / Standard / Full) stay separate — they control
+process, not how small the solution is. Lean intensity defaults to **full**;
+switch with `/code lite|full|ultra` (see `code-lean`).
+
+## Before you write
+
+Read the task and the code it touches. List every place the change must reach:
+callers, tests, fixtures, config, exports. Check what it could break for users:
+data destroyed or exposed, callers that stop working. That is scope. Extra
+features are not.
+
+## Ladder (first option that fully works)
+
+1. Does it need to exist? Skip features, options, and flexibility nobody
+   asked for — name them in one line. A vague "build me X" gets the smallest
+   version that does the core job.
+2. Already in this codebase (helper, component, service, pattern)? Use it the
+   way surrounding code does.
+3. Standard library or platform feature? Use it, unless the project has its
+   own. A house component beats a native widget.
+4. An installed dependency? Use it. Never add a dependency for a few lines.
+5. Can it be one line a reader gets at a glance? One line.
+6. Otherwise: the minimum code that works.
+
+## Finish the change
+
+- Touch every caller, test, and fixture the edit breaks. Incomplete is not lean.
+- No abstraction, wrapper, type conversion, option, config, boilerplate, or
+  "for later" code nobody asked for. Keep values in the form the platform
+  already gives. Deletion beats addition. Keep the repo's layers and conventions.
+- The shortest working diff wins once you know everything it must touch. A
+  one-liner that needs decoding is not short.
+- Comment only the why the code cannot show, in one line — or a durable
+  `shortcut:` marker when a known ceiling is deliberate (see `code-comments`).
+- Bug fix: before editing, grep every caller of the function you touch; fix the
+  root cause once in the shared code.
+- Code you move or merge keeps its error handling and validation.
+- Between equal-size options, take the one correct on edge cases.
+- New non-trivial logic (branch, loop, parser, money, security, or a whole new
+  script/app) leaves one small test or assert-based self-check. Trivial changes
+  need none.
+
+## Never cut
+
+Validation at trust boundaries, error handling that prevents data loss,
+security, accessibility, hardware calibration the product needs, and anything
+the user asked for.
+
+## Lean intensity
+
+| Level | Behavior |
+| --- | --- |
+| **lite** | Build what was asked. Name the smaller option in one line and let the user pick. |
+| **full** | The ladder above. Default. |
+| **ultra** | Also question the request: before building, push back on any *solution shape* the need does not justify. Does not replace product briefs for unscoped outcomes. |
+
+## Reply close (Change work)
+
+End coding replies with one or two lines: what you skipped or did not check,
+and any risk the user must know.

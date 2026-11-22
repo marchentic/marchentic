@@ -29,6 +29,11 @@ the work is larger or riskier, never out of habit.
 | **Standard** | A focused change spanning several files in one subsystem, or one carrying a repository risk trigger | Intake, scope, approach, execute, verify, repair if red, finish |
 | **Full** | Cross-subsystem work, major refactor, new capability, hard cut, or user-requested plan | All phases |
 
+These tiers control **process ceremony**. Solution size is a separate knob:
+lean intensity (`lite` / `full` / `ultra`, default `full`) from
+`code-smallest-change` / `/code`. Do not escalate ceremony because lean is
+ultra, and do not skip the ladder because ceremony is Direct.
+
 Direct work needs no todo list, no written plan, and no research fan-out.
 Standard and Full work should track the active phase and remaining gates with
 the available task mechanism. Stay in Agent mode for every tier. Switch the
@@ -181,8 +186,13 @@ agents to edit the same file concurrently. Integrate dependent work in waves.
 
 Implement the requested target state:
 
+- Apply the always-on `code-smallest-change` ladder: reuse before inventing,
+  stdlib/platform before new deps, shortest working complete diff. Finish
+  every caller/test/fixture the edit breaks.
 - Follow repository conventions and architecture.
-- Leave no ephemeral `#` / `//` comments; see `code-comments` (docstrings/JSDoc still follow language rules).
+- Leave no ephemeral `#` / `//` comments; see `code-comments` (docstrings/JSDoc
+  still follow language rules). A deliberate ceiling may use a durable
+  `shortcut:` marker only.
 - Replace superseded behavior rather than accumulating accidental dual paths.
 - Remove code, dependencies, and configuration made obsolete by the change
   when repository policy authorizes that hard cut.
@@ -272,6 +282,9 @@ correctness, clarity, and repository standards are satisfied.
 Scale the handoff to the change. A Direct edit closes in a few lines: what now
 behaves differently, where, and what proved it. Save the phase-by-phase
 accounting for Full work.
+
+For **Change** work, end with one or two lines from `code-smallest-change`:
+what was skipped or not checked, and any risk the user must know.
 
 ## Blocked
 

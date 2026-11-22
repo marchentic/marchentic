@@ -42,12 +42,29 @@ Controls without handlers, registrations without implementations, placeholder
 modules, always-empty allowlists, and no-op hooks should be completed when the
 contract is live or deleted when it is not.
 
-## Premature abstraction
+## Premature abstraction (yagni)
 
 Generic helpers with one trivial implementation, catch-all utility modules, and
 speculative extension points increase surface without reducing complexity.
 Inline or move behavior to the owner. Do not merge implementations whose
 validation, ordering, retry, or error semantics differ.
+
+## Reuse / stdlib / native
+
+**Smell:** a new helper or dependency that duplicates an in-repo pattern, a
+platform feature, or a few lines of standard library.
+
+**Fix:** call the existing helper the way surrounding code does; prefer
+stdlib/platform over a new package for a few lines.
+
+## Near-copies (merge) and mixed jobs (split)
+
+**Smell:** two almost-identical blocks that must change together, or one
+function owning several unrelated jobs.
+
+**Fix:** merge near-copies only when contracts and error semantics match.
+Split mixed jobs by responsibility — never by line count, and never into
+helpers that exist only to make a function shorter.
 
 ## Derived state and memo noise
 

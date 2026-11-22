@@ -88,6 +88,18 @@ Deslop:
 
 ## Phase A rules
 
+Classify hygiene with the same lean vocabulary as `code-smallest-change` and
+`code-reviewer` so review → deslop handoffs share words:
+
+| Label | Meaning |
+| --- | --- |
+| **delete** | Dead code, unused options, speculative features |
+| **reuse** | Repo already has this helper — use it, remove the duplicate |
+| **stdlib / native** | Platform or standard library already does it; drop a few-line dep |
+| **yagni** | Abstraction with one implementation, config nobody sets |
+| **merge** | Near-copies that must change together |
+| **split** | One function doing several unrelated jobs — by job, never by line count |
+
 - Prefer deletion and inlining over new abstraction.
 - Remove both a dead symbol and tests, fixtures, exports, and documentation that
   exist only for it.
@@ -98,6 +110,8 @@ Deslop:
 - Do not edit generated outputs; edit their source or generator when in scope.
 - Respect host-repo isolation boundaries when they exist (do not smuggle
   product-specific identity into shared substrate packages).
+- Leave durable `shortcut:` markers alone unless the user asked to clear debt
+  or the ceiling is already crossed.
 
 ## Phase B rules
 

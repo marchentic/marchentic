@@ -34,6 +34,14 @@ Only when a future reader cannot recover the *why* from code + docs/tests:
 - Mandatory markers a tool or gate requires
 - A durable operator note in an **example** env/template when peers already
   use that pattern — never a session diary
+- A deliberate lean shortcut with a known ceiling, using exactly this form so
+  `code-debt` can harvest it:
+
+  `shortcut: <ceiling>; upgrade when <trigger>`
+
+  Example: `shortcut: in-memory map only; upgrade when multi-process`.
+  Both ceiling and trigger are required. Session TODOs, "fix later", and
+  trail comments stay refused above.
 
 If unsure whether a comment is durable: **omit it**.
 

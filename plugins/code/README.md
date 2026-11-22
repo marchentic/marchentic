@@ -3,17 +3,18 @@
 Coding standards and coding workflow for Claude Code, Cursor, GitHub Copilot,
 and OpenAI Codex.
 
-This plugin owns file-type conventions, refactor / debug / verify skills,
-and coding agents. Tracker filing, git-host craft, product briefs, and a
-full security checklist are out of scope. Stack rules keep one-line
-trust-boundary controls; `code-workflow` Finish runs a security checklist
-when available on trust-boundary diffs, otherwise stops on the local
-trust-boundary list.
+This plugin owns file-type conventions, the always-on smallest-complete-change
+ladder, refactor / debug / verify / audit / debt skills, and coding agents.
+Tracker filing, git-host craft, product briefs, and a full security checklist
+are out of scope. Stack rules keep one-line trust-boundary controls;
+`code-workflow` Finish runs a security checklist when available on
+trust-boundary diffs, otherwise stops on the local trust-boundary list.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
+| `code-smallest-change` | Always-on lean ladder, never-cut list, skip/risk reply close |
 | `code-python` | Python style, typing, Google docstrings, tests |
 | `code-javascript` | JavaScript and JSX style, JSDoc, robustness, tests |
 | `code-typescript` | TypeScript and TSX types, narrowing, and module boundaries |
@@ -34,14 +35,17 @@ trust-boundary list.
 | `code-yaml` | YAML structure, quoting, multi-doc streams, secrets hygiene |
 | `code-markdown` | Markdown structure, clarity, safety |
 | `code-terraform` | HCL layout, locals SSoT, validation, templates, safety |
-| `code-comments` | Sparse, durable source comments only |
+| `code-comments` | Sparse durable comments; allows `shortcut:` debt markers |
 | `code-unit-testing` | Lasting unit-test philosophy (core contracts, no AI scratch theater) |
 
 ## Skills (both)
 
 | Skill | Purpose |
 | --- | --- |
-| `code-workflow` | Intake → execute → verify |
+| `code-workflow` | Intake → execute → verify (ceremony tiers) |
+| `code-lean` | Session lean intensity (`lite` / `full` / `ultra`) + command help |
+| `code-audit` | Whole-repo / folder quality audit (read-only) |
+| `code-debt` | Harvest `shortcut:` comments into a ledger |
 | `code-investigation` | Evidence-driven codebase investigation |
 | `code-systematic-debugging` | Diagnose before fixing |
 | `code-verification-before-completion` | Evidence before completion claims |
@@ -54,7 +58,7 @@ trust-boundary list.
 | Agent | Purpose |
 | --- | --- |
 | `code-technical-lead` | Approach, risks, sequencing |
-| `code-reviewer` | Read-only review of a meaningful diff |
+| `code-reviewer` | Read-only review of a meaningful diff (bug → risk → scale → test → speed → lean) |
 | `code-debugger` | Root-cause + minimal fix |
 | `code-quality-assurance` | Tests in the same change for app/library code |
 
@@ -62,19 +66,25 @@ trust-boundary list.
 
 Primary slash UX (run the matching skill immediately):
 
+- `/code [lite|full|ultra]` → `code-lean` (session lean intensity; bare `/code` reports it)
 - `/deslop` → `code-deslop`
 - `/refactor` → `code-refactor`
+- `/code-review` → launch `code-reviewer`
+- `/code-audit` → `code-audit`
+- `/code-debt` → `code-debt`
 
 Also:
 
 - `code-workflow`
-- `code-review`
 - `code-debug`
 - `code-investigate`
 - `code-verify`
 - `/code-execute-issue <ISSUE-KEY>` → `code-execute-issue` (worktree → pull request; manual merge)
 
+Ceremony tiers (Direct / Standard / Full) and lean intensity are orthogonal:
+tiers control process; lean controls solution size.
+
 ## Docs
 
-- [`docs/code-workflow.drawio`](docs/code-workflow.drawio) — visual map of `code-workflow` (tiers, phases, isolation, subagent routing)
+- [`docs/code-workflow.drawio`](docs/code-workflow.drawio) — visual map of `code-workflow` (tiers, lean ambient, phases, isolation, subagent routing)
 - [`docs/code-workflow.png`](docs/code-workflow.png) — same map, black background
