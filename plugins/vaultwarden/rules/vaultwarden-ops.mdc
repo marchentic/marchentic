@@ -1,15 +1,105 @@
 ---
 description: >-
-  Vaultwarden admin/ops craft — users, orgs, invites, and instance config
-  shape without dumping vault item secrets.
+  Vaultwarden admin/ops inventory — users, orgs, invites, and non-secret
+  instance config via Admin API/UI (no Vaultwarden MCP discovered). Never
+  dump vault item secrets; always pair with vaultwarden-refuse-leak.
 alwaysApply: false
 ---
 
 # Vaultwarden ops
 
-Admin and ops craft for Vaultwarden / Bitwarden-compatible instances: user and
-org inventory, invites, and non-secret config. Prefer MCP when connected; else admin API or authenticated UI.
+## Gate
 
-Never invent org / collection / user ids. Resolve the instance base URL from
-operator config — do not hardcode hosts. Report counts and statuses — not
-cipher plaintext. Always load `vaultwarden-refuse-leak` with this rule.
+Use when the user asks about Vaultwarden / Bitwarden-compatible **admin
+ops**: instance health, user/org inventory, invites, SMTP/config shape
+(non-secret), or admin-token gated diagnostics. Skip HashiCorp Vault
+asks. Skip “show me the password for …” — that is refuse-leak, not ops.
+
+## Transport
+
+No Vaultwarden MCP was discovered for this harness. Prefer:
+
+1. Vaultwarden **Admin** API / admin UI with a resolved base URL and
+   admin token from the operator’s secret store / env.
+2. Else Bitwarden-compatible API for **org/collection/user metadata
+   only** — never for cipher plaintext.
+
+If a Vaultwarden MCP appears later, use its admin inventory tools when
+ready — **do not invent MCP tool names**. Never hardcode hosts or paste
+admin tokens into chat.
+
+Resolve base URL from operator config / env (for example
+`VAULTWARDEN_URL`) — never invent an internal hostname.
+
+Admin auth shape (token value never echoed):
+
+```text
+Authorization: Bearer <admin-token>
+# or the instance’s documented admin-token header / cookie flow
+```
+
+Confirm the exact admin routes for the running version via the
+instance’s admin docs or OpenAPI if exposed — path prefixes vary
+(` /admin `, `/api/...`). Prefer list/get that return **counts and
+statuses**, not cipher bodies.
+
+## Resolve ids
+
+Never invent user id, org id, or collection id. Resolve from the user,
+a prior list this turn, or admin list endpoints. If several match, list
+candidates (email/name + status) and ask once.
+
+## Receipt shape
+
+Report: **user email/name**, **org name**, **status** (enabled /
+verified / invites pending), **counts**. Never report:
+
+- login passwords, secure notes, card numbers, identities
+- TOTP seeds, passkeys, attachment bytes
+- cipher JSON/CSV exports
+- RSA data keys, `data.json`, admin tokens
+
+Always load `vaultwarden-refuse-leak` with this rule.
+
+## Admin inventory (read)
+
+Typical admin needs (adjust paths to the instance version after checking
+docs — do not invent MCP tools):
+
+| Need | Approach |
+| --- | --- |
+| Users | Admin users list — id, email, created, enabled |
+| Orgs | Admin orgs list — name, user count, collections count |
+| Invites | Pending invites metadata (email + org) — no passwords |
+| Diagnostics | Version / config **flags** (SMTP configured? Y/N) — not SMTP passwords |
+
+Cap listings; summarize large user tables.
+
+## Config shape (non-secret)
+
+When asked how the instance is configured, report **booleans and names
+only**: signup allowed, invitations, SSO/OIDC enabled, attachment limit
+class, domain setting **hostname form** the operator already named. Do
+not dump env files, `ADMIN_TOKEN`, database URLs, or SMTP credentials.
+
+## Mutate (gated)
+
+User delete, org delete, invite revoke, disable user, wipe collections
+→ `vaultwarden-safety` plus an explicit verb naming the object. Prefer
+disable over delete when the user did not say delete.
+
+## Defaults
+
+1. Read-only admin inventory is the default.
+2. Prefer the user’s own Bitwarden/Vaultwarden client for reading any
+   secret material.
+3. HashiCorp Vault and other secret stores are out of scope here.
+4. After an authorized mutate, re-list and report status — still zero
+   cipher bytes.
+
+## Refuse
+
+- Inventing user/org/collection ids.
+- Any cipher plaintext, export, or “debug by pasting the vault.”
+- Pasting admin tokens or DB URLs into chat.
+- Claiming a user/org exists without a list this turn.

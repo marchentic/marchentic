@@ -1,25 +1,70 @@
 ---
 description: >-
-  Hard refuse to dump Vaultwarden / Bitwarden vault item contents, passwords,
-  TOTP, or attachment bytes into chat or commits.
+  Hard refuse dumping Vaultwarden / Bitwarden vault item contents,
+  passwords, TOTP, exports, or admin tokens into chat, commits, or logs.
+  Load on every Vaultwarden turn.
 alwaysApply: false
 ---
 
 # Vaultwarden refuse leak
 
-## Hard refuse
+Load with every Vaultwarden ops, users, or safety turn.
+
+## Hard never
 
 Do **not**:
 
-- paste login passwords, notes, card numbers, TOTP seeds, or attachment bytes
-- export vault JSON/CSV into chat or the repo
-- commit `data.json`, RSA keys, or admin tokens
-- “help debug” by echoing decrypted cipher fields
+- Paste login passwords, secure notes, card numbers, identity fields,
+  TOTP seeds, passkey material, or attachment bytes into chat, commits,
+  tickets, docs, or screenshots.
+- Run or paste `bw export`, vault JSON/CSV, or cipher bulk dumps into
+  the repo or chat.
+- Commit `data.json`, RSA keys, `config.json` secrets, `.env` with
+  `ADMIN_TOKEN`, or database dumps.
+- “Confirm” a secret by repeating a value the user just pasted.
+- Unlock a personal vault in the agent session to read item plaintext
+  “for debugging.”
+- Store vault item values in memory tools, pastebins, or issue trackers.
 
-Summarize that an item exists (name/type only) when needed. Prefer the user’s
-own client for reading secrets.
+## Instead
 
-## Mutate gates
+- Admin/ops: report **names, types, counts, statuses** only.
+- Item existence: “login item named X exists” — never the password.
+- Prefer the user’s own Vaultwarden/Bitwarden client for reading secrets.
+- Land admin tokens and SMTP passwords in the operator’s secret store —
+  reference by **name**, not value.
+- If a secret was already exposed in chat or a log, **recommend rotate**
+  in the owning system and say so — do **not** repeat the value.
 
-Delete user/org, revoke sessions, or wipe collections need an explicit verb
-naming the object. Never paste admin tokens into chat.
+## Chat hygiene
+
+1. Treat any credential the user pasted as exposed for that channel —
+   recommend rotate when it was production material.
+2. When summarizing API output, strip cipher fields before quoting.
+3. Do not include secret values in commit messages, PR bodies, or
+   diagram text.
+4. Magic invite links: prefer out-of-band delivery; if shown once,
+   do not re-quote later.
+
+## Commits and CI
+
+- Refuse commits that add vault exports, `data.json`, or admin tokens.
+- If a diff already contains a secret, stop; tell the operator to
+   rotate and purge — do not amplify by reprinting it.
+- CI should use short-lived automation accounts — not long-lived admin
+  tokens in workflow YAML.
+
+## After a leak
+
+1. Name what was exposed (type + where), not the value.
+2. Rotate / revoke (password, admin token, API key, invite).
+3. Invalidate sessions when applicable.
+4. Confirm consumers use the new secret **without** pasting it here.
+5. Done when the old material is rotated and the reply still has
+   **zero** vault secret bytes.
+
+## Scope boundary
+
+HashiCorp Vault and other secret backends are out of scope — do not
+absorb them. This rule is about Vaultwarden / Bitwarden-compatible
+password-vault material and admin tokens only.

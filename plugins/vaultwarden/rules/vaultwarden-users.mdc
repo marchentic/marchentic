@@ -1,0 +1,76 @@
+---
+description: >-
+  Vaultwarden user and organization membership craft — list/invite/disable
+  via admin surfaces (no Vaultwarden MCP discovered). Never dump vault
+  item contents; pair with vaultwarden-refuse-leak and vaultwarden-safety.
+alwaysApply: false
+---
+
+# Vaultwarden users / orgs
+
+## Gate
+
+Use when the user asks to list, invite, disable, or remove **users**,
+**organizations**, or **collections** (metadata) on a Vaultwarden /
+Bitwarden-compatible instance. Skip cipher/item content asks (refuse).
+Skip instance config diagnostics (use `vaultwarden-ops`).
+
+## Transport
+
+No Vaultwarden MCP discovered. Use Admin API/UI with resolved base URL
++ admin token (never echo). Prefer a real Vaultwarden MCP later without
+inventing tool names. Bitwarden CLI (`bw`) may list **org/collection
+structure** when the operator authorized that account — still **never**
+print item passwords/notes/TOTP.
+
+## Resolve ids
+
+Never invent user UUID, org id, or collection id. Resolve via admin
+list/search or operator paste. Confirm email ↔ id before mutate.
+
+## Receipt shape
+
+| OK | Never |
+| --- | --- |
+| email, name, user id | password, master-password hint values |
+| org name, role (user/admin) | collection item plaintext |
+| invite pending / accepted | attachment bytes |
+| 2FA **enabled?** boolean | TOTP seed / recovery codes |
+
+## Invites (gated)
+
+Creating an invite needs an **explicit verb** naming the email (+ org
+when applicable). Send via the instance’s invite flow; do not invent
+temporary passwords into chat. If the API returns a one-time setup
+link, tell the operator it was issued and to deliver it out-of-band —
+prefer not pasting magic links into shared chat when avoidable.
+
+## Membership / roles (gated)
+
+Org role changes and collection assignments need an explicit verb
+naming the **user** and **org/collection**. Prefer least privilege
+(user over org-admin). Follow `vaultwarden-safety`.
+
+## Disable / delete (gated)
+
+| Prefer | When |
+| --- | --- |
+| Disable / deauthorize | user should lose access but retain audit trail |
+| Delete | user explicitly said delete naming the account |
+
+Org delete and collection wipe are irreversible for shared metadata —
+state risk; require clear authorization.
+
+## Defaults
+
+1. List/status first; mutate only under verb + named object.
+2. Always load `vaultwarden-refuse-leak`.
+3. Do not use personal vault unlock in the agent session to “help
+   debug” item contents — refuse and point at the user’s client.
+4. Cap member listings; summarize.
+
+## Refuse
+
+- Dumping any vault item field to “verify” membership work.
+- Inventing emails or org ids.
+- Pasting admin tokens or `bw` session keys into chat.

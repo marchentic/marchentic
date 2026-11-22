@@ -1,0 +1,60 @@
+---
+description: >-
+  Vaultwarden mutate gates — delete/disable users or orgs, revoke
+  sessions, wipe collections, and admin-token rotation need an explicit
+  verb naming the object. Never dump vault contents.
+alwaysApply: false
+---
+
+# Vaultwarden safety
+
+## Read-only default
+
+Admin user/org list and non-secret diagnostics are fine when
+Vaultwarden work is authorized. Do **not** do any of the following
+unless the user gave an **explicit verb this turn naming the object**:
+
+| Class | Examples |
+| --- | --- |
+| Delete / wipe | user, org, collection, attachments bulk delete |
+| Access | disable user, revoke sessions, revoke invites |
+| Privilege | promote org-admin, broaden collection access |
+| Secrets | rotate/reveal admin token into chat; export vault |
+| Irreversible | purge org, reset instance DB, disable 2FA for a user |
+
+Bare “clean up users” / “fix access” without naming targets is **not**
+authorization.
+
+## Authorization checklist
+
+Before a gated mutate:
+
+1. Base URL resolved from operator config (not guessed).
+2. User/org/collection id listed this turn (or pasted by the user).
+3. Explicit verb matches the action (disable ≠ delete; revoke ≠ export).
+4. One-sentence risk for deletes and org wipes.
+5. Prefer disable / revoke over delete when equivalent.
+
+If any step fails → refuse, say what is missing, and stop.
+
+## Always with refuse-leak
+
+Every mutate still forbids cipher plaintext and admin-token pasting
+(`vaultwarden-refuse-leak`). Success receipts are ids + status only.
+
+## Admin token
+
+Rotating `ADMIN_TOKEN` needs an explicit verb. Confirm rotated; tell the
+operator to land the new value in their secret store — **never paste
+the token**. Update only the store path the user named.
+
+## Aftercare
+
+Re-list the affected user/org and report status. Do not claim success
+from a write status alone when a follow-up list is cheap. Still zero
+vault secret bytes in the reply.
+
+## Neighbor surfaces
+
+HashiCorp Vault, IdP SSO wiring, and reverse-proxy TLS are out of
+scope except as non-secret flags the operator already set.
