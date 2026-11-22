@@ -1,23 +1,30 @@
 # zot
 
-Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise API/UI. Sibling to harbor — install what you run.
+Agnostic Zot OCI registry craft: repository/tag inventory and gated
+delete/GC via API/UI. No Zot MCP in the live harness catalog — resolve a
+base URL; never invent repo or tag names; keep credentials out of chat.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `zot-inventory` | List repositories, tags, and referrers |
-| `zot-safety` | Delete tag/repo / GC / auth need an explicit verb |
+| `zot-repos` | Repository list and resolve |
+| `zot-tags` | Tag/manifest/referrer inventory |
+| `zot-safety` | Delete/GC/auth gates; credential refuse |
 
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
-| `zot` | Index / gate |
+| `zot` | Index / gate / procedure |
+| `zot-repo-audit` | Repository fleet inventory checklist |
+| `zot-gc-run` | Gated garbage-collection checklist |
 
 ## Commands
 
-- `/zot` → Zot inventory or gated mutate
+- `/zot` → Zot repository/tag craft
+- `/zot-audit` → Repository fleet audit
+- `/zot-gc` → Gated garbage collection
 
 ## Related capabilities
 
@@ -26,4 +33,4 @@ Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. P
 
 ## Diagrams
 
-- [`docs/zot-workflow.drawio`](docs/zot-workflow.drawio) — gate → act → evidence
+- [`docs/zot-workflow.drawio`](docs/zot-workflow.drawio) — gate → route → inventory / GC / gated mutate

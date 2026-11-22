@@ -1,0 +1,66 @@
+---
+description: >-
+  Zot repository inventory: list/resolve repos and high-level counts. Never
+  invent repository names; resolve registry base URL from config.
+alwaysApply: false
+---
+
+# Zot repositories
+
+## Gate
+
+Use when the user authorized Zot work and the turn needs **repository**
+inventory: list repos, pick a repo for tags/referrers, or audit registry
+shape. Skip bare "OCI registry" talk without Zot. Load `zot-safety` on
+every Zot turn. Tags/manifests/referrers → `zot-tags`. Other OCI registry
+products are out of scope.
+
+## Prefer live surface
+
+No Zot MCP was discovered in the live harness catalog. Prefer:
+
+1. Zot **API** / Distribution-compatible endpoints with a base URL from
+   operator config / env
+2. Authenticated Zot **UI** when API access is unavailable
+
+If an MCP appears later, discover tools from the live map — do not invent
+tool names. Never hardcode a host. Never invent repository names —
+list/resolve this turn or use exact names the user pasted.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List repositories | Catalog/list API or UI Repositories |
+| One repository | Resolve from list; report name + tag count when present |
+| Auth / anonymous pull policy | Read-only note — changes need `zot-safety` |
+
+## Discover first
+
+1. Resolve **base URL** from config/env — refuse guessing.
+2. List repositories before naming one for tag or GC work.
+3. Report **repo name** — never paste htpasswd / token secrets.
+
+## Procedure (read paths)
+
+1. **Scope** — fleet list vs one named repo. **Done when** clear.
+2. **List / resolve** — evidence from API/UI this turn.
+   **Done when** every repo name you cite was listed or user-pasted.
+3. **Report** — short table (see shape). **Done when** no secrets appear.
+
+## Report shape
+
+- **repository**
+- **tags** — count when available
+- **base URL** — product host only; no credentials
+
+## Out of scope
+
+- Tag/manifest/referrer detail → `zot-tags`
+- Delete tag/repo / GC / auth mutate → `zot-safety`
+- Other OCI registries
+
+## Related (this plugin)
+
+- `zot-tags` — tags, manifests, referrers
+- `zot-safety` — delete / GC / auth gates

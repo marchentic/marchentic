@@ -1,0 +1,70 @@
+---
+description: >-
+  Zot tag/manifest/referrer inventory. Never invent tag or digest names;
+  prefer tag delete over full repo wipe.
+alwaysApply: false
+---
+
+# Zot tags
+
+## Gate
+
+Use when the user authorized Zot work and the turn needs **tag / manifest /
+referrer** inventory: list tags, digests, manifests, or referrers under a
+repository. Load `zot-safety` always. Repo fleet list → `zot-repos` first
+when the repository is ambiguous. Delete / GC → `zot-safety` with an
+explicit verb.
+
+## Prefer live surface
+
+No Zot MCP in the live harness catalog. Use Zot API or authenticated UI.
+If an MCP appears later, discover tools from the live map — do not invent
+tool names.
+
+Resolve **repository** then **tag/digest** before mutate.
+
+## Craft
+
+| Need | Approach |
+| --- | --- |
+| List tags | Tags API/UI for resolved repo |
+| Manifest / digest | Manifest get for tag; report digest + media type |
+| Referrers | Referrers API when present — subject digest + artifact type |
+| Delete tag | Explicit delete verb + repo + tag (`zot-safety`) |
+| Delete repository | Explicit delete + repo (`zot-safety`) — prefer tag delete first |
+
+## Discover first
+
+1. Resolve repository (`zot-repos`) — never invent the name.
+2. List tags before delete or GC planning.
+3. Prefer **tag** delete over repository wipe when that answers the ask.
+4. For referrers, resolve the subject digest from a listed tag first.
+
+## Procedure
+
+1. **Scope** — tags vs manifest vs referrers.
+   **Done when** one surface is named.
+2. **Resolve** — repo + tag/digest from list or user paste.
+   **Done when** every name used was proven this turn.
+3. **Report or gate** — inventory receipt, or hand off to `zot-safety`
+   for delete/GC. **Done when** no unauthorized delete ran.
+4. **Receipt** — repo + tag/digest (+ referrer count when useful).
+
+## Report shape
+
+- **repository**
+- **tag** / **digest** (short digest OK)
+- **media type** — when available
+- **referrers** — count or short list when asked
+- **action** — only when a gated mutate ran
+
+## Out of scope
+
+- Repo fleet audit without tags → `zot-repos`
+- GC / auth policy changes → `zot-safety`
+- Other OCI registries
+
+## Related (this plugin)
+
+- `zot-repos` — repository inventory
+- `zot-safety` — delete / GC / auth gates

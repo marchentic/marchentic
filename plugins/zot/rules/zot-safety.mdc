@@ -1,11 +1,16 @@
 ---
 description: >-
-  Zot mutate gates — delete tag/repo, GC, and auth changes need an explicit
-  verb naming the object.
+  Zot mutate gates — delete tag/repo, GC, and auth/anonymous policy changes.
+  Explicit verb naming the object; refuse credential dumps.
 alwaysApply: false
 ---
 
 # Zot safety
+
+## Gate
+
+Load on every Zot turn. Skip only when the turn never touches Zot
+repositories, tags, GC, or auth.
 
 ## Read-only default
 
@@ -13,8 +18,52 @@ List repos and tags are fine when Zot work is authorized. Do **not**:
 
 - delete a tag, manifest, or repository
 - run GC that removes unreferenced blobs the user did not ask to prune
-- change auth/anonymous pull policy without an explicit verb
+- change auth / anonymous pull policy without an explicit verb
 
-…unless the user gave an explicit verb this turn naming the object.
+…unless the user gave an **explicit verb this turn naming the object**.
 
-Prefer tag delete over repo wipe. Never paste htpasswd / token secrets into chat.
+## Mutate gates
+
+| Action | Require |
+| --- | --- |
+| Delete tag | delete / remove + repository + tag |
+| Delete repository | delete / remove / destroy + repository |
+| GC / blob prune | gc / prune / garbage-collect + scope confirmation |
+| Auth / anonymous pull | explicit auth/anonymous/public verb + intended policy |
+
+Prefer the narrowest action:
+
+1. Tag delete over repository wipe
+2. Scoped GC after tag deletes over blind full GC
+3. Ask once when mass-delete or GC scope is ambiguous
+
+## Refuse secrets
+
+Do **not** paste into chat:
+
+- htpasswd entries, bearer tokens, or client certs
+- Registry credentials or long-lived pull secrets
+
+Prefer: repository/tag **names**, digest prefixes, and "credential is set"
+language.
+
+## No invented MCP tools
+
+No Zot MCP was discovered in the live harness catalog. Do not invent MCP
+tool names for delete/GC. Use API/UI/CLI paths the operator authorized.
+If an MCP appears later, use only tools on the live map and still apply
+these gates.
+
+## Operator receipt (mutate)
+
+Safe shape:
+
+- Base URL product host (no credentials)
+- Repository (+ tag when relevant)
+- Action taken
+- "No registry credentials shown"
+
+## Related (this plugin)
+
+- `zot-repos` — repository inventory
+- `zot-tags` — tag / manifest / referrer craft
