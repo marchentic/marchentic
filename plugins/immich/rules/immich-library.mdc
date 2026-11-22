@@ -1,13 +1,87 @@
 ---
 description: >-
-  List Immich libraries, albums, assets, and people. Never invent asset ids.
+  List Immich libraries, albums, assets, people, and jobs via Immich API or UI.
+  No Immich MCP discovered — do not invent tools. Never invent asset ids.
 alwaysApply: false
 ---
 
 # Immich library
 
-List libraries, albums, assets, people, and jobs status. Prefer MCP when
-connected; else Immich API or authenticated UI.
+## Gate
 
-Never invent album / asset / person ids — list/resolve first. Report counts and
-ids — do not dump original media bytes or EXIF that embeds secrets into chat.
+Use when the user authorized Immich work and the turn needs **read**
+inventory: libraries, albums, assets, people, or jobs status. Skip bare
+"photos" talk without Immich. Load `immich-safety` on every Immich turn;
+load `immich-mutate` only when the user also authorized delete/share/admin
+changes. Out of scope: Nextcloud photo apps and media-fleet (*arr/Plex)
+surfaces.
+
+## Transport
+
+No Immich MCP was discovered for this harness. Prefer the Immich REST API
+with an API key from operator config/env — **never paste the key into
+chat**. If an Immich MCP appears later, use its list/get tools when ready —
+**do not invent MCP tool names**. Authenticated UI is fine for confirm-only
+reads.
+
+## Resolve instance first
+
+1. Prefer an exact base URL the user named this turn.
+2. Else use operator config/env (`IMMICH_URL` or documented URL) — never
+   hardcode a host.
+3. Confirm with a cheap health/server-info read before claiming inventory.
+4. Fail closed on auth errors — do not invent alternate keys.
+
+## Live API read map
+
+| Need | Approach |
+| --- | --- |
+| Server / version | Immich server-info / about endpoint for installed version |
+| Search assets | search/metadata or search endpoints with filters |
+| Albums | albums list / album by id |
+| People | people list / person by id |
+| Asset detail | asset by id (metadata only — no original bytes dump) |
+| Jobs | jobs status when troubleshooting pipelines |
+
+Exact paths vary by Immich version — confirm against the instance OpenAPI
+or docs for the resolved version. Prefer metadata fields (id, filename,
+takenAt, album name, person name, counts).
+
+## Discover first
+
+1. Never invent album, asset, or person ids — list/resolve this turn or
+   take exact paste.
+2. Before detailing an asset/album, prove the id appears in a list (same
+   turn).
+3. Cap large library dumps; summarize counts and show focused hits.
+4. Do not dump original media bytes or EXIF that embeds secrets into chat.
+
+## Procedure (read paths)
+
+1. **Scope** — albums vs assets vs people vs jobs.
+   **Done when** one read surface is named.
+2. **Connect** — resolve base URL; cheap health/info check.
+   **Done when** instance identity is evidence-backed, or auth failed.
+3. **List** — albums/assets/people with filters from the ask.
+   **Done when** rows come from API/UI, not guesses.
+4. **Report** — id + name/filename + counts. No API keys or media bytes.
+   **Done when** receipt is evidence-backed.
+
+## Report shape
+
+- **id** — album/asset/person id
+- **name** — album title, filename, or person name
+- **counts** — assets in album / face count when present
+- **takenAt** — for assets when useful
+
+## Out of scope
+
+- Permanent delete, share links, admin user/OAuth/API-key changes →
+  `immich-mutate` + `immich-safety`
+- Nextcloud / *arr / Plex library craft
+- Pasting API keys or dumping originals
+
+## Related (this plugin)
+
+- `immich-mutate` — gated delete/share/admin
+- `immich-safety` — trash-over-delete, secret refuse

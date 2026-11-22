@@ -1,0 +1,66 @@
+---
+description: >-
+  Gated Immich mutate via API: trash/delete assets, share links, album edits,
+  admin user changes. Inventory-before-mutate; explicit verb required.
+alwaysApply: false
+---
+
+# Immich mutate
+
+## Gate
+
+Load only when the user authorized Immich **and** used an explicit mutate
+verb this turn (**delete**, **trash**, **share**, **archive**, **create
+album**, **admin**) naming the object(s). Otherwise stay on
+`immich-library`. Always pair with `immich-safety` before any mutate call.
+
+No Immich MCP discovered — use Immich REST API or UI only. **Do not invent
+MCP tool names.**
+
+## Inventory before mutate
+
+1. Resolve album/asset/person ids from list/search this turn
+   (`immich-library`).
+2. Prefer trash/archive over permanent delete when silence is enough.
+3. State planned action + ids in one line; then call.
+
+## Live API mutate map
+
+| Action | Approach | Notes |
+| --- | --- | --- |
+| Trash / archive assets | asset update / trash endpoints | prefer before hard delete |
+| Permanent delete / empty trash | delete endpoints | explicit **delete** + ids |
+| Create / update album | albums create/update | named album only |
+| Add/remove album assets | album asset endpoints | resolved asset ids |
+| Share link create/revoke | shared-link endpoints | public link = exposure risk |
+| Admin user / API key | admin endpoints | refuse key dumps; explicit admin verb |
+
+Confirm exact paths against the instance OpenAPI for the resolved Immich
+version.
+
+## Defaults
+
+- Prefer trash over permanent delete.
+- Prefer private albums over public share links unless the user asked for
+  a share link.
+- Never bulk-delete across libraries the user did not name.
+- State which endpoints/fields you used in the receipt.
+
+## Share-link warning
+
+Public share links expose media to anyone with the URL. Before create:
+restate scope (album/assets) and whether the link is public. Prefer
+passworded or short-lived links when the API supports them and the user
+asked.
+
+## Operator receipt (mutate)
+
+- action (trash/delete/share/album/admin)
+- object id(s)
+- outcome
+- no API keys, passwords, or media bytes
+
+## Related (this plugin)
+
+- `immich-library` — list/get before mutate
+- `immich-safety` — gates and refuse

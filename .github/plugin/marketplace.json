@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex — posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.51"
+    "version": "0.12.53"
   },
   "plugins": [
     {
@@ -627,7 +627,7 @@
       "name": "nodadyoushutup-immich",
       "source": "./plugins/immich",
       "description": "Agnostic Immich craft: library/album/asset inventory and gated delete/share changes. Prefer MCP when connected; otherwise API/UI. Never invent asset ids; refuse credential dumps.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "logo": "assets/avatar.png"
     },
     {

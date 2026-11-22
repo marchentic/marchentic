@@ -547,7 +547,7 @@
     {
       "name": "nodadyoushutup-immich",
       "description": "Agnostic Immich craft: library/album/asset inventory and gated delete/share changes. Prefer MCP when connected; otherwise API/UI. Never invent asset ids; refuse credential dumps.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/immich"

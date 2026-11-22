@@ -1,21 +1,63 @@
 ---
 description: >-
-  Immich mutate gates — permanent delete, share-link create, and admin user
-  changes need an explicit verb naming the object.
+  Immich safety: read-only default, prefer trash over hard delete, share-link
+  exposure gates, refuse API-key dumps and media-byte dumps.
 alwaysApply: false
 ---
 
 # Immich safety
 
+## Gate
+
+Load on every authorized Immich turn (inventory or mutate). Skip when the
+turn never touches Immich.
+
 ## Read-only default
 
-List albums/assets and search are fine when Immich work is authorized. Do **not**:
+These are fine without an extra destructive verb when Immich is authorized:
 
-- permanently delete assets or empty trash
-- create public share links without an explicit verb
-- change admin users, OAuth, or API keys
-- bulk-retag/move across libraries the user did not name
+- server-info / health reads
+- album / asset / people list and search
+- jobs status reads
+- asset metadata (not original bytes)
 
-…unless the user gave an explicit verb this turn naming the object(s).
+Do **not** delete, create public shares, or change admin users/API keys
+unless the user gave an explicit verb **this turn** naming the object(s).
 
-Prefer trash/archive over hard delete. Never paste API keys into chat.
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn |
+| --- | --- |
+| Trash / archive | **trash**/**archive** + asset/album ids |
+| Permanent delete / empty trash | **delete** + ids |
+| Public share link | **share** + scope |
+| Album create/update membership | **create**/**update**/**add**/**remove** + ids |
+| Admin user / OAuth / API keys | **admin** + named change |
+
+Ambiguous "clean up duplicates" → ask for ids; do not mass-delete.
+
+## Prefer trash
+
+Prefer trash/archive over hard delete when the user only wants items gone
+from the library view. Empty-trash is permanent — require an explicit
+empty/delete verb.
+
+## Refuse
+
+- Pasting API keys, OAuth secrets, or user passwords into chat
+- Dumping original media bytes or EXIF secret material into chat
+- Inventing album/asset/person ids
+- Absorbing Nextcloud / *arr / Plex into this surface
+
+## Receipt examples (safe)
+
+Inventory turn: album `Wedding` id `…` count 120 — no mutate.
+
+Trash turn (authorized): trashed assets `a1`, `a2` — no keys; originals not
+dumped.
+
+## Related (this plugin)
+
+- `immich-library` — discover-first list/search
+- `immich-mutate` — mutate map
+- Skills: `immich-library-search`, `immich-share-or-delete`
