@@ -1,6 +1,17 @@
 <p align="center">
-  <img src="docs/assets/github-banner-v2.png" alt="marchentic" width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/mark-white.svg">
+    <img src="docs/assets/mark-black.svg" alt="marchentic" width="96" height="96">
+  </picture>
 </p>
+
+<h1 align="center">marchentic</h1>
+
+<p align="center">
+  Agent plugins that stick with you — across Claude, Cursor, Copilot, and Codex.
+</p>
+
+## Built so agents behave the way you already decided
 
 Agent plugins for [Claude Code](https://docs.anthropic.com/en/docs/claude-code),
 [Cursor](https://cursor.com),
