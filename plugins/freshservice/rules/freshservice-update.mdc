@@ -1,0 +1,50 @@
+---
+description: >-
+  Freshservice update craft — edit existing tickets, prefer additive notes,
+  preserve fields you do not understand, never invent ticket ids.
+alwaysApply: false
+---
+
+# Freshservice update
+
+## Gate
+
+Update **only** when the user names an existing ticket (id / display id) or
+explicitly says to revise / refresh / comment on a known Freshservice ticket.
+
+Do not invent a ticket id. Resolve via connected MCP search/get when ready,
+or the operator’s configured API/UI path. Ambiguity → ask once for the id, or
+stop.
+
+## Prefer additive updates
+
+1. Read the current ticket so subject, type, status, and description are known.
+2. Prefer a **note / reply / public or private comment** for progress chatter
+   and evidence — leave the durable description stable when possible.
+3. Edit the description only when the user asked to fix shape, correct facts,
+   or replace a stub — then follow `freshservice-ticket`.
+4. Never delete fields, custom attributes, or attachments you do not
+   understand.
+
+## Field discipline
+
+- Subject: keep stable unless the user asked to rename.
+- Type: do not convert Incident ↔ Change unless the user named the new type
+  and the workspace allows it.
+- Priority / group / requester: `freshservice-status` honesty — named or
+  existing only.
+- Links: add related ids the user named; do not invent.
+
+## Status during update
+
+Status changes are a separate authorization from “add a note”:
+
+- “Update the ticket with X” → note/description only unless they also said
+  resolve / close / assign / pending.
+- Resolve/close still needs evidence (`freshservice-status`).
+
+## Done
+
+Return ticket id, what changed (note vs description vs fields), resulting
+status, and browse URL when known. Stop — do not implement product code
+unless the user added an explicit implement verb.

@@ -1,7 +1,7 @@
 ---
 description: >-
   When and how to create Freshservice tickets — create-only by default, never
-  invent workspace/group. Use when filing ITSM tickets.
+  invent workspace/group/requester. Use when filing ITSM tickets.
 alwaysApply: false
 ---
 
@@ -9,21 +9,82 @@ alwaysApply: false
 
 ## Gate
 
-Ordinary coding stays **ticketless**. Create only when the user clearly says
-to file a Freshservice / ITSM ticket (incident, service request, problem,
-change). “Fix X” alone does **not** authorize create.
+Ordinary coding stays **ticketless**. Do not create a ticket, invent an id, or
+open the service desk to “cover” work unless this turn explicitly authorizes
+it.
 
-## Create-only default
+Create **only** when the user text clearly says to file one, for example:
 
-“File a Freshservice ticket” authorizes **create only**. Put scope into the
-description (`freshservice-ticket`) and **stop**. Do not implement code unless
-the user added an explicit second verb.
+- “make a Freshservice ticket”, “file an incident”, “open a service request”,
+  “create a problem/change”, “file it in the service desk”
+
+These do **not** authorize create — just implement on the current branch:
+
+- “add X”, “fix Y”, “I think Z is broken”, naming a feature without filing
+
+Naming an **existing** ticket id means work that ticket — it does not mean
+create another one.
+
+Ambiguity → **do not create**. Never ask whether to file unless the user
+already raised filing.
+
+## Create-only is the default
+
+“File a Freshservice ticket / incident” authorizes **create only**. Put the
+rest of the message into the description (see `freshservice-ticket`) and
+**stop**. Do not edit code, open a worktree, or change status beyond the
+default created state.
+
+Create-only stays create-only when the primary verb this turn is file or
+ticket. Do not treat that ask as authorization to implement.
+
+## Create-and-implement (explicit second verb only)
+
+Same-turn implementation only when the user adds an explicit second verb, for
+example: “file it and fix it”, “create the incident and remediate”, “file it
+then implement”. Inference (“they described the outage, so fix prod”) is
+forbidden.
 
 ## Defaults (never invent)
 
-1. Workspace / domain — configured or named only.
-2. Group, requester, category, priority — configured or named; else omit or
-   use the host default the operator already set.
-3. Prefer MCP create tools when ready.
+When create is authorized:
 
-Ambiguity → **do not create**.
+1. **Workspace / domain** — host-configured default when present; else a
+   workspace the operator or chat already named. Never invent a domain.
+2. **Group / requester / category / priority** — same rule: configured or
+   named only; omit or leave host defaults when unknown.
+3. **Type** — see Types below; do not invent custom types the workspace does
+   not use.
+
+Prefer a connected Freshservice / ITSM MCP when one is ready. If none is
+connected, use the operator’s configured API or UI path once — **do not
+invent credentials, tool names, or side CLIs**.
+
+## Types
+
+| Type | Default create? | Notes |
+| --- | --- | --- |
+| Incident | Yes when user says incident / outage / broken | Impact + urgency honest |
+| Service request | Yes when user says request / access / provision | Requested outcome clear |
+| Problem | Only if user asks for a problem | Root-cause tracking; link incidents when known |
+| Change | Only if user asks for a change | Window / risk / rollback when known |
+
+If the user says only “ticket” without a type, prefer **Incident** for
+breakage and **Service request** for asks — state which you chose.
+
+## Create procedure
+
+1. Resolve workspace / group / requester / category / priority from host
+   config or explicit context — never invent.
+2. Apply `freshservice-ticket` for the description body.
+3. Create via connected MCP when available; otherwise the operator’s
+   configured API/UI path. Do not invent tool names.
+4. Leave in the **default created / Open** state unless the user asked to
+   assign, prioritize, or resolve. Status moves: `freshservice-status`.
+5. Return the ticket id and browse link when the site URL is known.
+
+## Done
+
+Create is done when the reply contains the ticket id (or a clear create
+failure), the body matched `freshservice-ticket`, and no product code was
+edited on a create-only ask.

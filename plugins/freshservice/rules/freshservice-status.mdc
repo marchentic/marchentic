@@ -7,10 +7,53 @@ alwaysApply: false
 
 # Freshservice status
 
-## Honesty
+Keep status honest. Prefer a connected Freshservice / ITSM MCP when one is
+ready. If none is connected, use the operator’s configured API or UI path —
+do not invent tool names, workspace ids, or credentials.
 
-- Do not mark **Resolved** / **Closed** without evidence the ask is done.
-- Pending ≠ resolved. Say what is waiting (user reply, vendor, change window).
+## Lifecycle
+
+| Moment | Status posture |
+| --- | --- |
+| Just created, no start directive | Leave Open / default created |
+| Waiting on requester / vendor | Pending (say what is waiting) |
+| Work actively underway | In Progress / Open with assignee when set |
+| Ask completed with evidence | Resolved |
+| Confirmed closed / no further action | Closed |
+
+Exact status labels vary by workspace — use the workspace’s real status names
+from the ticket or tools; do not invent a custom workflow.
+
+## Honesty gates
+
+- Do **not** mark **Resolved** / **Closed** without evidence the requested
+  outcome is done (or the requester confirmed).
+- Pending ≠ resolved. Say what is waiting (user reply, vendor, change window,
+  approval).
 - Never invent priority, group, or assignee — only set values the user named
   or the ticket already has.
-- Transitions: prefer MCP status/update tools; report the resulting state.
+- Do not “resolve” because chat feels finished or a PR was opened without
+  verification.
+
+## Assignment and priority
+
+1. Assign only when the user named a group/agent or host config supplies one.
+2. Priority / urgency / impact: set only from named values or existing ticket
+   fields; do not escalate for drama.
+3. Reassignment: state from → to; refuse silent broad reassignment of many
+   tickets unless the user listed them.
+
+## Transitions
+
+1. Read the current ticket (id known) before changing status.
+2. Apply the smallest honest move that matches the user’s verb.
+3. If a transition fails, report the blocker — do not fake status in chat.
+4. After mutate: return ticket id, new status, and evidence (not secret dumps).
+
+## Scope
+
+- Do not invent a ticket so this status rule can run.
+- Naming a ticket id authorizes status work on that ticket when the user asked
+  to update/resolve/assign — it does not authorize create of a new one.
+- Create-only turns leave status alone unless the user also asked to board /
+  assign / resolve (see `freshservice-create`).

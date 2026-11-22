@@ -1,15 +1,18 @@
 # freshservice
 
-Agnostic Freshservice ITSM craft — create gates, ticket body shape, status
-honesty. Install when the project uses Freshservice (MCP or API).
+Agnostic Freshservice ITSM craft — create gates (create-only by default), ticket
+body shape, additive updates, and honest status. Install when the project uses
+Freshservice (MCP or configured API). No Freshservice MCP is assumed; do not
+invent tool names.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `freshservice-create` | Create-only filing gate |
-| `freshservice-ticket` | Description shape |
-| `freshservice-status` | Status / priority honesty |
+| `freshservice-create` | Create-only filing gate, types, never invent ids |
+| `freshservice-ticket` | Overview / Impact / Details / outcome body shape |
+| `freshservice-update` | Edit existing tickets; prefer notes over rewrites |
+| `freshservice-status` | Status / priority / assign honesty |
 
 All rules are **agent-requested** (`alwaysApply: false`).
 
@@ -17,11 +20,12 @@ All rules are **agent-requested** (`alwaysApply: false`).
 
 | Skill | Purpose |
 | --- | --- |
-| `freshservice` | Index / gate |
+| `freshservice` | Gate / load map / defaults / procedure |
+| `freshservice-ticket-author` | Body authoring + create/update checklist |
 
 ## Commands
 
-- `/freshservice` → ticket craft
+- `/freshservice` → ticket create, update, and status craft
 
 ## Related capabilities
 
@@ -30,4 +34,4 @@ All rules are **agent-requested** (`alwaysApply: false`).
 
 ## Diagrams
 
-- [`docs/freshservice-workflow.drawio`](docs/freshservice-workflow.drawio) — gate → act → evidence
+- [`docs/freshservice-workflow.drawio`](docs/freshservice-workflow.drawio) — gate → route → create/update/status → evidence

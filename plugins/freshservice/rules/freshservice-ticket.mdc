@@ -1,24 +1,67 @@
 ---
 description: >-
-  Freshservice ticket body shape — Overview, impact, and clear next steps.
-  Use when authoring or editing ticket descriptions.
+  Freshservice ticket body shape — Overview, impact, details, requested
+  outcome, and next steps. Use when authoring or editing ticket descriptions.
 alwaysApply: false
 ---
 
 # Freshservice ticket body
 
-## Shape
+Incidents and service requests **must** use this headed shape. Do not omit
+Overview or Requested outcome. Problems and changes keep the same sections
+and add type-specific facts under Details.
 
-Use short headed sections:
+## Body template
 
-1. **Overview** — one or two sentences on what is wrong or requested.
-2. **Impact** — who/what is blocked (systems, users, urgency).
-3. **Details** — facts, error text (redacted), timestamps, links.
-4. **Requested outcome** — what “done” looks like.
-5. **Next steps** — optional numbered asks for the assignee.
+```markdown
+## Overview
+<One or two sentences: what is wrong or requested, and the outcome wanted.>
 
-## Rules
+## Impact
+<Who/what is blocked — systems, users, customer-facing surface, urgency.>
 
-- No secrets, tokens, or full credential dumps.
-- Link related Jira/GitHub items when known; do not invent keys.
-- Keep operator-facing language brief.
+## Details
+<Facts, error text (redacted), timestamps, environments, reproduction,
+related ticket or change ids when known — never invent keys.>
+
+## Requested outcome
+<What “done” looks like for the assignee — testable, not vague “fixed”.>
+
+## Next steps
+1. <Optional numbered ask for the assignee>
+2. <...>
+```
+
+## Section rules
+
+- **Overview** — cold-reader brief; not a dump of chat history.
+- **Impact** — who/what is blocked and how urgent; do not inflate severity.
+- **Details** — evidence only. Redact tokens, passwords, session cookies, and
+  PII beyond what the desk already needs. Prefer key names over secret values.
+- **Requested outcome** — acceptance-style: observable result the requester
+  will verify.
+- **Next steps** — optional ordered list for the assignee; omit the section
+  when empty rather than writing “TBD”.
+
+## Type accents
+
+| Type | Extra under Details |
+| --- | --- |
+| Incident | When started, scope of blast, workaround if any |
+| Service request | Who needs it, by when, access/system named |
+| Problem | Suspected root cause themes; linked incident ids |
+| Change | Window, risk, rollback plan when known |
+
+## Links and cross-refs
+
+- Link related tracker issues, PRs, or runbooks when the user named them.
+- Do **not** invent issue keys, PR numbers, or ticket ids.
+- Neighbor product craft (other trackers, CI) is out of scope — cite the id
+  only; do not file elsewhere unless the user asked that surface too.
+
+## Anti-patterns
+
+- Merging all sections into one prose blob
+- Pasting full `.env`, stack traces with secrets, or access tokens
+- Marking severity/priority in the body that contradicts fields you set
+- Writing “see chat” as the entire description
