@@ -1,12 +1,95 @@
 ---
 description: >-
-  List nodes, VMs, storage, and pools via MCP. Never invent node names or VMIDs — list/resolve first.
+  Proxmox VE inventory via MCP: nodes, VMs/LXC, storage, pools, HA, firewall
+  rules, RRD, config/status. Never invent node names or VMIDs.
 alwaysApply: false
 ---
 
-# Proxmox Inventory
+# Proxmox inventory
 
-List nodes, VMs, storage, and pools via MCP. Never invent node names or VMIDs — list/resolve first.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks to list or inspect Proxmox nodes, VMs, LXC,
+storage, pools, HA resources, firewall rules, templates, backups,
+snapshots, guest IPs, task status, or capacity (RRD). Skip bare
+"hypervisor" with no Proxmox / VM / LXC ask. Load `proxmox-safety` when
+the turn also mutates (power, clone, migrate, delete, resize, network,
+backup restore).
+
+Never invent a node name, VMID, storage id, pool id, UPID, or snapshot
+name. Resolve from MCP listing this turn or from an id the user pasted.
+
+## Prefer MCP
+
+When a Proxmox MCP is ready, use these tools — do not invent a side CLI
+or raw API client while MCP works:
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| Who am I / ACL | `proxmox_whoami` | diagnose elevated-permission gaps |
+| Nodes | `proxmox_get_nodes` | cluster node list |
+| Node status | `proxmox_get_node_status` | `node` required |
+| Cluster status | `proxmox_get_cluster_status` | nodes + usage summary |
+| Guests | `proxmox_get_vms` | optional `node`, `type` (`qemu`/`lxc`) |
+| Guest status | `proxmox_get_vm_status` | `node`, `vmid`; optional `type` |
+| Guest config | `proxmox_get_vm_config` | cores/memory/disks/net/cloud-init |
+| Guest IPs | `proxmox_get_guest_ips` | QEMU guest agent; running agent required |
+| Next VMID | `proxmox_get_next_vmid` | before create/clone planning |
+| Storage | `proxmox_get_storage` | optional `node` |
+| Pools | `proxmox_get_pools` | optional `poolid` |
+| HA resources | `proxmox_get_ha_resources` | read-only |
+| Firewall rules | `proxmox_get_firewall_rules` | `level` cluster/node/guest |
+| RRD / capacity | `proxmox_get_rrd_data` | `node`, optional `vmid`/`type`/`timeframe` |
+| Templates | `proxmox_list_templates` | `node`, `storage` |
+| Snapshots list | `proxmox_list_snapshots_vm` / `proxmox_list_snapshots_lxc` | elevated |
+| Backups list | `proxmox_list_backups` | `node`, `storage`; elevated |
+| Task status | `proxmox_get_task_status` | `node`, `upid`; optional wait |
+| Terraform HCL | `proxmox_generate_terraform` | export existing guest; not a mutate |
+
+## Resolve guests
+
+1. Prefer exact `node` + `vmid` the user named.
+2. Else `proxmox_get_vms` (filter `node` / `type` when known) and match
+   by name or VMID.
+3. Confirm with `proxmox_get_vm_status` / `proxmox_get_vm_config` before
+   claiming running/stopped or hardware facts.
+4. If several guests match, list node + VMID + name + type + status and
+   ask once — do not pick prod by vibes.
+5. When a mutate tool later returns a UPID, track it with
+   `proxmox_get_task_status` instead of inventing completion.
+
+## Cluster and capacity
+
+- Start with `proxmox_get_nodes` / `proxmox_get_cluster_status` for fleet
+  overview.
+- Use `proxmox_get_storage` before discussing free space or backup
+  targets.
+- `proxmox_get_rrd_data` for CPU/memory/disk/net trends — say the
+  timeframe you used.
+- `proxmox_get_ha_resources` / `proxmox_get_firewall_rules` are
+  observability only here; changing HA or firewall is out of scope
+  unless a separate authorized path exists.
+
+## Honesty
+
+- Do **not** claim a guest is running/stopped without a fresh status
+  read this turn.
+- Distinguish QEMU vs LXC; tools are often type-specific.
+- "Elevated permissions" errors → call `proxmox_whoami` and report the
+  gap; do not invent credentials.
+
+## Report shape
+
+1. Node + VMID (+ name/type when known)
+2. Status (running/stopped/paused) or inventory table
+3. Storage / pool / HA finding when asked
+4. UPID + task result when following a prior mutate
+5. Next action (wait, gated op with explicit verb, or stop)
+
+## Out of scope
+
+- Guest OS package management and app deploys inside the VM
+- Site-specific sacred VM lists live in consuming repos — respect them
+  via `proxmox-safety`, do not invent deny-list IDs here
+- Power / clone / migrate / delete / resize / network / backup restore —
+  see `proxmox-safety`

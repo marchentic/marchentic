@@ -1,32 +1,97 @@
 ---
 description: >-
-  Destructive Proxmox gates — stop/shutdown/delete/migrate/resize need an
-  explicit verb naming the VMID. Read-only is the default.
+  Destructive Proxmox gates — power, clone, migrate, delete, resize,
+  network, snapshot/backup restore need an explicit verb naming the VMID.
+  Read-only is the default.
 alwaysApply: false
 ---
 
 # Proxmox safety
 
+## Gate
+
+Load on every Proxmox mutate turn (power, create/clone, migrate, delete,
+resize, disk/network changes, snapshot/backup create-restore-forget,
+cloud-init, convert-to-template, guest command). Skip pure inventory
+asks (`proxmox-inventory`).
+
+Never invent `node`, `vmid`, `newid`, storage, snapshot name, or backup
+volume. Resolve from MCP this turn or from ids the user pasted.
+
+## Prefer MCP (mutate)
+
+When a Proxmox MCP is ready, use these tools only behind an explicit
+verb — do not invent a side CLI while MCP works:
+
+| Need | Tools | Gate |
+| --- | --- | --- |
+| Power on | `proxmox_start_vm` / `proxmox_start_lxc` | explicit start |
+| Power off hard | `proxmox_stop_vm` / `proxmox_stop_lxc` | explicit stop |
+| Shutdown soft | `proxmox_shutdown_vm` / `proxmox_shutdown_lxc` | explicit shutdown |
+| Reboot | `proxmox_reboot_vm` / `proxmox_reboot_lxc` | explicit reboot |
+| Pause / resume | `proxmox_pause_vm` / `proxmox_resume_vm` | QEMU only; explicit |
+| Create | `proxmox_create_vm` / `proxmox_create_lxc` | explicit create + params |
+| Clone | `proxmox_clone_vm` / `proxmox_clone_lxc` | explicit clone + `newid` |
+| Migrate | `proxmox_migrate_vm` | explicit migrate + target node |
+| Delete guest | `proxmox_delete_vm` / `proxmox_delete_lxc` | explicit delete |
+| Resize CPU/mem | `proxmox_resize_vm` / `proxmox_resize_lxc` | explicit resize |
+| Disk add/resize/move/remove | `proxmox_add_disk_vm`, `proxmox_resize_disk_*`, `proxmox_move_disk_*`, `proxmox_remove_disk_vm`, `proxmox_add_mountpoint_lxc`, `proxmox_remove_mountpoint_lxc` | explicit disk verb |
+| Network add/update/remove | `proxmox_add_network_*`, `proxmox_update_network_*`, `proxmox_remove_network_*` | explicit net verb |
+| Snapshot create/rollback/delete | `proxmox_create_snapshot_*`, `proxmox_rollback_snapshot_*`, `proxmox_delete_snapshot_*` | explicit snap verb |
+| Backup create/restore/delete | `proxmox_create_backup_*`, `proxmox_restore_backup_*`, `proxmox_delete_backup` | explicit backup verb |
+| Cloud-init | `proxmox_set_cloudinit` | explicit cloud-init change |
+| Template convert | `proxmox_convert_to_template` | irreversible; explicit |
+| Guest shell | `proxmox_execute_vm_command` | explicit command + VMID |
+
+After mutates that return a UPID, prefer `proxmox_get_task_status`
+(`proxmox-inventory`) before claiming success.
+
 ## Read-only default
 
-List/get status/config/RRD are fine when Proxmox work is authorized. Do **not**:
+List/get status/config/RRD/pools/HA/firewall reads are fine when
+Proxmox work is authorized. Do **not**:
 
-- stop / shutdown / reboot / reset
+- stop / shutdown / reboot / reset / pause
 - delete VM or LXC
-- migrate / clone / resize disk
+- migrate / clone / create / convert-to-template
+- resize CPU, memory, or disks (especially shrink)
 - change cloud-init or network in a way that drops management access
+- restore from backup onto a live guest
+- run arbitrary guest commands
 
-…unless the user gave an explicit verb this turn naming the VMID (and node when
-required).
+…unless the user gave an explicit verb this turn naming the VMID (and
+node when required).
 
 ## Sacred / deny-list guests
 
-If the consuming repo defines sacred VMIDs or deny-lists (for example TrueNAS),
-**never** power-cycle, migrate, or delete those guests — even when a broad
-“fix Proxmox” ask is present. Say the deny reason and stop.
+If the consuming repo defines sacred VMIDs or deny-lists (for example
+storage appliances), **never** power-cycle, migrate, or delete those
+guests — even when a broad "fix Proxmox" ask is present. Say the deny
+reason and stop.
 
-## Irreversible
+## Irreversible / blast radius
 
-Disk shrink, delete, and restore-from-backup onto a live guest: state the risk
-and only proceed when clearly authorized (execute-first posture scope grill
-for irreversible loss).
+- Disk shrink, delete guest, restore-from-backup onto a live guest,
+  convert-to-template, and cascade-like disk remove: state the risk in
+  one sentence; proceed only when clearly authorized.
+- Prefer graceful `shutdown_*` over hard `stop_*` unless the user asked
+  for force/stop.
+- Network/cloud-init edits that can strand management access need the
+  user to name the interface/intent; do not invent bridges, VLANs, or
+  IPs.
+- `proxmox_execute_vm_command` is remote code execution on the guest —
+  only the command the user authorized; never dump secrets from output.
+
+## Report shape
+
+1. Node + VMID (+ type)
+2. Action taken (start/stop/clone/migrate/…)
+3. Task UPID + result when available
+4. Post-read status when cheap
+5. Stop — do not chain unrelated destructive ops
+
+## Refuse
+
+- Mass power-cycle / delete "all VMs" without each VMID in scope
+- Invented `newid`, target node, storage, or cloud-init passwords
+- Pasting guest passwords, API tokens, or private SSH keys into chat

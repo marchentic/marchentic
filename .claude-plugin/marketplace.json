@@ -8,7 +8,7 @@
   },
   "metadata": {
     "description": "Public portable agent plugins for Claude Code, Cursor, GitHub Copilot, and OpenAI Codex \u2014 posture, coding, planning, security, Atlassian, GitHub, diagrams, and optional service stacks. Pair with archentic/marketplace for the archentic framework plugin.",
-    "version": "0.12.30",
+    "version": "0.12.31",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -503,7 +503,7 @@
       "name": "nodadyoushutup-proxmox",
       "source": "./proxmox",
       "description": "Agnostic Proxmox VE craft: list nodes/VMs, status, and gated power/clone/migrate via MCP. Prefer Proxmox MCP; never invent VMID or touch sacred hosts.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"
@@ -678,7 +678,7 @@
       "name": "nodadyoushutup-yarr",
       "source": "./yarr",
       "description": "Agnostic *arr / Plex / qBittorrent / Seerr craft via the yarr MCP fleet: search, status, and gated mutations. Prefer yarr MCP; never invent instance ids.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "author": {
         "name": "nodadyoushutup",
         "email": "admin@nodadyoushutup.com"

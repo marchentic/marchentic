@@ -1,23 +1,27 @@
 # proxmox
 
-Agnostic Proxmox VE craft: list nodes/VMs, status, and gated power/clone/migrate via MCP. Prefer Proxmox MCP; never invent VMID or touch sacred hosts.
+Agnostic Proxmox VE craft: list nodes/VMs, status, and gated
+power/clone/migrate via MCP. Prefer Proxmox MCP; never invent VMID or
+touch sacred hosts.
 
 ## Rules (Cursor)
 
 | Rule | Purpose |
 | --- | --- |
-| `proxmox-inventory` | List nodes, VMs, storage, and pools via MCP |
-| `proxmox-safety` | Destructive Proxmox gates |
+| `proxmox-inventory` | MCP nodes/VMs/storage/pools/HA/RRD/status/config |
+| `proxmox-safety` | Gated power, clone, migrate, delete, resize, backup |
 
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
-| `proxmox` | Index / gate |
+| `proxmox` | Index / gate / procedure |
+| `proxmox-guest-ops` | Power / clone / migrate checklist |
 
 ## Commands
 
-- `/proxmox` → Proxmox inventory or gated VM ops
+- `/proxmox` → Inventory: nodes, VMs/LXC, storage, status
+- `/proxmox-guest` → Gated power, clone, or migrate
 
 ## Related capabilities
 
@@ -26,4 +30,4 @@ Agnostic Proxmox VE craft: list nodes/VMs, status, and gated power/clone/migrate
 
 ## Diagrams
 
-- [`docs/proxmox-workflow.drawio`](docs/proxmox-workflow.drawio) — gate → act → evidence
+- [`docs/proxmox-workflow.drawio`](docs/proxmox-workflow.drawio) — gate → route → inventory / guest-ops / refuse
