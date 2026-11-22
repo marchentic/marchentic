@@ -1,0 +1,74 @@
+---
+description: >-
+  Gated Home Assistant service calls and automation/script mutate via REST API.
+  Inventory-before-mutate; explicit verb required. No HA MCP discovered.
+alwaysApply: false
+---
+
+# Home Assistant services
+
+## Gate
+
+Load only when the user authorized Home Assistant **and** used an explicit
+mutate verb this turn (**turn on/off**, **call**, **set**, **unlock**,
+**disarm**, **delete**, **reload**, **restart**) naming the entity or
+object. Otherwise stay on `home-assistant-entities`. Always pair with
+`home-assistant-safety` before any service call.
+
+No Home Assistant MCP discovered — use REST/WebSocket API only. **Do not
+invent MCP tool names.**
+
+## Inventory before mutate
+
+1. Resolve `entity_id` from `GET /api/states` or user paste this turn
+   (`home-assistant-entities`).
+2. Prefer `GET /api/services` to confirm domain/service exists before calling.
+3. State planned domain/service + entity_id in one line; then call.
+
+## Live API mutate map
+
+| Action | Endpoint | Notes |
+| --- | --- | --- |
+| Call service | `POST /api/services/<domain>/<service>` | body: `{"entity_id": "...", ...}` |
+| Fire event | `POST /api/events/<event_type>` | only when user named the event |
+| Template render (read-ish) | `POST /api/template` | no secrets in templates echoed |
+
+Common domains (examples — resolve from `/api/services`, do not invent):
+
+- `homeassistant.turn_on` / `turn_off` / `toggle`
+- `light.turn_on` / `light.turn_off`
+- `switch.turn_on` / `switch.turn_off`
+- `climate.set_temperature`
+- `lock.unlock` / `lock.lock` — **high risk**
+- `alarm_control_panel.alarm_disarm` — **high risk**
+- `cover.open_cover` / `close_cover` — garage-shaped risk
+
+Automation / script hygiene (when API or UI exposes it):
+
+- Prefer disable/pause over delete when silence is enough
+- Delete automation/script only with explicit **delete** + object name
+- Restart / reload all YAML only when user explicitly asked
+
+## Defaults
+
+- Prefer the narrowest service targeting a single named `entity_id`.
+- Prefer `turn_off` / pause over restarting Home Assistant.
+- Never bulk-act across unrelated domains without listed entity_ids.
+- State which service + data fields you used in the receipt.
+
+## High-risk services
+
+Before unlock, disarm, garage open, or HVAC setpoint changes: restate the
+entity_id and effect; require the explicit verb this turn naming that entity.
+
+## Operator receipt (mutate)
+
+- domain.service
+- entity_id(s)
+- key data fields (no tokens)
+- resulting state from follow-up `GET /api/states/<entity_id>` when useful
+
+## Related (this plugin)
+
+- `home-assistant-entities` — list/get before mutate
+- `home-assistant-safety` — gates and token refuse

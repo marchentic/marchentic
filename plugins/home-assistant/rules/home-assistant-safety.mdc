@@ -1,23 +1,66 @@
 ---
 description: >-
-  Home Assistant mutate gates — destructive service calls, automation delete,
-  and restarts need an explicit verb naming the entity or object.
+  Home Assistant safety: read-only default, explicit service-call verbs,
+  high-risk unlock/disarm/garage gates, refuse access-token dumps.
 alwaysApply: false
 ---
 
 # Home Assistant safety
 
+## Gate
+
+Load on every authorized Home Assistant turn (inventory or mutate). Skip when
+the turn never touches Home Assistant.
+
 ## Read-only default
 
-List entities and states are fine when Home Assistant work is authorized.
-Do **not**:
+These are fine without an extra destructive verb when HA is authorized:
 
-- call services that unlock doors, disarm alarms, open garage, or control HVAC
-  setpoints without an explicit verb naming the entity
-- delete automations, scripts, or helpers
-- restart Home Assistant / reload all YAML unless asked
-- bulk-turn-off unrelated domains
+- `GET /api/`, `GET /api/config`
+- `GET /api/states`, `GET /api/states/<entity_id>`
+- `GET /api/services`
+- Area/device registry list reads
+- Automation/script inventory reads
 
-…unless the user gave an explicit verb this turn naming the object(s).
+Do **not** call services or delete automations unless the user gave an
+explicit verb **this turn** naming the entity or object.
 
-Never paste long-lived access tokens into chat. Prefer scoped service calls.
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn |
+| --- | --- |
+| Turn on/off / toggle | **on**/**off**/**toggle** + entity_id |
+| Climate setpoint | **set** + entity_id + temperature |
+| Unlock / open cover / garage | **unlock**/**open** + entity_id |
+| Disarm alarm | **disarm** + entity_id |
+| Delete automation/script/helper | **delete** + object name |
+| Restart / reload all YAML | **restart**/**reload** + scope |
+
+Ambiguous "turn everything off" → ask for entity_ids or area; do not
+bulk-act across unrelated domains.
+
+## High-risk surfaces
+
+Unlock doors, disarm alarms, open garage covers, and large HVAC changes can
+affect physical safety and security. Restate entity_id + effect before the
+service call. Prefer skill `home-assistant-service-call` for the checklist.
+
+## Refuse
+
+- Pasting long-lived access tokens or webhook secrets into chat
+- Inventing entity_ids
+- Absorbing non-HA IoT clouds into this surface
+- Restarting Home Assistant when a single service call suffices
+
+## Receipt examples (safe)
+
+Inventory turn: `light.kitchen` friendly Kitchen state `on` — no mutate.
+
+Service turn (authorized): called `light.turn_off` on `light.kitchen`;
+follow-up state `off` — no token.
+
+## Related (this plugin)
+
+- `home-assistant-entities` — discover-first list/get
+- `home-assistant-services` — service call map
+- Skills: `home-assistant-entity-audit`, `home-assistant-service-call`

@@ -1,14 +1,86 @@
 ---
 description: >-
-  List Home Assistant entities, states, areas, and devices. Never invent
-  entity_ids.
+  List Home Assistant entities, states, areas, devices, and automations via
+  REST/WebSocket API or UI. No Home Assistant MCP discovered — do not invent
+  tools. Never invent entity_ids.
 alwaysApply: false
 ---
 
 # Home Assistant entities
 
-List entities, states, areas, devices, and automations inventory. Prefer MCP
-when connected; else REST/WebSocket API or UI.
+## Gate
 
-Never invent `entity_id` values — list/resolve first. Report entity_id +
-friendly name + state — never paste access tokens.
+Use when the user authorized Home Assistant work and the turn needs **read**
+inventory: entities, states, areas, devices, or automation/script lists.
+Skip bare "smart home" talk without Home Assistant. Load
+`home-assistant-safety` on every HA turn; load `home-assistant-services`
+only when the user also authorized service calls or automation mutate.
+Out of scope: vendor mobile apps and non-HA IoT clouds.
+
+## Transport
+
+No Home Assistant MCP was discovered for this harness. Prefer the HA
+REST API (`/api/...`) or WebSocket API with a long-lived access token from
+operator config/env — **never paste the token into chat**. If an HA MCP
+appears later, use its list/get tools when ready — **do not invent MCP tool
+names**. UI is fine for confirm-only reads when API access is unavailable.
+
+## Resolve instance first
+
+1. Prefer an exact base URL the user named this turn.
+2. Else use operator config/env (`HASS_URL`, `HOMEASSISTANT_URL`, or
+   documented local URL) — never hardcode a host.
+3. Confirm reachability with a cheap read (`GET /api/` or
+   `GET /api/config`) before claiming inventory.
+4. Fail closed on auth errors — do not invent alternate tokens.
+
+## Live API read map
+
+| Need | Endpoint / approach |
+| --- | --- |
+| Instance config | `GET /api/config` |
+| All states | `GET /api/states` (cap / filter in report) |
+| One entity | `GET /api/states/<entity_id>` |
+| Services catalog | `GET /api/services` |
+| Areas / devices | WebSocket `config/area_registry/list`, `config/device_registry/list` when available; else UI |
+| Automations list | entities with `automation.` domain from states, or UI |
+
+Use `Authorization: Bearer <token>` from env — never echo the token.
+
+## Discover first
+
+1. Never invent `entity_id` values — list/resolve this turn or take exact
+   paste (`light.`, `switch.`, `sensor.`, `binary_sensor.`, `climate.`, …).
+2. Before acting on an entity, prove it appears in states (same turn).
+3. Prefer area/device filters when the user named a room or device.
+4. Cap large state dumps; summarize by domain counts when huge.
+
+## Procedure (read paths)
+
+1. **Scope** — states vs one entity vs areas/devices vs automations.
+   **Done when** one read surface is named.
+2. **Connect** — resolve base URL; cheap `/api/` or `/api/config` check.
+   **Done when** instance identity is evidence-backed, or auth failed cleanly.
+3. **List** — states / registry with filters.
+   **Done when** rows come from API/UI, not guesses.
+4. **Report** — entity_id + friendly name + state. No tokens.
+   **Done when** receipt is evidence-backed.
+
+## Report shape
+
+- **entity_id** — canonical id
+- **friendly_name** — when present in attributes
+- **state** — current state string
+- **domain** — prefix before `.`
+
+## Out of scope
+
+- Service calls, automation delete, restarts → `home-assistant-services` +
+  `home-assistant-safety`
+- Pasting long-lived access tokens
+- Non-HA IoT platforms
+
+## Related (this plugin)
+
+- `home-assistant-services` — gated service calls and automation mutate
+- `home-assistant-safety` — destructive gates, token refuse
