@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/github-banner.png" alt="marchentic" width="100%">
+  <img src="docs/assets/github-banner-v2.png" alt="marchentic" width="100%">
 </p>
 
 Agent plugins for [Claude Code](https://docs.anthropic.com/en/docs/claude-code),
