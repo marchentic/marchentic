@@ -352,7 +352,7 @@
     {
       "name": "nodadyoushutup-velero",
       "description": "Agnostic Velero craft: list backups/schedules/restores and gated create/delete via MCP. Prefer Velero MCP; restores are irreversible without explicit ask.",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "source": {
         "source": "local",
         "path": "./plugins/velero"
@@ -591,7 +591,7 @@
     },
     {
       "name": "nodadyoushutup-zot",
-      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor \u2014 install what you run.",
+      "description": "Agnostic Zot OCI registry craft: repository/tag inventory and gated delete/GC. Prefer MCP when connected; otherwise zot API/UI. Sibling to harbor — install what you run.",
       "version": "0.11.0",
       "source": {
         "source": "local",
@@ -606,7 +606,7 @@
     },
     {
       "name": "nodadyoushutup-harbor",
-      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot \u2014 install what you run.",
+      "description": "Agnostic Harbor registry craft: projects/repos/artifacts inventory and gated delete/retention/robot changes. Prefer MCP when connected; otherwise API/UI. Sibling to zot — install what you run.",
       "version": "0.11.0",
       "source": {
         "source": "local",

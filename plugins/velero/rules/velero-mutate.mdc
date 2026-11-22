@@ -1,0 +1,86 @@
+---
+description: >-
+  Gated Velero mutate via MCP: create/delete backup, restore, schedule.
+  Inventory-before-mutate; confirm=true on destructive tools; defaults from MCP.
+alwaysApply: false
+---
+
+# Velero mutate
+
+## Gate
+
+Load only when the user authorized Velero **and** used an explicit mutate
+verb this turn (**create**, **delete**, **restore**, **schedule**) naming
+the object or scope. Otherwise stay on `velero-inventory`. Always pair with
+`velero-safety` before any tool call.
+
+Prefer namespace `user-mcp_velero`. Never invent tool names or CR names.
+
+## Inventory before mutate
+
+1. List matching backups/restores/schedules **this turn** (`velero-inventory`).
+2. Resolve every `name`, `backup_name`, and namespace filter from MCP or
+   user paste — never guess.
+3. For restore: `velero_backup_get` and prefer **phase=Completed** evidence.
+4. State planned action + namespaces in one line; then call the mutate tool.
+
+## Live mutate tool map
+
+| Action | Tool | Required / default args |
+| --- | --- | --- |
+| Create backup | `velero_backup_create` | `name`; `included_namespaces`; `storage_location` default `default`; `ttl` default `336h0m0s`; `snapshot_move_data` default `true` |
+| Delete backup | `velero_backup_delete` | `name`; **`confirm=true`** |
+| Create restore | `velero_restore_create` | `name`; `backup_name`; **`confirm=true`**; optional `included_namespaces`, `namespace_mapping` |
+| Delete restore | `velero_restore_delete` | `name`; **`confirm=true`** |
+| Create schedule | `velero_schedule_create` | `name`; `cron`; `included_namespaces`; **`confirm=true`**; optional `storage_location`, `ttl`, `snapshot_move_data` |
+| Delete schedule | `velero_schedule_delete` | `name`; **`confirm=true`** |
+
+Do not omit `confirm=true` on delete, restore create, or schedule create when
+the tool schema requires it.
+
+## Defaults (from MCP)
+
+- Backup TTL: `336h0m0s` unless the user set another retention window.
+- `storage_location`: `default` unless the user named a BSL.
+- `snapshot_move_data`: `true` unless the user asked for volume-only or
+  filesystem-only semantics explicitly.
+
+State which defaults you relied on in the receipt.
+
+## Restore warning
+
+Restores are **destructive / overwrite-shaped**: live objects in target
+namespaces can be replaced. Before `velero_restore_create`:
+
+1. Warn cluster/namespace impact in plain language.
+2. Prove backup exists and prefer **Completed** phase.
+3. Confirm `included_namespaces` / `namespace_mapping` with the user when
+   ambiguous — mapping errors can land data in the wrong namespace.
+
+After create: `velero_restore_get` on the new restore name for phase.
+
+## Schedule create note
+
+Ad-hoc schedules created only via MCP may be **pruned** by GitOps reconcile
+when the schedule is not tracked in the desired-state repo. Say so when the
+user asked for a durable schedule — GitOps is the long-lived path.
+
+## Delete discipline
+
+- Backup delete: explicit **delete** verb + backup name + `confirm=true`.
+- Restore delete: explicit verb + restore name (in-progress cancel shape).
+- Schedule delete: explicit verb + schedule name.
+
+## Operator receipt (mutate)
+
+- action (create/delete/restore/schedule)
+- object name(s)
+- backup_name (for restore)
+- namespaces / mapping summary
+- phase after get (when applicable)
+- no credentials or BSL secret material
+
+## Related (this plugin)
+
+- `velero-inventory` — list/get before mutate
+- `velero-safety` — gates, confirm policy, refuse credential edits

@@ -1,25 +1,77 @@
 ---
 description: >-
-  Velero mutate gates — create restore / delete backup need an explicit verb
-  naming the object. Restores are data-loss shaped.
+  Velero safety: read-only default, explicit mutate verbs, confirm=true on
+  destructive MCP tools, restore overwrite risk, BSL credential refuse.
 alwaysApply: false
 ---
 
 # Velero safety
 
+## Gate
+
+Load on every authorized Velero turn (inventory or mutate). Skip when the
+turn never touches Velero or the Velero MCP.
+
 ## Read-only default
 
-List backups, schedules, restores, BSL, and status summaries are fine when
-Velero work is authorized. Do **not**:
+These are fine without an extra destructive verb when Velero is authorized:
 
-- create a restore
-- delete a backup or schedule
-- change BSL credentials
+- `velero_backups_list`, `velero_backup_get`
+- `velero_restores_list`, `velero_restore_get`
+- `velero_schedules_list`, `velero_schedule_get`
+- `velero_bsls_list`, `velero_datauploads_list`
+- `velero_status_summary`
 
-…unless the user gave an explicit verb this turn naming the object.
+Do **not** run mutate tools unless the user gave an explicit verb **this
+turn** naming the target object or scope.
+
+## Mutate gates (explicit verb required)
+
+| Risk | Needs this turn | MCP confirm |
+| --- | --- | --- |
+| Delete backup | **delete** + backup name | `velero_backup_delete` + `confirm=true` |
+| Delete restore | **delete** + restore name | `velero_restore_delete` + `confirm=true` |
+| Create restore | **restore** + backup name (restore CR name if given) | `velero_restore_create` + `confirm=true` |
+| Delete schedule | **delete** + schedule name | `velero_schedule_delete` + `confirm=true` |
+| Create schedule | **schedule** / **create** + name + cron + namespaces | `velero_schedule_create` + `confirm=true` |
+| Create backup | **backup** / **create** + name + namespaces | `velero_backup_create` |
+
+Ambiguous scope (e.g. "clean up old backups") → ask once for names/retention;
+do not mass-delete without listed targets.
 
 ## Restore risk
 
-Before restore: state target cluster/namespace impact and that restore can
-overwrite live objects. Prefer inventory evidence (backup phase=Completed)
-first. Irreversible restore → scope grill when ambiguous.
+Restores can **overwrite live Kubernetes objects** in target namespaces.
+
+1. Prefer inventory proof: backup **phase=Completed** from `velero_backup_get`.
+2. State namespace impact and overwrite risk before `confirm=true`.
+3. Use skill `velero-restore-run` for the full checklist when the user asked
+   to run a restore.
+
+Irreversible or production-shaped restore → narrow namespaces; confirm mapping.
+
+## confirm=true policy
+
+Never call `velero_backup_delete`, `velero_restore_delete`,
+`velero_restore_create`, or `velero_schedule_delete` /
+`velero_schedule_create` without `confirm=true` when the tool requires it.
+Do not "dry run" mutate tools — inventory tools are the dry-run path.
+
+## Refuse
+
+- Pasting BSL credentials, cloud keys, or secret refs into chat
+- Inventing BSL or credential changes — GitOps/cluster config owns BSL YAML
+- Inventing backup, restore, or schedule names
+- Cluster API triage or GitOps sync as a substitute for Velero MCP craft
+- Non-Velero backup products absorbed into this surface
+
+## Schedule / GitOps
+
+Schedules created only through MCP may disappear when GitOps prunes untracked
+resources. Warn when the user expects a persistent schedule.
+
+## Related (this plugin)
+
+- `velero-inventory` — discover-first list/get
+- `velero-mutate` — tool args and mutate sequence
+- Skills: `velero-status-check`, `velero-restore-run`

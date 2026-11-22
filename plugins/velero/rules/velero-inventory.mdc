@@ -1,12 +1,98 @@
 ---
 description: >-
-  List backups, schedules, restores, and BSL status via MCP. Never invent backup names.
+  List Velero backups, restores, schedules, BSLs, data uploads, and status
+  via MCP. Discover-first; never invent backup, schedule, or restore names.
 alwaysApply: false
 ---
 
-# Velero Inventory
+# Velero inventory
 
-List backups, schedules, restores, and BSL status via MCP. Never invent backup names.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user authorized Velero work and the turn needs **read**
+inventory: backups, restores, schedules, backup storage locations (BSL),
+data uploads, or a health summary. Skip bare cluster backup talk without
+Velero. Load `velero-safety` on every Velero turn; load `velero-mutate` only
+when the user also authorized create/delete. Out of scope here: gated
+mutate steps → `velero-mutate`; refuse / confirm policy → `velero-safety`.
+Cluster API triage and GitOps sync are out of scope for this plugin.
+
+## Prefer MCP
+
+Namespace: `user-mcp_velero`. Do not invent tool names or Velero CR names.
+List/resolve this turn before referencing a backup, restore, or schedule.
+
+## Live read tool map
+
+| Need | Tool | Filters / args |
+| --- | --- | --- |
+| List backups | `velero_backups_list` | optional `phase`, `schedule` |
+| One backup | `velero_backup_get` | backup `name` from list/get |
+| List restores | `velero_restores_list` | optional `phase` |
+| One restore | `velero_restore_get` | restore `name` |
+| List schedules | `velero_schedules_list` | — |
+| One schedule | `velero_schedule_get` | schedule `name` |
+| BSL inventory | `velero_bsls_list` | **read-only** — GitOps owns BSL YAML |
+| CSI data uploads | `velero_datauploads_list` | optional `backup_name` |
+| Fleet summary | `velero_status_summary` | start here for health/status |
+
+Phase filters (when the tool supports them): narrow failed/in-progress
+lists before paging through everything.
+
+## Discover first
+
+1. Never invent `backup`, `schedule`, or `restore` names — resolve from
+   `velero_backups_list`, `velero_schedules_list`, or `velero_restores_list`
+   this turn, or from exact names the user pasted.
+2. Before `velero_backup_get` / `velero_restore_get` / `velero_schedule_get`,
+   prove the name exists in the matching list (same turn).
+3. For schedule-scoped backup questions, list with `schedule` filter or
+   correlate schedule names from `velero_schedules_list` with backup labels.
+4. For upload troubleshoot, scope `velero_datauploads_list` with
+   `backup_name` when the backup is already resolved.
+
+## Procedure (read paths)
+
+1. **Scope** — backups vs restores vs schedules vs BSL vs uploads vs
+   summary. **Done when** one read surface is named.
+2. **List** — run the list tool with tight filters (`phase`, `schedule`,
+   `backup_name`). **Done when** rows come from MCP, not guesses.
+3. **Detail** — optional get tools on resolved names only.
+   **Done when** each get uses a name from step 2 or user paste.
+4. **Report** — short table or bullets (see shape below). No secret dumps.
+   **Done when** receipt is evidence-backed.
+
+## Report shape
+
+For each object in focus:
+
+- **name** — Velero CR name
+- **phase** — status phase from MCP (e.g. Completed, Failed, InProgress)
+- **namespaces** — included or affected namespaces when present in payload
+
+For summaries (`velero_status_summary`):
+
+- headline counts / failed items
+- point to named backups/schedules worth a follow-up get
+
+## BSL / GitOps note
+
+`velero_bsls_list` is **inventory only**. Backup storage location YAML
+and credentials live in GitOps or cluster config — do not treat MCP BSL
+list as a mutate surface. Refuse ad-hoc credential or BSL edits here;
+route mutate asks to `velero-mutate` only when the user named create/delete
+of backups/schedules/restores.
+
+## Out of scope
+
+- Creating or deleting backups, restores, schedules → `velero-mutate` +
+  `velero-safety`
+- Changing BSL secrets or storage provider config
+- Non-Velero backup products
+- Generic workload debugging via cluster API (pods/events) without a Velero
+  inventory ask
+
+## Related (this plugin)
+
+- `velero-mutate` — gated create/delete via MCP
+- `velero-safety` — confirm gates, restore risk, read-only default
