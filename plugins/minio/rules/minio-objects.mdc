@@ -1,12 +1,104 @@
 ---
 description: >-
-  List buckets/objects, read metadata, and upload/download via MCP after resolving names.
+  MinIO / S3-compatible object craft via MCP: list contents, metadata, tags,
+  versions, upload/download/copy, ask, text write, and presigned URLs. Never
+  invent bucket or object keys.
 alwaysApply: false
 ---
 
-# Minio Objects
+# MinIO objects
 
-List buckets/objects, read metadata, and upload/download via MCP after resolving names.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Use when the user asks to list objects, read metadata/tags/versions,
+upload/download/copy, ask about an object, write text into an object, or
+mint a short-lived presigned URL on a MinIO MCP surface. Skip bare "S3"
+for another store. Always load `minio-safety` with this rule.
+
+Never invent a bucket name or object key. Resolve from MCP listing this
+turn or from names the user pasted.
+
+## Prefer MCP (dual namespaces)
+
+Same tool surface on both live MinIO MCPs. Pick **one** per turn:
+
+| User signal | Prefer namespace |
+| --- | --- |
+| swarm / fleet / primary | `user-mcp_minio_swarm` |
+| backup / DR / secondary | `user-mcp_minio_backup` |
+| ambiguous | ask once, or use the only ready namespace |
+
+Do not invent a side CLI while MCP works.
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List objects | `list_bucket_contents` | `bucket_name`; optional `prefix`, `recursive`, `with_metadata`, `with_versions` |
+| Object metadata | `get_object_metadata` | `bucket_name` + `object_name` |
+| Object tags (read) | `get_object_tags` | |
+| Object tags (write) | `set_object_tags` | `tags` JSON string; optional `version_id` |
+| Object versions | `get_object_versions` | after versioning is on |
+| Ask about object | `ask_object` | `question` about a resolved object |
+| Download | `download_object` | `file_path` local; optional `version_id` |
+| Upload | `upload_object` | `file_path` + `object_name`; overwrite-gated |
+| Text → object | `text_to_object` | optional `content_type` (default text/plain) |
+| Copy | `copy_object` | src/dst bucket + object; optional `version_id` |
+| Presigned URL | `get_object_presigned_url` | `expires` seconds (tool often requires it) |
+| Allowed local dirs | `list_allowed_directories` | before upload/download paths |
+| Local files | `list_local_files` | under an allowed path |
+
+## Discover first
+
+1. Resolve bucket (`list_buckets` or user-pasted name) on the chosen MCP.
+2. `list_bucket_contents` with a tight `prefix` when the keyspace is large;
+   set `recursive` only when needed.
+
+## Prefix pagination
+
+1. Start with a narrow prefix the user named; widen one segment at a time.
+2. Use `with_metadata` when size or headers matter; avoid recursive listing
+   on huge buckets until a prefix is justified.
+3. When the tool returns a truncated page, say so and offer the next prefix
+   — do not assume an empty bucket from a partial page.
+3. Prefer `with_versions` / `get_object_versions` when the ask is about
+   history or a specific version.
+4. If several keys match a fuzzy ask, list candidates and ask once.
+
+## Read paths
+
+1. Metadata / tags / versions: call the matching get tool on a resolved
+   bucket + key.
+2. `ask_object`: use for grounded Q&A about object content the MCP can
+   read — still redact secrets in the chat reply (`minio-safety`).
+3. Presigned URL: pass an explicit `expires` (seconds). Report expiry and
+   that the URL is time-limited — do not treat it as a long-lived
+   credential dump to paste broadly.
+
+## Transfer paths (upload / download / copy / text)
+
+1. Before local paths: `list_allowed_directories`, then `list_local_files`
+   when the file name is unclear.
+2. Download: `download_object` to an allowed `file_path`; optional
+   `version_id` from a prior versions list.
+3. Upload: `upload_object` with resolved bucket + `object_name` +
+   `file_path`. Overwriting an existing key needs an explicit verb
+   (`minio-safety`).
+4. Text write: `text_to_object` — same overwrite gate; prefer
+   `content_type` when not plain text.
+5. Copy: resolve both src and dst bucket/key; optional `version_id` on
+   source. Cross-MCP copy is out of scope unless the user named both
+   endpoints and both MCPs are ready — prefer same-namespace copy.
+
+## Report shape
+
+- MCP namespace used
+- Bucket + object key (+ version id when used)
+- Action (list / get / upload / download / copy / ask / presign)
+- Short finding (size, last-modified, tag keys, local path) — no access
+  keys, no secret object bodies
+
+## Out of scope
+
+- Bucket create / lifecycle / replication / admin — see `minio-buckets`
+- Delete / public ACL / credential paste — see `minio-safety`
+- Inventing delete tools that are not on the live MCP
+

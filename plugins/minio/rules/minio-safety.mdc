@@ -1,12 +1,99 @@
 ---
 description: >-
-  Delete bucket/object and public ACL changes need an explicit verb. Never paste access keys into chat.
+  MinIO delete / overwrite / public-ACL gates and credential refuse. Pick
+  swarm vs backup MCP honestly; never paste access keys into chat.
 alwaysApply: false
 ---
 
-# Minio Safety
+# MinIO safety
 
-Delete bucket/object and public ACL changes need an explicit verb. Never paste access keys into chat.
+## Gate
 
-Prefer the connected MCP for this product. Never invent
-ids — list/resolve first.
+Load on every MinIO bucket/object turn. Skip only when the turn never
+touches a MinIO MCP or object-store paths.
+
+## Dual MCP honesty
+
+| Signal | Namespace |
+| --- | --- |
+| swarm / primary fleet | `user-mcp_minio_swarm` |
+| backup / DR | `user-mcp_minio_backup` |
+
+If both are ready and the ask does not name which store, **ask once** —
+do not write to backup thinking it is swarm (or the reverse). State the
+namespace used in every mutate receipt.
+
+When only one namespace is connected, use it and say which store was
+unavailable — do not failover silently to a different MCP mid-mutate.
+
+## Refuse secrets
+
+Do **not** paste into chat:
+
+- Access keys, secret keys, session tokens, or connection strings
+- Private object bodies that are credentials, `.env`, or key material
+- Long-lived URLs that embed credentials
+
+Prefer: bucket/key names, tag **keys**, sizes, version ids, short
+presigned expiry notes, and "key is set" language.
+
+When `ask_object` or a download surfaces secret-looking content, summarize
+or redact (`[REDACTED]`) — do not dump the body "for completeness."
+
+## Delete gates
+
+Live MinIO MCP tool maps observed for craft **do not** ship
+`delete_object` / `remove_bucket` tools. Do **not** invent delete tool
+names.
+
+If a delete path appears later on the live MCP, or the user brings an
+authorized non-MCP path:
+
+1. Require an explicit destructive verb this turn (**delete** / **remove**
+   / **destroy**) naming the bucket and/or object key.
+2. Prefer object-level delete over bucket wipe when that answers the ask.
+3. Confirm namespace + bucket + key in the receipt — no credentials.
+4. Ambiguous mass-delete → ask once to scope before acting.
+
+Without an explicit delete verb: stay on inventory / read / gated write.
+
+## Overwrite / create gates
+
+These need an explicit verb naming the target:
+
+| Action | Tools (live map) | Gate |
+| --- | --- | --- |
+| Create bucket | `create_bucket` | explicit create |
+| Upload / replace object | `upload_object`, `text_to_object` | explicit upload/write; overwrite if key exists |
+| Copy onto existing key | `copy_object` | explicit copy; warn if dst exists |
+| Set versioning | `set_bucket_versioning` | explicit enable/disable |
+| Set tags | `set_bucket_tags`, `set_object_tags` | explicit tag change |
+
+List / get / download / ask / presign / admin / usage stay read-oriented
+once the surface is authorized — still never dump secrets.
+
+## Public ACL / exposure
+
+Do not invent public-ACL or anonymous-policy tools. If the user asks to
+make a bucket/object public:
+
+1. Require an explicit public / anonymous / world-readable verb.
+2. Prefer short-lived `get_object_presigned_url` with bounded `expires`
+   when that satisfies sharing.
+3. Stop and say the live MCP has no ACL write tool rather than guessing
+   a CLI flag set.
+
+## Operator receipt (mutate)
+
+Safe shape:
+
+- MCP namespace (`user-mcp_minio_swarm` or `user-mcp_minio_backup`)
+- Bucket (+ object key / version when relevant)
+- Action taken
+- "No access keys shown"
+
+## Related (this plugin)
+
+- `minio-buckets` — bucket inventory and config
+- `minio-objects` — object read / transfer craft
+

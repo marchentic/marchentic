@@ -1,0 +1,111 @@
+---
+description: >-
+  MinIO / S3-compatible bucket inventory and config via MCP: list, create,
+  tags, versioning, lifecycle, replication, admin and usage. Never invent
+  bucket names; pick swarm vs backup MCP from the ask.
+alwaysApply: false
+---
+
+# MinIO buckets
+
+## Gate
+
+Use when the user asks to list or create buckets, inspect bucket tags /
+versioning / lifecycle / replication, or read cluster admin / data-usage
+info on a MinIO (or S3-compatible MinIO MCP) surface. Skip bare "S3" for
+another object store. Always load `minio-safety` with this rule.
+
+Never invent a bucket name. Resolve from MCP listing this turn or from a
+name the user pasted.
+
+## Prefer MCP (dual namespaces)
+
+Live MinIO MCPs share the same tool surface. Pick **one** namespace per
+turn from the ask — do not invent which cluster:
+
+| User signal | Prefer namespace |
+| --- | --- |
+| swarm / fleet / primary object store | `user-mcp_minio_swarm` |
+| backup / DR / secondary store | `user-mcp_minio_backup` |
+| unnamed / ambiguous | ask once, or list on the only ready namespace |
+
+Do not invent a side CLI or raw HTTP client while the chosen MCP works.
+
+| Need | Tool | Notes |
+| --- | --- | --- |
+| List buckets | `list_buckets` | start here for inventory |
+| Create bucket | `create_bucket` | explicit create verb; `bucket_name` |
+| Bucket tags (read) | `get_bucket_tags` | resolved `bucket_name` |
+| Bucket tags (write) | `set_bucket_tags` | `tags` as JSON string |
+| Versioning (read) | `get_bucket_versioning` | status / config |
+| Versioning (write) | `set_bucket_versioning` | `enabled` bool — gated |
+| Lifecycle | `get_bucket_lifecycle` | read-only on this MCP |
+| Replication | `get_bucket_replication` | read-only on this MCP |
+| Cluster admin | `get_admin_info` | no args |
+| Data usage | `get_data_usage_info` | no args |
+
+## Discover first
+
+1. Prefer the exact bucket name the user named.
+2. Else `list_buckets` on the chosen MCP; match by substring only when
+   unique.
+3. If several buckets match, list names and ask once — never pick a
+   production bucket by guess.
+4. Confirm which MCP (swarm vs backup) in the receipt when both could
+   apply.
+
+## Create bucket
+
+1. Requires an explicit create / new-bucket verb this turn.
+2. Call `create_bucket` with the exact `bucket_name` the user authorized.
+3. Receipt: MCP namespace + bucket name. No access keys.
+
+## Tags and versioning
+
+1. Read with `get_bucket_tags` / `get_bucket_versioning` before changing.
+2. `set_bucket_tags`: pass `tags` as a JSON string; summarize key names in
+   the reply, not secret-looking values.
+3. `set_bucket_versioning`: needs an explicit enable/disable verb; state
+   prior status from `get_bucket_versioning` in the receipt.
+4. Lifecycle / replication tools are **read** on the live MCP — do not
+   invent write tools for them.
+
+## Admin / usage
+
+1. `get_admin_info` and `get_data_usage_info` for cluster-level summaries.
+2. Report high-level counts / capacity shape — not credentials, tokens, or
+   internal host dumps beyond what the ask needs.
+3. Pair with `list_buckets` when the ask is "what is on the store?"
+
+## Swarm vs backup inventory
+
+When the user names both stores or asks "primary vs backup":
+
+1. Run the same discover pass on each ready namespace separately.
+2. Report bucket counts and notable names per namespace — do not merge lists
+   without labeling which MCP they came from.
+3. Prefer read-only passes; cross-store bucket create is two explicit verbs.
+
+## Lifecycle / replication (read-only)
+
+1. `get_bucket_lifecycle` and `get_bucket_replication` describe policy — no
+   write tools on the live MCP map.
+2. Summarize presence (configured vs empty) and rule counts — not full policy
+   JSON dumps with secret ARNs unless the user asked for that bucket only.
+3. Point gated deletes and object work to sibling rules — do not invent
+   lifecycle PUT APIs.
+
+## Report shape
+
+- MCP namespace used (`user-mcp_minio_swarm` or `user-mcp_minio_backup`)
+- Bucket name(s) + action (list / create / tags / versioning / usage)
+- Short finding (counts, versioning on/off, tag keys)
+- Explicit note that access keys were not shown
+
+## Out of scope
+
+- Object upload / download / copy / ask — see `minio-objects`
+- Delete / public ACL / overwrite gates — see `minio-safety`
+- Non-MinIO cloud object APIs without a ready MinIO MCP
+- Site-specific bucket maps — resolve from MCP, never invent
+
